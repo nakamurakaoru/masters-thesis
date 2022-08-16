@@ -73,9 +73,13 @@ Proof.
   by apply GRing.mulf_neq0.
 Qed.
 
+(* main *)
+
+(* q-differential *)
 Definition dq (f : R -> R) x := f (q * x) - f x.
 (* dq : (R -> R) -> R -> R であるが, dq : (R => R) -> (R -> R) の方がよいか？ *)
 
+(* q-differential product rule *)
 Lemma dq_prod f g x :
   dq (f ** g) x = (f (q * x)) * dq g x + (g x) * dq f x.
 Proof.
@@ -86,9 +90,11 @@ Proof.
   by rewrite GRing.subrKA.
 Qed.
 
+(* q-derivative *)
 Definition Dq f x := (dq f x) / (dq (fun x => x) x).
 (* dq と同様 *)
 
+(* q-derivative is linear *)
 Lemma Dq_is_linear f g a b x :
   x != 0 -> Dq ((a */ f) +/ (b */ g)) x = a * (Dq f x) + b * (Dq g x).
 Proof.
@@ -107,8 +113,16 @@ Proof.
   by apply denom_is_nonzero.
 Qed.
 
+(* q-analogue of natural number *)
 Definition qnat n : R := (q ^ n - 1) / (q - 1).
 
+(*Lemma lim_qnat n :
+  forall e : R, e > 0 -> exists d, `|q - 1| < d -> `|n - (qnat n)| < e.
+Proof.
+
+Qed.*)
+
+(* q-derivative of x ^ n *)
 Lemma qderiv_of_pow n x :
   x != 0 -> Dq (fun x => x ^ n) x = qnat n * x ^ (n - 1).
 Proof.
@@ -133,6 +147,7 @@ Proof.
   by apply GRing.mulf_neq0.
 Qed.
 
+(* q-derivative product rule *)
 Lemma qderiv_prod f g x :
   x != 0 -> Dq (f ** g) x = f (q * x) * Dq g x + (g x) * Dq f x.
 Proof.
@@ -142,6 +157,7 @@ Proof.
   by apply denom_is_nonzero.
 Qed.
 
+(* q-derivative product rule' *)
 Lemma qderiv_prod' f g x :
   x != 0 ->  Dq (f ** g) x = (f x) * Dq g x + g (q * x) * Dq f x.
 Proof.
@@ -149,6 +165,7 @@ Proof.
   by rewrite mulfC qderiv_prod // GRing.addrC.
 Qed.
 
+(* reduce fraction in q-derivative *)
 Lemma qderiv_divff f g x : g x != 0 -> g (q * x) != 0 ->
   Dq (g ** (f // g)) x = Dq f x.
 Proof.
@@ -161,6 +178,7 @@ Proof.
   by rewrite !GRing.mul1r.
 Qed.
 
+(* q-derivative quotient rule *)
 Lemma qderiv_quot f g x : x != 0 -> g x != 0 -> g (q * x) != 0 ->
   Dq (f // g) x = (g x * Dq f x - f x * Dq g x) / (g x * g (q * x)).
 Proof.
@@ -186,6 +204,7 @@ Proof.
   by apply GRing.mulf_neq0.
 Qed.
 
+(* q-derivative quotient rule' *)
 Lemma qderiv_quot' f g x : x != 0 -> g x != 0 -> g (q * x) != 0 ->
   Dq (f // g) x =
     (g (q * x) * Dq f x - f (q * x) * Dq g x) / (g x * g (q * x)).
@@ -213,14 +232,15 @@ Proof.
   by apply GRing.mulf_neq0.
 Qed.
 
+(* q-analogue of polynomial for nat *)
 Fixpoint qpoly_nonneg a n x :=
   match n with
   | 0 => 1
   | n.+1 => (qpoly_nonneg a n x) * (x - q ^ n * a)
   end.
 
-(*Lemma prod_qpoly_nonneg x a n :
-  qpoly_nonneg x a n.+1 = \prod_(0 <= i < n.+1) (x -  q ^ i * a).
+(*Lemma prod_qpoly_nonneg a n x :
+  qpoly_nonneg a n.+1 x = \prod_(0 <= i < n.+1) (x -  q ^ i * a).
 Proof.
   elim: n => [/=|n IH].
   - by rewrite big_nat1 GRing.mul1r.
@@ -228,7 +248,8 @@ Proof.
     by rewrite big_nat1 -IH.
 Qed.*)
 
-Theorem qderiv_poly x a n :
+(* q-derivative of q-polynomial for nat *)
+Theorem qderiv_poly a n x :
   x != 0 -> Dq (qpoly_nonneg a n.+1) x = qnat n.+1 * qpoly_nonneg a n x.
 Proof.
   move=> Hx.
@@ -267,19 +288,25 @@ Proof.
     by apply denom_is_nonzero.
 Qed.
 
+(* q-polynomial exponential law for nat *)
 Lemma qpoly_nonneg_explaw x a m n :
-  qpoly_nonneg a (m.+1 + n.+1) x = qpoly_nonneg a m.+1 x * qpoly_nonneg (q ^ m.+1 * a) n.+1 x.
+  qpoly_nonneg a (m + n) x =
+    qpoly_nonneg a m x * qpoly_nonneg (q ^ m * a) n x.
 Proof.
-  elim: n => [|n IH].
-  - by rewrite addSn addn1 /= expr0z !GRing.mul1r.
-  - rewrite addnS (lock (m.+1)) [LHS]/= -(lock (m.+1)) IH /=.
-    rewrite [q ^ n.+1 * (q ^ m.+1 * a)] GRing.mulrA.
-    rewrite [q ^ n.+1 * q ^ m.+1] GRing.mulrC -expfz_n0addr //.
-    by rewrite !GRing.mulrA.
+  elim: n.
+  - by rewrite addn0 /= GRing.mulr1.
+  - elim => [_|n _ IH].
+    + by rewrite addnS /= addn0 expr0z !GRing.mul1r.
+    + rewrite addnS [LHS]/= IH /=.
+      rewrite !GRing.mulrA.
+      by rewrite -[q ^ n.+1 * q ^ m] expfz_n0addr // addnC.
 Qed.
 
-Definition qpoly_neg a n x := 1 / qpoly_nonneg (q ^ Negz n * a) n x.
+(* q-polynomial for neg int *)
+Definition qpoly_neg a n x := 1 / qpoly_nonneg (q ^ ((Negz n) + 1) * a) n x.
+Print qpoly_neg.
 
+(* q-poly_nat 0 = q-poly_neg 0 *)
 Lemma qpoly_0 a x : qpoly_neg a 0 x = qpoly_nonneg a 0 x.
 Proof.
   rewrite /qpoly_neg /=.
@@ -287,11 +314,43 @@ Proof.
   by apply GRing.oner_neq0.
 Qed.
 
+(* q-analogue polynomial for int *)
 Definition qpoly a n x :=
   match n with
   | Posz n0 => qpoly_nonneg a n0 x
   | Negz n0 => qpoly_neg a n0 x
   end.
+
+Lemma qpoly_exp_0 a m n x : m = 0 \/ n = 0 ->
+  qpoly a (m + n) x = qpoly a m x * qpoly (q ^ m * a) n x.
+Proof.
+  move=> [->|->].
+  - by rewrite GRing.add0r expr0z /= !GRing.mul1r.
+  - by rewrite GRing.addr0 /= GRing.mulr1.
+Qed.
+
+Theorem qpoly_exp_law a m n x :
+  qpoly a (m + n) x = qpoly a m x * qpoly (q ^ m * a) n x.
+Proof.
+  case: m => m.
+  - case: n => n.
+    + by apply qpoly_nonneg_explaw.
+    + case_eq (Posz m + Negz n) => l Hmnl /=.
+      - rewrite /qpoly_neg.
+        rewrite (_ : Posz m = Posz m + Negz n + n).
+
+        rewrite -[LHS]GRing.divr1.
+        rewrite -(red_frac_r _ _ (qpoly_nonneg (q ^ (Posz m + Negz n) * a) n x)).
+      -
+  -
+Admitted.
+
+Lemma qpoly_exp_neg_pos a m n x : m < 0 /\ n > 0 ->
+  qpoly a (m + n) x = qpoly a m x * qpoly (q ^ m * a) n x.
+Proof.
+  move=> [Hm Hn].
+  case_eq (m + n). Check NegzE.
+Admitted.
 
 End q_analogue.
 
