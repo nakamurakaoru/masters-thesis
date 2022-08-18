@@ -22,6 +22,29 @@ Proof.
   by rewrite GRing.mulrC.
 Qed.
 
+Lemma mulnon0 (a b : R) : a * b != 0 -> a != 0.
+Proof.
+  move/eqP.
+  case_eq (a == 0) => //.
+  move/eqP ->.
+  by rewrite GRing.mul0r.
+Qed.
+
+Lemma expnon0 (x : R) (n : nat) : x != 0 -> x ^ n != 0.
+Proof.
+  move=> Hx.
+  elim: n => [|n IH].
+  - by rewrite expr0z GRing.oner_neq0.
+  - by rewrite exprSz GRing.mulf_neq0.
+Qed.
+
+(* add cancel *)
+Lemma addrK (a : R) : a - a = 0.
+Proof. by rewrite -{1}(GRing.add0r a) GRing.addrK. Qed.
+
+Lemma Negz_rK n c : Negz n.+1 + c - c = Negz n.+1.
+Proof. by rewrite GRing.addrK. Qed.
+
 (* 移項 *)
 Lemma transposition (a b c : R) : a + b = c -> a = c - b.
 Proof.
@@ -94,6 +117,14 @@ Qed.
 Definition Dq f x := (dq f x) / (dq (fun x => x) x).
 (* dq と同様 *)
 
+(* q-derivative for const is 0 *)
+Lemma Dq_const x c : Dq (fun x => c) x = 0.
+Proof.
+  rewrite /Dq /dq.
+  by rewrite addrK GRing.mul0r.
+Qed.
+
+
 (* q-derivative is linear *)
 Lemma Dq_is_linear f g a b x :
   x != 0 -> Dq ((a */ f) +/ (b */ g)) x = a * (Dq f x) + b * (Dq g x).
@@ -115,6 +146,10 @@ Qed.
 
 (* q-analogue of natural number *)
 Definition qnat n : R := (q ^ n - 1) / (q - 1).
+
+(* qnat 0 is 0 *)
+Lemma qnat_0 : qnat 0 = 0.
+Proof. by rewrite /qnat expr0z addrK GRing.mul0r. Qed.
 
 (*Lemma lim_qnat n :
   forall e : R, e > 0 -> exists d, `|q - 1| < d -> `|n - (qnat n)| < e.
@@ -239,6 +274,14 @@ Fixpoint qpoly_nonneg a n x :=
   | n.+1 => (qpoly_nonneg a n x) * (x - q ^ n * a)
   end.
 
+Lemma qpoly_nonneg_head a n x:
+   qpoly_nonneg a n.+1 x = (x - a) * qpoly_nonneg (q * a) n x.
+Proof.
+  elim: n => [|n IH] /=.
+  - by rewrite expr0z !GRing.mul1r GRing.mulr1.
+  - by rewrite !GRing.mulrA -IH exprSzr.
+Qed.
+
 (*Lemma prod_qpoly_nonneg a n x :
   qpoly_nonneg a n.+1 x = \prod_(0 <= i < n.+1) (x -  q ^ i * a).
 Proof.
@@ -249,7 +292,7 @@ Proof.
 Qed.*)
 
 (* q-derivative of q-polynomial for nat *)
-Theorem qderiv_poly a n x :
+Theorem qderiv_qpoly_nonneg a n x :
   x != 0 -> Dq (qpoly_nonneg a n.+1) x = qnat n.+1 * qpoly_nonneg a n x.
 Proof.
   move=> Hx.
@@ -302,7 +345,7 @@ Proof.
       by rewrite -[q ^ n.+1 * q ^ m] expfz_n0addr // addnC.
 Qed.
 
-(* q-polynomial for neg int *)
+(* q-polynomial for neg *)
 Definition qpoly_neg a n x := 1 / qpoly_nonneg (q ^ ((Negz n) + 1) * a) n x.
 Print qpoly_neg.
 
@@ -313,6 +356,16 @@ Proof.
   rewrite -[RHS] (@GRing.divff _ 1) //.
   by apply GRing.oner_neq0.
 Qed.
+
+Theorem qpoly_neg_inv a n x :
+  qpoly_nonneg a n x * qpoly_neg a n x = 1.
+Proof.
+  rewrite /qpoly_neg.
+  rewrite GRing.mulrA.
+  rewrite GRing.mulr1.
+  rewrite NegzE.
+Qed.
+
 
 (* q-analogue polynomial for int *)
 Definition qpoly a n x :=
@@ -351,6 +404,144 @@ Proof.
   move=> [Hm Hn].
   case_eq (m + n). Check NegzE.
 Admitted.
+
+(* q-derivative of q-polynomial for 0 *)
+Lemma qderiv_qpoly_0 a x :
+  Dq (qpoly a 0) x = qnat 0 * qpoly a (- 1) x.
+Proof.
+  by rewrite Dq_const qnat_0 GRing.mul0r.
+Qed.
+
+Lemma qpoly_qx a m n x : q != 0 ->
+  qpoly_nonneg (q ^ m * a) n (q * x) =
+    q ^ n * qpoly_nonneg (q ^ (m - 1) * a) n x.
+Proof.
+  move=> Hq0.
+  elim: n => [|n IH] /=.
+  - by rewrite expr0z GRing.mul1r.
+  - rewrite IH.
+    Search (_ ^ (_.+1)).
+    rewrite exprSzr.
+    rewrite -[RHS]GRing.mulrA.
+    rewrite [q * (qpoly_nonneg (q ^ (m - 1) * a) n x *
+              (x - q ^ n * (q ^ (m - 1) * a)))] GRing.mulrA.
+    rewrite [q * qpoly_nonneg (q ^ (m - 1) * a) n x] GRing.mulrC.
+    rewrite -[qpoly_nonneg (q ^ (m - 1) * a) n x * q *
+               (x - q ^ n * (q ^ (m - 1) * a))] GRing.mulrA.
+    rewrite [q * (x - q ^ n * (q ^ (m - 1) * a))] GRing.mulrBr.
+    rewrite [q * (q ^ n * (q ^ (m - 1) * a))] GRing.mulrA.
+    rewrite [q * q ^ n] GRing.mulrC.
+    rewrite -[q ^ n * q * (q ^ (m - 1) * a)] GRing.mulrA.
+    rewrite (_ : q * (q ^ (m - 1) * a) = q ^ m * a).
+      by rewrite [RHS] GRing.mulrA.
+    rewrite GRing.mulrA.
+    rewrite -{1}(expr1z q).
+    by rewrite -expfzDr // GRing.addrC GRing.subrK.
+Qed.
+
+(* q-derivative of q-polynomial for neg *)
+Theorem qderiv_qpoly_neg a n x : q != 0 -> x != 0 ->
+  (x - q ^ (Negz n) * a) != 0 ->
+  qpoly_nonneg (q ^ (Negz n + 1) * a) n x != 0 ->
+  Dq (qpoly_neg a n) x = qnat (Negz n + 1) * qpoly_neg a (n.+1) x.
+Proof.
+  move=> Hq0 Hx Hqn Hqpoly.
+  destruct n.
+  - by rewrite /Dq /dq /qpoly_neg /= addrK qnat_0 !GRing.mul0r.
+  - rewrite qderiv_quot //.
+      rewrite Dq_const GRing.mulr0 GRing.mul1r GRing.sub0r.
+      rewrite qderiv_qpoly_nonneg //.
+      rewrite qpoly_qx //.
+      rewrite -GRing.mulNr.
+      rewrite [qpoly_nonneg (q ^ (Negz n.+1 + 1) * a) n.+1 x *
+                (q ^ n.+1 * qpoly_nonneg (q ^ (Negz n.+1 + 1 - 1) *
+                  a) n.+1 x)] GRing.mulrC.
+      rewrite -GRing.mulf_div.
+      have -> : qpoly_nonneg (q ^ (Negz n.+1 + 1) * a) n x /
+                    qpoly_nonneg (q ^ (Negz n.+1 + 1) * a) n.+1 x =
+                      1 / (x - q ^ (- 1) * a).
+        rewrite -(GRing.mulr1
+                     (qpoly_nonneg (q ^ (Negz n.+1 + 1) * a) n x)) /=.
+        rewrite red_frac_l.
+          rewrite NegzE.
+          rewrite GRing.mulrA.
+          rewrite -expfzDr //.
+          rewrite GRing.addrA.
+          rewrite -addn2.
+          rewrite (_ : Posz (n + 2)%N = Posz n + 2) //.
+          rewrite -{1}(GRing.add0r (Posz n)).
+          by rewrite GRing.addrKA.
+        rewrite /= in Hqpoly.
+        by apply mulnon0 in Hqpoly.
+      rewrite GRing.mulf_div.
+      rewrite -[q ^ n.+1 *
+                 qpoly_nonneg (q ^ (Negz n.+1 + 1 - 1) * a) n.+1 x *
+                   (x - q ^ (-1) * a)]GRing.mulrA.
+      have -> : qpoly_nonneg (q ^ (Negz n.+1 + 1 - 1) * a) n.+1 x *
+                (x - q ^ (-1) * a) =
+                qpoly_nonneg (q ^ (Negz (n.+1)) * a) n.+2 x => /=.
+        have -> : Negz n.+1 + 1 - 1 = Negz n.+1.
+          by rewrite GRing.addrK.
+        have -> : q ^ n.+1 * (q ^ Negz n.+1 * a) = q ^ (-1) * a => //.
+        rewrite GRing.mulrA.
+        rewrite -expfzDr //.
+        rewrite NegzE.
+        have -> : Posz n.+1 - Posz n.+2 = - 1 => //.
+        rewrite -addn1.
+        rewrite -[(n + 1).+1]addn1.
+        rewrite (_ : Posz (n + 1)%N = Posz n + 1) //.
+        rewrite (_ : Posz (n + 1 + 1)%N = Posz n + 1 + 1) //.
+        rewrite -(GRing.add0r (Posz n + 1)).
+        by rewrite GRing.addrKA.
+      rewrite /qpoly_neg /=.
+      rewrite (_ : Negz n.+2 + 1 = Negz n.+1) //.
+      rewrite -GRing.mulf_div.
+      congr (_ * _).
+      rewrite NegzE GRing.mulrC.
+      rewrite /qnat.
+      rewrite -GRing.mulNr GRing.mulrA.
+      congr (_ / _).
+      rewrite GRing.opprB GRing.mulrBr GRing.mulr1 GRing.mulrC GRing.divff.
+        rewrite invr_expz.
+        rewrite (_ : - Posz n.+2 + 1 = - Posz n.+1) //.
+        rewrite -addn1.
+        rewrite (_ : Posz (n.+1 + 1)%N = Posz n.+1 + 1) //.
+        rewrite GRing.addrC.
+        rewrite [Posz n.+1 + 1]GRing.addrC.
+        rewrite -{1}(GRing.add0r 1).
+        by rewrite GRing.addrKA GRing.sub0r.
+      by rewrite expnon0 //.
+    rewrite qpoly_qx //.
+    rewrite GRing.mulf_neq0 //.
+      by rewrite expnon0.
+    rewrite qpoly_nonneg_head.
+    rewrite GRing.mulf_neq0 //.
+    rewrite (_ : Negz n.+1 + 1 - 1 = Negz n.+1) //.
+      by rewrite GRing.addrK.
+    move: Hqpoly => /=.
+    move/mulnon0.
+    rewrite GRing.addrK.
+    rewrite GRing.mulrA.
+    rewrite -{2}(expr1z q).
+    by rewrite -expfzDr.
+Qed.
+
+Theorem qderiv_qpoly a n x : q != 0 -> x != 0 ->
+  Dq (qpoly a n) x = qnat n * qpoly a (n - 1) x.
+Proof.
+  move=> Hq0 Hx.
+  case: n => [|] n.
+  - destruct n.
+    + by rewrite qderiv_qpoly_0.
+    + rewrite qderiv_qpoly_nonneg //.
+      rewrite (_ : Posz n.+1 - 1 = n) //.
+      rewrite -addn1.
+      rewrite (_ : Posz (n + 1)%N = Posz n + 1) //.
+      by rewrite GRing.addrK.
+  - rewrite qderiv_qpoly_neg //.
+      destruct n => //=.
+Qed.
+
 
 End q_analogue.
 
