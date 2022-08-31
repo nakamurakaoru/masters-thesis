@@ -14,6 +14,26 @@ Notation "f ** g" := (fun x => f x * g x) (at level 49).
 Notation "f // g" := (fun x => f x / g x) (at level 49).
 Notation "a */ f" := (fun x => a * (f x)) (at level 49).
 
+(*Definition cvg a b (f : R -> R) := forall e : R, e > 0 -> 
+  exists d, (forall x,`|x - a| < d -> `|f x - b| < e).*)
+
+(*Lemma lim_add a b c (f g : R -> R) : cvg a b f -> cvg a c g ->
+  cvg a (b + c) (f +/ g).
+Proof.
+  rewrite /cvg.
+  move=> fa_b ga_c e He0.
+  move:(fa_b (e/2%:R)) => [].
+    apply Num.Theory.divr_gt0 => //.
+    by apply Num.Theory.ltr0n.
+  move=> d1 fa_b'.
+  move:(ga_c (e/2%:R)) => [].
+    apply Num.Theory.divr_gt0 => //.
+    by apply Num.Theory.ltr0n.
+  move=> d2 ga_c'.
+  exists (Num.min d1 d2).
+  move=> x Hd.
+Admitted.*)
+
 (* tools *)
 (* 関数の積の交換 *)
 Lemma mulfC (f g : R -> R) : f ** g = g ** f.
@@ -24,18 +44,13 @@ Qed.
 
 Lemma NegzK m n : Negz (m + n) + n = Negz m.
 Proof.
-  rewrite !NegzE.
-  rewrite GRing.addrC.
-  rewrite -addn1.
+  rewrite !NegzE GRing.addrC -addn1.
   rewrite (_ : Posz (m + n + 1)%N = Posz m + n + 1) //.
   rewrite -[Posz m + n + 1] GRing.addrA.
   rewrite [Posz m + (Posz n + 1)] GRing.addrC.
   rewrite -[Posz n + 1 + m] GRing.addrA.
   rewrite -{1}(GRing.add0r (Posz n)).
-  rewrite GRing.addrKA.
-  rewrite -addn1.
-  rewrite GRing.sub0r.
-  by rewrite addnC.
+  by rewrite GRing.addrKA -addn1 GRing.sub0r addnC.
 Qed.
 
 Lemma mulnon0 (a b : R) : a * b != 0 -> a != 0.
@@ -58,21 +73,15 @@ Qed.
 Lemma addrK (a : R) : a - a = 0.
 Proof. by rewrite -{1}(GRing.add0r a) GRing.addrK. Qed.
 
-Lemma Negz_rK n c : Negz n.+1 + c - c = Negz n.+1.
+Lemma NegzrK n c : Negz n.+1 + c - c = Negz n.+1.
 Proof. by rewrite GRing.addrK. Qed.
 
 (* 移項 *)
 Lemma rtransposition (a b c : R) : a + b = c -> a = c - b.
-Proof.
-  move=> <-.
-  by rewrite GRing.addrK.
-Qed.
+Proof. by move=> <-; rewrite GRing.addrK. Qed.
 
 Theorem itransposition (l m n : int) : l + m = n -> l = n - m.
-Proof.
-  move=> <-.
-  by rewrite GRing.addrK.
-Qed.
+Proof. by move=> <-; rewrite GRing.addrK. Qed.
 
 (* 両辺にかける *)
 Lemma same_prod {a b} (c : R) : c != 0 -> a * c = b * c -> a = b.
@@ -88,38 +97,31 @@ Qed.
 Lemma red_frac_r (x y z : R) : z != 0 -> x * z / (y * z) = x / y.
 Proof.
   move=> Hz.
-  rewrite -GRing.mulf_div.
-  by rewrite GRing.divff // GRing.mulr1.
+  by rewrite -GRing.mulf_div GRing.divff // GRing.mulr1.
 Qed.
 
 Lemma red_frac_l (x y z : R) : z != 0 -> z * x / (z * y) = x / y.
 Proof.
   move=> Hz.
-  rewrite [z * x] GRing.mulrC.
-  rewrite [z * y] GRing.mulrC.
-  by rewrite red_frac_r.
+  by rewrite [z * x] GRing.mulrC [z * y] GRing.mulrC red_frac_r.
 Qed.
 
 (* 分母共通の和 *)
 Lemma GRing_add_div (x y z : R) : z != 0 -> x / z + y / z = (x + y) / z.
 Proof.
   move=> nz0.
-  rewrite GRing.addf_div //.
-  rewrite -GRing.mulrDl.
-  by rewrite red_frac_r.
+  by rewrite GRing.addf_div // -GRing.mulrDl red_frac_r.
 Qed.
 
 (* 頻出分母が0でない *)
 Lemma denom_is_nonzero x : x != 0 -> q * x - x != 0.
 Proof.
   move=> Hx.
-  rewrite -{2}(GRing.mul1r x).
-  rewrite -GRing.mulrBl.
+  rewrite -{2}(GRing.mul1r x) -GRing.mulrBl.
   by apply GRing.mulf_neq0.
 Qed.
 
 (* main *)
-
 (* q-differential *)
 Definition dq (f : R -> R) x := f (q * x) - f x.
 (* dq : (R -> R) -> R -> R であるが, dq : (R => R) -> (R -> R) の方がよいか？ *)
@@ -128,11 +130,9 @@ Definition dq (f : R -> R) x := f (q * x) - f x.
 Lemma dq_prod f g x :
   dq (f ** g) x = (f (q * x)) * dq g x + (g x) * dq f x.
 Proof.
-  rewrite /dq.
-  rewrite !GRing.mulrBr.
+  rewrite /dq !GRing.mulrBr.
   rewrite [in g x * f (q * x)] GRing.mulrC.
-  rewrite [in g x * f x] GRing.mulrC.
-  by rewrite GRing.subrKA.
+  by rewrite [in g x * f x] GRing.mulrC GRing.subrKA.
 Qed.
 
 (* q-derivative *)
@@ -141,23 +141,15 @@ Definition Dq f x := (dq f x) / (dq (fun x => x) x).
 
 (* q-derivative for const is 0 *)
 Lemma Dq_const x c : Dq (fun x => c) x = 0.
-Proof.
-  rewrite /Dq /dq.
-  by rewrite addrK GRing.mul0r.
-Qed.
-
+Proof. by rewrite /Dq /dq addrK GRing.mul0r. Qed.
 
 (* q-derivative is linear *)
 Lemma Dq_is_linear f g a b x :
   x != 0 -> Dq ((a */ f) +/ (b */ g)) x = a * (Dq f x) + b * (Dq g x).
 Proof.
   move=> Hx.
-  rewrite /Dq /dq.
-  rewrite !GRing.mulrA.
-  rewrite GRing_add_div.
-    rewrite !GRing.mulrBr.
-    rewrite GRing.opprD.
-    rewrite !GRing.addrA.
+  rewrite /Dq /dq !GRing.mulrA GRing_add_div.
+    rewrite !GRing.mulrBr GRing.opprD !GRing.addrA.
     rewrite [a * f (q * x) + b * g (q * x) - a * f x] GRing.addrC.
     rewrite [(a * f (q * x) + b * g (q * x))] GRing.addrC.
     rewrite GRing.addrA.
@@ -173,11 +165,15 @@ Definition qnat n : R := (q ^ n - 1) / (q - 1).
 Lemma qnat_0 : qnat 0 = 0.
 Proof. by rewrite /qnat expr0z addrK GRing.mul0r. Qed.
 
-(*Lemma lim_qnat n :
-  forall e : R, e > 0 -> exists d, `|q - 1| < d -> `|n - (qnat n)| < e.
+Lemma lim_qnat n :
+  forall e : R, e > 0 -> exists d, `|q - 1| < d -> `|n%:R - (qnat n)| < e.
 Proof.
-
-Qed.*)
+  move=> e He.
+  destruct n.
+  - eexists => _.
+    by rewrite qnat_0 addrK Num.Theory.normr0.
+  - exists (e / n%:R).
+Admitted.
 
 (* q-derivative of x ^ n *)
 Lemma qderiv_of_pow n x :
@@ -185,20 +181,14 @@ Lemma qderiv_of_pow n x :
 Proof.
   move=> Hx.
   rewrite /Dq /dq /qnat.
-  rewrite -{4}(GRing.mul1r x).
-  rewrite -GRing.mulrBl.
-  rewrite expfzMl.
+  rewrite -{4}(GRing.mul1r x) -GRing.mulrBl expfzMl.
     rewrite -GRing_add_div.
     rewrite [in x ^ n](_ : n = (n -1) +1) //.
-      rewrite expfzDr //.
-      rewrite expr1z.
-      rewrite GRing.mulrA.
-      rewrite -GRing.mulNr.
-      rewrite !red_frac_r //.
+      rewrite expfzDr // expr1z.
+      rewrite GRing.mulrA -GRing.mulNr !red_frac_r //.
       rewrite GRing_add_div //.
       rewrite -{2}[x ^ (n - 1)]GRing.mul1r.
-      rewrite -GRing.mulrBl.
-      rewrite GRing.mulrC GRing.mulrA.
+      rewrite -GRing.mulrBl GRing.mulrC GRing.mulrA.
       by rewrite [in (q - 1)^-1 * (q ^ n - 1)] GRing.mulrC.
     by rewrite GRing.subrK.
   by apply GRing.mulf_neq0.
@@ -230,9 +220,7 @@ Proof.
   rewrite /Dq /dq.
   rewrite [f (q * x) / g (q * x)] GRing.mulrC.
   rewrite [f x / g x] GRing.mulrC.
-  rewrite !GRing.mulrA.
-  rewrite !GRing.divff //.
-  by rewrite !GRing.mul1r.
+  by rewrite !GRing.mulrA !GRing.divff // !GRing.mul1r.
 Qed.
 
 (* q-derivative quotient rule *)
@@ -242,17 +230,14 @@ Proof.
   move=> Hx Hgx Hgqx.
   rewrite -GRing_add_div.
     rewrite red_frac_l // GRing.mulNr.
-    apply rtransposition.
-    apply (same_prod (g (q * x))) => //.
+    apply /rtransposition /(same_prod (g (q * x))) => //.
     rewrite GRing.mulrDl.
     rewrite -[f x * Dq g x / (g x * g (q * x)) * g (q * x)] GRing.mulrA.
     rewrite [(g x * g (q * x))^-1 * g (q * x)] GRing.mulrC.
-    rewrite GRing.mulrA.
-    rewrite red_frac_r //.
+    rewrite GRing.mulrA red_frac_r //.
     rewrite -[Dq f x / g (q * x) * g (q * x)] GRing.mulrA.
     rewrite [(g (q * x))^-1 * g (q * x)] GRing.mulrC.
-    rewrite GRing.divff // GRing.mulr1.
-    rewrite GRing.mulrC.
+    rewrite GRing.divff // GRing.mulr1 GRing.mulrC.
     rewrite -[f x * Dq g x / g x] GRing.mulrA.
     rewrite [Dq g x / g x] GRing.mulrC.
     rewrite [f x * ((g x)^-1 * Dq g x)] GRing.mulrA.
@@ -270,17 +255,14 @@ Proof.
   rewrite -GRing_add_div.
     rewrite [g x * g (q * x)] GRing.mulrC.
     rewrite red_frac_l // GRing.mulNr.
-    apply rtransposition.
-    apply (same_prod (g x)) => //.
+    apply /rtransposition /(same_prod (g x)) => //.
     rewrite GRing.mulrDl.
     rewrite [f (q * x) * Dq g x / (g (q * x) * g x) * g x] GRing.mulrC.
     rewrite [g (q * x) * g x] GRing.mulrC.
-    rewrite GRing.mulrA.
-    rewrite red_frac_l //.
+    rewrite GRing.mulrA red_frac_l //.
     rewrite -[Dq f x / g x * g x] GRing.mulrA.
     rewrite [(g x)^-1 * g x] GRing.mulrC.
-    rewrite GRing.divff // GRing.mulr1.
-    rewrite GRing.mulrC.
+    rewrite GRing.divff // GRing.mulr1 GRing.mulrC.
     rewrite -[f (q * x) * Dq g x / g (q * x)] GRing.mulrA.
     rewrite [Dq g x / g (q * x)] GRing.mulrC.
     rewrite [f (q * x) * ((g (q * x))^-1 * Dq g x)] GRing.mulrA.
@@ -321,12 +303,8 @@ Proof.
   elim: n => [|n IH].
   - rewrite /Dq /dq /qpoly_nonneg /qnat.
     rewrite !GRing.mul1r GRing.mulr1 expr1z.
-    rewrite GRing.opprB.
-    rewrite GRing.subrKA.
-    rewrite !GRing.divff //.
-    rewrite -{2}(GRing.mul1r x).
-    rewrite -(GRing.mulrBl x).
-    by apply GRing.mulf_neq0.
+    rewrite GRing.opprB GRing.subrKA !GRing.divff //.
+    by rewrite denom_is_nonzero.
   - rewrite (_ : Dq (qpoly_nonneg a n.+2) x =
                  Dq ((qpoly_nonneg a n.+1) **
                  (fun x => (x - q ^ (n.+1) * a))) x) //.
@@ -334,17 +312,14 @@ Proof.
     rewrite [Dq (+%R^~ (- (q ^ n.+1 * a))) x] /Dq /dq.
     rewrite GRing.opprB GRing.subrKA GRing.divff //.
       rewrite GRing.mulr1 exprSz.
-      rewrite -[q * q ^ n * a] GRing.mulrA.
-      rewrite -(GRing.mulrBr q).
-      rewrite IH.
+      rewrite -[q * q ^ n * a] GRing.mulrA -(GRing.mulrBr q) IH.
       rewrite -[q * (x - q ^ n * a) * (qnat n.+1 * qpoly_nonneg a n x)] GRing.mulrA.
       rewrite [(x - q ^ n * a) * (qnat n.+1 * qpoly_nonneg a n x)] GRing.mulrC.
       rewrite -[qnat n.+1 * qpoly_nonneg a n x * (x - q ^ n * a)] GRing.mulrA.
       rewrite (_ : qpoly_nonneg a n x * (x - q ^ n * a) = qpoly_nonneg a n.+1 x) //.
       rewrite GRing.mulrA.
       rewrite -{1}(GRing.mul1r (qpoly_nonneg a n.+1 x)).
-      rewrite -GRing.mulrDl.
-      rewrite GRing.addrC.
+      rewrite -GRing.mulrDl GRing.addrC.
       rewrite -(@GRing.divff _ (q - 1)) //.
       rewrite [qnat n.+1] /qnat.
       rewrite [q * ((q ^ n.+1 - 1) / (q - 1))] GRing.mulrA.
@@ -362,8 +337,7 @@ Proof.
   - by rewrite addn0 /= GRing.mulr1.
   - elim => [_|n _ IH].
     + by rewrite addnS /= addn0 expr0z !GRing.mul1r.
-    + rewrite addnS [LHS]/= IH /=.
-      rewrite !GRing.mulrA.
+    + rewrite addnS [LHS]/= IH /= !GRing.mulrA.
       by rewrite -[q ^ n.+1 * q ^ m] expfz_n0addr // addnC.
 Qed.
 
@@ -373,8 +347,7 @@ Definition qpoly_neg a n x := 1 / qpoly_nonneg (q ^ ((Negz n) + 1) * a) n x.
 (* q-poly_nat 0 = q-poly_neg 0 *)
 Lemma qpoly_0 a x : qpoly_neg a 0 x = qpoly_nonneg a 0 x.
 Proof.
-  rewrite /qpoly_neg /=.
-  rewrite -[RHS] (@GRing.divff _ 1) //.
+  rewrite /qpoly_neg /= -[RHS] (@GRing.divff _ 1) //.
   by apply GRing.oner_neq0.
 Qed.
 
@@ -383,11 +356,7 @@ Theorem qpoly_neg_inv a n x :
   qpoly_neg a n x * qpoly_nonneg (q ^ (Negz n + 1) * a) n x = 1.
 Proof.
   move=> H.
-  rewrite /qpoly_neg.
-  rewrite GRing.mulrC.
-  rewrite GRing.mulrA.
-  rewrite GRing.mulr1.
-  by rewrite GRing.divff.
+  by rewrite /qpoly_neg GRing.mulrC GRing.mulrA GRing.mulr1 GRing.divff.
 Qed.
 
 (* q-analogue polynomial for int *)
@@ -437,16 +406,14 @@ Lemma qpoly_exp_neg_pos a m n x : m < 0 /\ n > 0 ->
 Proof.
   move=> [Hm Hn].
   case_eq (m + n) => l Hl /=.
-  -
+  - 
   -
 Admitted.
 
 (* q-derivative of q-polynomial for 0 *)
 Lemma qderiv_qpoly_0 a x :
   Dq (qpoly a 0) x = qnat 0 * qpoly a (- 1) x.
-Proof.
-  by rewrite Dq_const qnat_0 GRing.mul0r.
-Qed.
+Proof. by rewrite Dq_const qnat_0 GRing.mul0r. Qed.
 
 Lemma qpoly_qx a m n x : q != 0 ->
   qpoly_nonneg (q ^ m * a) n (q * x) =
@@ -456,8 +423,7 @@ Proof.
   elim: n => [|n IH] /=.
   - by rewrite expr0z GRing.mul1r.
   - rewrite IH.
-    rewrite exprSzr.
-    rewrite -[RHS]GRing.mulrA.
+    rewrite exprSzr -[RHS]GRing.mulrA.
     rewrite [q * (qpoly_nonneg (q ^ (m - 1) * a) n x *
               (x - q ^ n * (q ^ (m - 1) * a)))] GRing.mulrA.
     rewrite [q * qpoly_nonneg (q ^ (m - 1) * a) n x] GRing.mulrC.
@@ -469,9 +435,7 @@ Proof.
     rewrite -[q ^ n * q * (q ^ (m - 1) * a)] GRing.mulrA.
     rewrite (_ : q * (q ^ (m - 1) * a) = q ^ m * a).
       by rewrite [RHS] GRing.mulrA.
-    rewrite GRing.mulrA.
-    rewrite -{1}(expr1z q).
-    by rewrite -expfzDr // GRing.addrC GRing.subrK.
+    by rewrite GRing.mulrA -{1}(expr1z q) -expfzDr // GRing.addrC GRing.subrK.
 Qed.
 
 (* q-derivative of q-polynomial for neg *)
@@ -485,9 +449,7 @@ Proof.
   - by rewrite /Dq /dq /qpoly_neg /= addrK qnat_0 !GRing.mul0r.
   - rewrite qderiv_quot //.
       rewrite Dq_const GRing.mulr0 GRing.mul1r GRing.sub0r.
-      rewrite qderiv_qpoly_nonneg //.
-      rewrite qpoly_qx //.
-      rewrite -GRing.mulNr.
+      rewrite qderiv_qpoly_nonneg // qpoly_qx // -GRing.mulNr.
       rewrite [qpoly_nonneg (q ^ (Negz n.+1 + 1) * a) n.+1 x *
                 (q ^ n.+1 * qpoly_nonneg (q ^ (Negz n.+1 + 1 - 1) *
                   a) n.+1 x)] GRing.mulrC.
@@ -498,16 +460,11 @@ Proof.
         rewrite -(GRing.mulr1
                      (qpoly_nonneg (q ^ (Negz n.+1 + 1) * a) n x)) /=.
         rewrite red_frac_l.
-          rewrite NegzE.
-          rewrite GRing.mulrA.
-          rewrite -expfzDr //.
-          rewrite GRing.addrA.
-          rewrite -addn2.
+          rewrite NegzE GRing.mulrA -expfzDr // GRing.addrA -addn2.
           rewrite (_ : Posz (n + 2)%N = Posz n + 2) //.
           rewrite -{1}(GRing.add0r (Posz n)).
           by rewrite GRing.addrKA.
-        rewrite /= in Hqpoly.
-        by apply mulnon0 in Hqpoly.
+        by rewrite /=; apply mulnon0 in Hqpoly.
       rewrite GRing.mulf_div.
       rewrite -[q ^ n.+1 *
                  qpoly_nonneg (q ^ (Negz n.+1 + 1 - 1) * a) n.+1 x *
@@ -518,12 +475,9 @@ Proof.
         have -> : Negz n.+1 + 1 - 1 = Negz n.+1.
           by rewrite GRing.addrK.
         have -> : q ^ n.+1 * (q ^ Negz n.+1 * a) = q ^ (-1) * a => //.
-        rewrite GRing.mulrA.
-        rewrite -expfzDr //.
-        rewrite NegzE.
+        rewrite GRing.mulrA -expfzDr // NegzE.
         have -> : Posz n.+1 - Posz n.+2 = - 1 => //.
-        rewrite -addn1.
-        rewrite -[(n + 1).+1]addn1.
+        rewrite -addn1 -[(n + 1).+1]addn1.
         rewrite (_ : Posz (n + 1)%N = Posz n + 1) //.
         rewrite (_ : Posz (n + 1 + 1)%N = Posz n + 1 + 1) //.
         rewrite -(GRing.add0r (Posz n + 1)).
@@ -543,22 +497,16 @@ Proof.
         rewrite (_ : Posz (n.+1 + 1)%N = Posz n.+1 + 1) //.
         rewrite GRing.addrC.
         rewrite [Posz n.+1 + 1]GRing.addrC.
-        rewrite -{1}(GRing.add0r 1).
-        by rewrite GRing.addrKA GRing.sub0r.
+        by rewrite -{1}(GRing.add0r 1) GRing.addrKA GRing.sub0r.
       by rewrite expnon0 //.
-    rewrite qpoly_qx //.
-    rewrite GRing.mulf_neq0 //.
+    rewrite qpoly_qx // GRing.mulf_neq0 //.
       by rewrite expnon0.
-    rewrite qpoly_nonneg_head.
-    rewrite GRing.mulf_neq0 //.
+    rewrite qpoly_nonneg_head GRing.mulf_neq0 //.
     rewrite (_ : Negz n.+1 + 1 - 1 = Negz n.+1) //.
       by rewrite GRing.addrK.
     move: Hqpoly => /=.
     move/mulnon0.
-    rewrite GRing.addrK.
-    rewrite GRing.mulrA.
-    rewrite -{2}(expr1z q).
-    by rewrite -expfzDr.
+    by rewrite GRing.addrK GRing.mulrA -{2}(expr1z q) -expfzDr.
 Qed.
 
 Theorem qderiv_qpoly a n x : q != 0 -> x != 0 ->
@@ -575,14 +523,12 @@ Proof.
       rewrite -addn1.
       rewrite (_ : Posz (n + 1)%N = Posz n + 1) //.
       by rewrite GRing.addrK.
-  - rewrite Dq_qpoly_int_to_neg.
-    rewrite qderiv_qpoly_neg //.
+  - rewrite Dq_qpoly_int_to_neg qderiv_qpoly_neg //.
         rewrite NegzK.
         rewrite (_ : (n + 1).+1 = (n + 0).+2) //.
         by rewrite addn0 addn1.
       rewrite (_ : Negz (n + 1) = Negz n - 1) //.
-      apply itransposition.
-      by rewrite NegzK.
+      by apply itransposition; rewrite NegzK.
     by rewrite NegzK addn1.
 Qed.
 
@@ -597,16 +543,12 @@ Lemma qchain q u f a b x : dq R q u x != 0 -> u = (fun x => a * x ^ b) ->
   Dq R q (f o/ u) x = (Dq R (q^b) f (u x)) * (Dq R q u x).
 Proof.
   move=> Hqu Hu.
-  rewrite Hu /Dq /dq.
-  rewrite GRing.mulf_div.
+  rewrite Hu /Dq /dq GRing.mulf_div.
   rewrite [(q ^ b * (a * x ^ b) - a * x ^ b) * (q * x - x)] GRing.mulrC.
-  rewrite expfzMl.
-  rewrite !GRing.mulrA.
+  rewrite expfzMl !GRing.mulrA.
   rewrite [a * q ^ b] GRing.mulrC.
   rewrite red_frac_r //.
   move: Hqu.
-  rewrite /dq Hu.
-  rewrite expfzMl GRing.mulrA.
-  by rewrite GRing.mulrC.
+  by rewrite /dq Hu expfzMl GRing.mulrA GRing.mulrC.
 Qed.
 End q_chain_rule.
