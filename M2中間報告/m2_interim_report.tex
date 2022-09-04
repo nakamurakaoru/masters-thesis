@@ -1,0 +1,105 @@
+\documentclass[11pt]{jarticle}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[a4paper,margin=25mm]{geometry}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{ascmac}
+\newtheoremstyle{mystyle}% % Name
+    {}%                      % Space above
+    {}%                      % Space below
+    {\normalfont}%           % Body font
+    {}%                      % Indent amount
+    {\bfseries}%             % Theorem head font
+    {}%                      % Punctuation after theorem head
+    { }%                     % Space after theorem head, ' ', or \newline
+    {}%                      % Theorem head spec (can be left empty, meaning `normal')
+\theoremstyle{mystyle}
+\usepackage{amssymb}
+\usepackage{ascmac}
+\usepackage{txfonts}
+\usepackage{graphics}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newtheorem{df}{$\textrm{Def}$}[subsection]
+\newtheorem{ex}[df]{$\textrm{Ex}$}
+\newtheorem{prop}[df]{$\textrm{Prop}$}
+\newtheorem{lem}[df]{$\textrm{Lem}$}
+\newtheorem{cor}[df]{$\textrm{Cor}$}
+\newtheorem{rmk}[df]{$\textrm{Rmk}$}
+\newtheorem{thm}[df]{$\textrm{Thm}$}
+\newtheorem{axi}[df]{$\textrm{Axi}$}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\bdf}{\begin{shadebox} \begin{df}}
+\newcommand{\edf}{\end{df} \end{shadebox}}
+\newcommand{\bex}{\begin{ex}}
+\newcommand{\eex}{\end{ex}}
+\newcommand{\bprop}{\begin{shadebox} \begin{prop}}
+\newcommand{\eprop}{\end{prop} \end{shadebox}}
+\newcommand{\blem}{\begin{shadebox} \begin{lem}}
+\newcommand{\elem}{\end{lem} \end{shadebox}}
+\newcommand{\bcor}{\begin{shadebox} \begin{cor}}
+\newcommand{\ecor}{\end{cor} \end{shadebox}}
+\newcommand{\brmk}{\begin{rmk}}
+\newcommand{\ermk}{\end{rmk}}
+\newcommand{\bthm}{\begin{shadebox} \begin{thm}}
+\newcommand{\ethm}{\end{thm} \end{shadebox}}
+\newcommand{\bpf}{\begin{proof}}
+\newcommand{\epf}{\end{proof}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\D}{\mathbb{D}}
+\newcommand{\U}{\mathcal{U}}
+\newcommand{\plim}{{\displaystyle \lim_{\substack{\longleftarrow\\ n}}}}
+\newcommand{\seq}[2]{(#1_{#2})_{#2\ge1}}
+\newcommand{\Zmod}[1]{\Z/p^{#1}\Z}
+\newcommand{\Lra}{\Longrightarrow}
+\newcommand{\Llra}{\Longleftrightarrow}
+\newcommand{\ol}[1]{{\overline{#1}}}
+\newcommand{\ul}[1]{{\underline{#1}}}
+\newcommand{\sem}[1]{[\hspace{-2pt}[{#1}]\hspace{-2pt}]}
+\newcommand{\pros}[1]{\begin{array}{c} \ast \ast\\ \tt{#1} \end{array}}
+\newcommand{\pgm}[1]{{\tt{#1}}\text{-プログラム}}
+\newcommand{\pgms}[1]{{\tt{#1}}\text{-プログラム集合}}
+\newcommand{\dtm}[1]{{\tt{#1}}\text{-データ}}
+\newcommand{\data}[1]{{\tt{#1}}\text{-データ集合}}
+\newcommand{\rtf}[3]{time^{\tt{#1}}_{\tt{#2}}({\tt{#3}})}
+\newcommand{\id}{\textrm{id}}
+\newcommand{\refl}{\textrm{refl}}
+\newcommand{\ap}{\textrm{ap}}
+\newcommand{\apd}{\textrm{apd}}
+\newcommand{\pr}[1]{\textrm{pr}_{#1}}
+\newcommand{\tp}{\textrm{transport}}
+\newcommand{\qinv}{\textrm{qinv}}
+\newcommand{\iseq}{\textrm{isequiv}}
+\newcommand{\peq}{\textrm{pair}^=}
+\newcommand{\sig}[3]{\sum_{{#1} : {#2}} {#3}\ ({#1})}
+\newcommand{\0}{\textbf{0}}
+\newcommand{\1}{\textbf{1}}
+\newcommand{\2}{\textbf{2}}
+\newcommand{\fune}{\textrm{funext}}
+\newcommand{\happ}{\textrm{happly}}
+\newcommand{\ua}{\textrm{ua}}
+\newcommand{\ide}{\textrm{idtoequiv}}
+\newcommand{\set}[1]{\textrm{isSet({#1})}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+\title{少人数クラス}
+\author{中村　薫}
+\date{\today}
+\maketitle
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\tableofcontents
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\setcounter{section}{2}
+\section{集合と論理}
+%型理論とは、形式的であれ非公式であれ、型とその要素を操作するための規則の集合体である。しかし、数学を自然言語で非公式に記述する場合、一般に馴染みのある言葉、特に「and」や「or」といった論理接続詞や、「for all」や「there exists」といった論理量詞が使われることが多い。集合論とは対照的に、型理論では、これらの英文を型に対する操作と見なす方法が複数用意されている。この潜在的な曖昧さは、ローカルまたはグローバルな規約を定めるか、非公式な数学に新しい注釈を導入するか、あるいはその両方によって解決される必要がある。これには多少の慣れが必要であるが、型理論がこのような細かい論理の解析を可能にするため、集合論的基礎に比べて「言葉の乱用」が少なく、より忠実に数学を表現できるという事実がそれを補っている。この章では、その問題点を説明し、私たちが選択したことを正当化する。
+\setcounter{subsection}{0}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{集合と$n$-型}
+\begin{thebibliography}{9}
+    \bibitem{bib1} The Univalent Foundations Program, 
+        {\it{Homotopy Type Theory: Univalent Foundations of Mathematics}}
+  \end{thebibliography}
+\end{document}
