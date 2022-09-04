@@ -1,0 +1,93 @@
+\usepackage{ascmac}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\usepackage{cite}
+\usepackage{graphicx}
+\usepackage{enumerate}
+\usepackage{url}
+\usepackage{mathrsfs}
+\usepackage{eucal}
+\usepackage{listings}
+
+% %% amsthm
+% \usepackage{amsthm}
+% \theoremstyle{plain}
+% \newtheorem{theorem}{定理}[section]
+% \newtheorem{lemma}[theorem]{補題}
+% \newtheorem{condition}[theorem]{条件}
+% \newtheorem{axiom}[theorem]{公理}
+% \theoremstyle{definition}
+% \newtheorem{definition}[theorem]{定義}
+% \newtheorem{exercise}[theorem]{演習}
+% \newtheorem{remark}[theorem]{注意}
+% \newtheorem{example}[theorem]{例}
+% \newtheorem*{definition*}{定義}
+% \newtheorem*{exercise*}{演習}
+% \newtheorem*{remark*}{注意}
+% \newtheorem*{example*}{例}
+
+%% xcolor
+\usepackage{xcolor}
+\definecolor{darkgreen}{rgb}{0,0.5,0}
+\definecolor{darkred}{rgb}{0.5,0,0}
+\definecolor{darkyellow}{rgb}{0.3,0.3,0}
+\definecolor{darkorange}{rgb}{0.4,0.2,0}
+\definecolor{myviolet}{rgb}{0.6,0.0,0.65}
+\definecolor{myblue}{rgb}{0.1,0.0,0.8}
+\definecolor{mygreen}{rgb}{0.2,0.7,0.1}
+\definecolor{mycomment}{rgb}{0.7,0.2,0.2}
+\definecolor{myred}{rgb}{0.8,0.0,0.0}
+\definecolor{myorange}{rgb}{0.6,0.2,0.2}
+
+% \pgfdeclarelayer{background}
+% \pgfdeclarelayer{foreground}
+% \pgfsetlayers{background,main,foreground}
+
+\lstdefinelanguage{coq}[]{Caml}{
+keywords=[1]{Section,Definition,Defined,CoInductive,Coercion,Inductive,Fixpoint,
+  Parameter,Module,Import,Record,Structure,Axiom,Lemma,Theorem,Notation,
+  Reserved,End,Proof,Goal,Qed,Variable,Variables,Hypothesis,Let,Program,Canonical},
+keywordstyle=\color{myviolet}\ttfamily,
+morekeywords=[2]{match,with,end,Set,Prop,Type,fun,of,let,in,struct,if,is,then,else,return},
+keywordstyle=[2]\color{mygreen}\ttfamily,
+morekeywords=[3]{move},
+keywordstyle=[3]\color{myblue}\ttfamily,
+morekeywords=[3]{field,lra},
+keywordstyle=[3]\color{myred}\ttfamily
+}
+
+\lstset{
+language=coq,
+columns=fullflexible,
+keepspaces,
+basicstyle=\small\ttfamily,
+identifierstyle=\color{black}\ttfamily,
+commentstyle=\color{mycomment}\it\ttfamily,
+morecomment=[n]{(*}{*)},
+morestring=[b][\color{myorange}\ttfamily]",
+showstringspaces=false,
+extendedchars=true,
+literate=
+{forall}{$\forall$}1
+{!=}{$\neq$}1
+{<>}{$\neq$}1
+{<=}{$\leq$}1
+{<=m}{$\leq_m$}1
+{<=l}{$\leq_l$}1
+{->}{$\to$}1
+{<->}{$\leftrightarrow$}1
+{==>}{$\Longrightarrow$}1
+{~~}{$\neg$}1
+{=>}{$\Rightarrow$}1
+{\#|}{\#|}1
+{exists}{$\exists$}1
+{\\in}{$\in$}1
+{\\sigma_}{$\sigma$}1
+{\\omega_}{$\omega$}1
+{\\delta}{$\delta$}1
+{/\\}{$\land$}1
+}
+
+\let\L=\lstinline
