@@ -7,8 +7,10 @@ Axiom funext : forall A B (f g : A -> B), f =1 g -> f = g.
 
 Section q_analogue.
 Local Open Scope ring_scope.
-Variable (R : rcfType) (q : R).
+Variable (R : rcfType) (q : R) (f g: R -> R).
 Hypothesis Hq : q - 1 != 0.
+Check f \+ g.
+Check f  g.
 
 Notation "f +/ g" := (fun x => f x + g x) (at level 49).
 Notation "f ** g" := (fun x => f x * g x) (at level 49).
