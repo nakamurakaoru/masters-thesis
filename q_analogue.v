@@ -7,12 +7,9 @@ Axiom funext : forall A B (f g : A -> B), f =1 g -> f = g.
 
 Section q_analogue.
 Local Open Scope ring_scope.
-Variable (R : rcfType) (q : R) (f g: R -> R).
+Variable (R : rcfType) (q : R).
 Hypothesis Hq : q - 1 != 0.
-Check f \+ g.
-Check f  g.
 
-Notation "f +/ g" := (fun x => f x + g x) (at level 49).
 Notation "f ** g" := (fun x => f x * g x) (at level 49).
 Notation "f // g" := (fun x => f x / g x) (at level 49).
 Notation "a */ f" := (fun x => a * (f x)) (at level 49).
@@ -21,7 +18,7 @@ Notation "a */ f" := (fun x => a * (f x)) (at level 49).
   exists d, (forall x,`|x - a| < d -> `|f x - b| < e).*)
 
 (*Lemma lim_add a b c (f g : R -> R) : cvg a b f -> cvg a c g ->
-  cvg a (b + c) (f +/ g).
+  cvg a (b + c) (f \+ g).
 Proof.
   rewrite /cvg.
   move=> fa_b ga_c e He0.
@@ -148,7 +145,7 @@ Proof. by rewrite /Dq /dq addrK' mul0r. Qed.
 
 (* q-derivative is linear *)
 Lemma Dq_is_linear f g a b x :
-  x != 0 -> Dq ((a */ f) +/ (b */ g)) x = a * (Dq f x) + b * (Dq g x).
+  x != 0 -> Dq ((a */ f) \+ (b */ g)) x = a * (Dq f x) + b * (Dq g x).
 Proof.
   move=> Hx.
   rewrite /Dq /dq !mulrA GRing_add_div.
@@ -540,13 +537,12 @@ End q_analogue.
 Section q_chain_rule.
 Local Open Scope ring_scope.
 Variable (R : rcfType).
-Notation "f o/ g" := (fun x => f (g x)) (at level 49).
 
 Lemma qchain q u f a b x : dq R q u x != 0 -> u = (fun x => a * x ^ b) ->
-  Dq R q (f o/ u) x = (Dq R (q^b) f (u x)) * (Dq R q u x).
+  Dq R q (f \o u) x = (Dq R (q^b) f (u x)) * (Dq R q u x).
 Proof.
   move=> Hqu Hu.
-  rewrite Hu /Dq /dq mulf_div.
+  rewrite Hu /Dq /dq mulf_div /=.
   rewrite [(q ^ b * (a * x ^ b) - a * x ^ b) * (q * x - x)] mulrC.
   rewrite expfzMl !mulrA.
   rewrite [a * q ^ b] mulrC.
