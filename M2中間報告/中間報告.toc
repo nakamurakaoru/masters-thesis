@@ -1,5 +1,5 @@
 \contentsline {section}{\numberline {1}Coqによる$q$-類似の形式化}{1}
 \contentsline {subsection}{\numberline {1.1}Coq}{1}
-\contentsline {subsection}{\numberline {1.2}$q$-類似}{1}
-\contentsline {section}{\numberline {2}HoTT}{1}
-\contentsline {section}{\numberline {3}coqgenプロジェクト}{1}
+\contentsline {subsection}{\numberline {1.2}$q$-類似}{2}
+\contentsline {section}{\numberline {2}HoTT}{2}
+\contentsline {section}{\numberline {3}coqgenプロジェクト}{2}

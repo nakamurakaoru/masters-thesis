@@ -1,4 +1,4 @@
-This is e-pTeX, Version 3.14159265-p3.8.1-180518-2.6 (utf8.sjis) (TeX Live 2018/W32TeX) (preloaded format=platex 2018.7.29)  22 SEP 2022 16:07
+This is e-pTeX, Version 3.14159265-p3.8.1-180518-2.6 (utf8.sjis) (TeX Live 2018/W32TeX) (preloaded format=platex 2018.7.29)  30 SEP 2022 18:00
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -249,7 +249,15 @@ LaTeX Font Info:    Overwriting symbol font `largesymbolsA' in version `bold'
 LaTeX Info: Redefining \not on input line 1043.
 LaTeX Info: Redefining \textsquare on input line 1063.
 LaTeX Info: Redefining \openbox on input line 1064.
+) (./poster_packages.tex
+(c:/w32tex/share/texmf-dist/tex/latex/cite/cite.sty
+LaTeX Info: Redefining \cite on input line 302.
+LaTeX Info: Redefining \nocite on input line 332.
+Package: cite 2015/02/27  v 5.5
 )
+(c:/w32tex/share/texmf-dist/tex/latex/graphics/graphicx.sty
+Package: graphicx 2017/06/01 v1.1a Enhanced LaTeX Graphics (DPC,SPQR)
+
 (c:/w32tex/share/texmf-dist/tex/latex/graphics/graphics.sty
 Package: graphics 2017/06/25 v1.2c Standard LaTeX Graphics (DPC,SPQR)
 
@@ -264,13 +272,6 @@ Package graphics Info: Driver file: dvips.def on input line 99.
 (c:/w32tex/share/texmf-dist/tex/latex/graphics-def/dvips.def
 File: dvips.def 2017/06/20 v3.1d Graphics/color driver for dvips
 ))
-(./poster_packages.tex (c:/w32tex/share/texmf-dist/tex/latex/cite/cite.sty
-LaTeX Info: Redefining \cite on input line 302.
-LaTeX Info: Redefining \nocite on input line 332.
-Package: cite 2015/02/27  v 5.5
-)
-(c:/w32tex/share/texmf-dist/tex/latex/graphics/graphicx.sty
-Package: graphicx 2017/06/01 v1.1a Enhanced LaTeX Graphics (DPC,SPQR)
 \Gin@req@height=\dimen144
 \Gin@req@width=\dimen145
 )
@@ -474,29 +475,29 @@ LaTeX Font Info:    Try loading font information for OT1+txtt on input line 99.
 
  (c:/w32tex/share/texmf-dist/tex/latex/txr/ot1txtt.fd
 File: ot1txtt.fd 2000/12/15 v3.1
-)
+) [1
+
+]
 
 LaTeX Font Warning: Font shape `JT1/mc/m/it' undefined
-(Font)              using `JT1/mc/m/n' instead on input line 116.
+(Font)              using `JT1/mc/m/n' instead on input line 137.
 
 
 LaTeX Font Warning: Font shape `JY1/mc/m/it' undefined
-(Font)              using `JY1/mc/m/n' instead on input line 116.
+(Font)              using `JY1/mc/m/n' instead on input line 137.
 
-[1
-
-] (./中間報告.aux)
+[2] (./中間報告.aux)
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
  ) 
 Here is how much of TeX's memory you used:
- 5294 strings out of 493249
- 66062 string characters out of 6146370
- 171614 words of memory out of 5000000
- 9146 multiletter control sequences out of 15000+600000
- 41182 words of font info for 138 fonts, out of 8000000 for 9000
+ 5299 strings out of 493249
+ 66114 string characters out of 6146370
+ 173614 words of memory out of 5000000
+ 9149 multiletter control sequences out of 15000+600000
+ 41836 words of font info for 141 fonts, out of 8000000 for 9000
  929 hyphenation exceptions out of 8191
- 35i,6n,58p,302b,1224s stack positions out of 5000i,500n,10000p,500000b,80000s
+ 35i,10n,58p,322b,1224s stack positions out of 5000i,500n,10000p,500000b,80000s
 
-Output written on 中間報告.dvi (1 page, 4400 bytes).
+Output written on 中間報告.dvi (2 pages, 7264 bytes).
