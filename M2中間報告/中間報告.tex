@@ -1,0 +1,179 @@
+\documentclass[11pt]{jarticle}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[a4paper,margin=25mm]{geometry}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{ascmac}
+\newtheoremstyle{mystyle}% % Name
+    {}%                      % Space above
+    {}%                      % Space below
+    {\normalfont}%           % Body font
+    {}%                      % Indent amount
+    {\bfseries}%             % Theorem head font
+    {}%                      % Punctuation after theorem head
+    { }%                     % Space after theorem head, ' ', or \newline
+    {}%                      % Theorem head spec (can be left empty, meaning `normal')
+\theoremstyle{mystyle}
+\usepackage{amssymb}
+\usepackage{ascmac}
+\usepackage{txfonts}
+%\usepackage{graphics}
+\input{poster_packages.tex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newtheorem{df}{$\textrm{Def}$}[subsection]
+\newtheorem{ex}[df]{$\textrm{Ex}$}
+\newtheorem{prop}[df]{$\textrm{Prop}$}
+\newtheorem{lem}[df]{$\textrm{Lem}$}
+\newtheorem{cor}[df]{$\textrm{Cor}$}
+\newtheorem{rmk}[df]{$\textrm{Rmk}$}
+\newtheorem{thm}[df]{$\textrm{Thm}$}
+\newtheorem{axi}[df]{$\textrm{Axi}$}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\bdf}{\begin{shadebox} \begin{df}}
+\newcommand{\edf}{\end{df} \end{shadebox}}
+\newcommand{\bex}{\begin{ex}}
+\newcommand{\eex}{\end{ex}}
+\newcommand{\bprop}{\begin{shadebox} \begin{prop}}
+\newcommand{\eprop}{\end{prop} \end{shadebox}}
+\newcommand{\blem}{\begin{shadebox} \begin{lem}}
+\newcommand{\elem}{\end{lem} \end{shadebox}}
+\newcommand{\bcor}{\begin{shadebox} \begin{cor}}
+\newcommand{\ecor}{\end{cor} \end{shadebox}}
+\newcommand{\brmk}{\begin{rmk}}
+\newcommand{\ermk}{\end{rmk}}
+\newcommand{\bthm}{\begin{shadebox} \begin{thm}}
+\newcommand{\ethm}{\end{thm} \end{shadebox}}
+\newcommand{\bpf}{\begin{proof}}
+\newcommand{\epf}{\end{proof}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\D}{\mathbb{D}}
+\newcommand{\U}{\mathcal{U}}
+\newcommand{\plim}{{\displaystyle \lim_{\substack{\longleftarrow\\ n}}}}
+\newcommand{\seq}[2]{(#1_{#2})_{#2\ge1}}
+\newcommand{\Zmod}[1]{\Z/p^{#1}\Z}
+\newcommand{\Lra}{\Longrightarrow}
+\newcommand{\Llra}{\Longleftrightarrow}
+\newcommand{\lra}{\leftrightarrow}
+\newcommand{\ra}{\rightarrow}
+\newcommand{\ol}[1]{{\overline{#1}}}
+\newcommand{\ul}[1]{{\underline{#1}}}
+\newcommand{\sem}[1]{[\hspace{-2pt}[{#1}]\hspace{-2pt}]}
+\newcommand{\pros}[1]{\begin{array}{c} \ast \ast\\ \tt{#1} \end{array}}
+\newcommand{\pgm}[1]{{\tt{#1}}\text{-プログラム}}
+\newcommand{\pgms}[1]{{\tt{#1}}\text{-プログラム集合}}
+\newcommand{\dtm}[1]{{\tt{#1}}\text{-データ}}
+\newcommand{\data}[1]{{\tt{#1}}\text{-データ集合}}
+\newcommand{\rtf}[3]{time^{\tt{#1}}_{\tt{#2}}({\tt{#3}})}
+\newcommand{\id}{\textrm{id}}
+\newcommand{\refl}{\textrm{refl}}
+\newcommand{\ap}{\textrm{ap}}
+\newcommand{\apd}{\textrm{apd}}
+\newcommand{\pr}[1]{\textrm{pr}_{#1}}
+\newcommand{\tp}{\textrm{transport}}
+\newcommand{\qinv}{\textrm{qinv}}
+\newcommand{\iseq}{\textrm{isequiv}}
+\newcommand{\peq}{\textrm{pair}^=}
+\newcommand{\sig}[3]{\sum_{{#1} : {#2}} {#3}\ ({#1})}
+\newcommand{\0}{\textbf{0}}
+\newcommand{\1}{\textbf{1}}
+\newcommand{\2}{\textbf{2}}
+\newcommand{\fune}{\textrm{funext}}
+\newcommand{\happ}{\textrm{happly}}
+\newcommand{\ua}{\textrm{ua}}
+\newcommand{\ide}{\textrm{idtoequiv}}
+\newcommand{\set}[1]{\textrm{isSet({#1})}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+\title{少人数クラス}
+\author{中村　薫}
+\date{\today}
+\maketitle
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\tableofcontents
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Coqによる$q$-類似の形式化}
+\subsection{Coq}
+Coq とは, 定理証明支援系の1つであり, 数学的な証明が正しいかどうか判定するプログラムである. 人間がチェックすることが難しい複雑な証明でも正しさが保証され, また証明付きプログラミングにも応用される. 例えば, 命題$P$, $Q$について, $P \Lra Q$かつ$P$であれば, $Q$が成り立つということは, Coq では
+\begin{lstlisting}{Coq}
+From mathcomp Require Import ssreflect.
+
+Theorem modus_ponens (P Q : Prop) : (P -> Q) /\ P -> Q.
+Proof.
+  move=> [] pq p.
+  by apply pq.
+Qed.
+\end{lstlisting}
+と表現できる. \\
+Coq による証明は, Curry-Howard 同型と呼ばれる, 
+\begin{align*}
+  \text{命題} &\leftrightarrow \text{型} \\
+  \text{証明} &\leftrightarrow \text{型に要素が存在する}
+\end{align*}
+という対応関係に基づいている. また, 各論理演算子について, 以下のように対応している
+\begin{align*}
+  P \text{ならば} Q &\quad P \rightarrow Q \\
+  P \text{かつ} Q &\quad P \times Q \\
+  P \text{または} Q &\quad  P + Q
+\end{align*}
+この同型をもとに上記の証明をもう一度考えてみると, $P \ra Q$と$P$という型に要素が存在することから, $Q$という型の要素を構成すればよいということである. \\
+まず, 前提の要素それぞれに$pq$, $p$と名前をつける. これがプログラム中の{\tt move$\Rightarrow$ [] pq p}のことである. 
+ここで, $P \to Q$という型は, 入力する値の型が$P$, 出力する値の型が$Q$であるような関数の型であるため, $P$の要素$p$に$pq$を適用することで, $Q$の要素を構成することができる. この関数適用がプログラム中の{\tt apply pq}のことである. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{$q$-類似}
+$q$-類似とは, $q \to 1$とすると通常の数学に一致するような拡張のことである. 例えば, 自然数$n$の$q$-類似$[n]$は
+\[
+  [n] = 1 + q + q^2 + \cdots q ^ {n -1} 
+\]
+であり, $(x-a)^n$の$q$-類似$(x-a)^n_q$は
+\[
+  (x-a)^n_q \coloneqq \begin{cases}
+                                  1 & (n=0)\\
+                                  (x-a)(x-qa)\cdots(x-q^{n-1}a) & (n\ge1)
+                                \end{cases}
+\]
+である. 本章では, $D_q (x-a)^n_q = [n] (x-a)^{n-1}_q$(ここで, $D_q$は微分の$q$-類似)の形式化を目標とする. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{形式化}
+様々な$q$-類似を考えるにあたって, まずは微分の$q$-類似から始める. 
+\begin{lstlisting}{Coq}
+Definition dq (f : R -> R) x := f (q * x) - f x.
+Definition Dq f := dq f // dq id.
+\end{lstlisting}
+次に, 自然数の$q$-類似を定義する. 
+\begin{lstlisting}{Coq}
+Definition qnat n : R := (q ^ n - 1) / (q - 1).
+\end{lstlisting}
+この{\tt qnat}に対して, $(x^n)' = n x^{n-1}$の$q$-類似が成り立つ. 
+\begin{lstlisting}{Coq}
+
+Lemma qderiv_of_pow n x :
+  x != 0 -> Dq (fun x => x ^ n) x = qnat n * x ^ (n - 1).
+Proof.
+  move=> Hx.
+  rewrite /Dq /dq /qnat.
+  rewrite -{4}(mul1r x) -mulrBl expfzMl.
+    rewrite -GRing_add_div.
+    rewrite [in x ^ n](_ : n = (n -1) +1) //.
+      rewrite expfzDr // expr1z.
+      rewrite mulrA -mulNr !red_frac_r //.
+      rewrite GRing_add_div //.
+      rewrite -{2}[x ^ (n - 1)]mul1r.
+      rewrite -mulrBl mulrC mulrA.
+      by rewrite [in (q - 1)^-1 * (q ^ n - 1)] mulrC.
+    by rewrite subrK.
+  by apply mulf_neq0.
+Qed.\end{lstlisting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{HoTT}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{coqgenプロジェクト}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{thebibliography}{9}
+    \bibitem{bib1} The Univalent Foundations Program, 
+        {\it{Homotopy Type Theory: Univalent Foundations of Mathematics}}
+  \end{thebibliography}
+\end{document}
