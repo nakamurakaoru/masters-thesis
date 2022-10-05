@@ -117,7 +117,7 @@ Proof.
 Qed.
 
 (* 分母共通の和 *)
-Lemma GRing_add_div (x y z : R) : z != 0 -> x / z + y / z = (x + y) / z.
+Lemma add_div (x y z : R) : z != 0 -> x / z + y / z = (x + y) / z.
 Proof.
   move=> nz0.
   by rewrite addf_div // -mulrDl red_frac_r.
@@ -134,7 +134,6 @@ Qed.
 (* main *)
 (* q-differential *)
 Definition dq (f : R -> R) x := f (q * x) - f x.
-(* dq : (R -> R) -> R -> R であるが, dq : (R => R) -> (R -> R) の方がよいか？ *)
 
 (* q-differential product rule *)
 Lemma dq_prod f g x :
@@ -146,8 +145,7 @@ Proof.
 Qed.
 
 (* q-derivative *)
-Definition Dq f x := (dq f x) / (dq (fun x => x) x).
-(* dq と同様 *)
+Definition Dq f := dq f // dq id.
 
 (* q-derivative for const is 0 *)
 Lemma Dq_const x c : Dq (fun x => c) x = 0.
@@ -158,7 +156,7 @@ Lemma Dq_is_linear f g a b x :
   x != 0 -> Dq ((a */ f) \+ (b */ g)) x = a * (Dq f x) + b * (Dq g x).
 Proof.
   move=> Hx.
-  rewrite /Dq /dq !mulrA GRing_add_div.
+  rewrite /Dq /dq !mulrA add_div.
     rewrite !mulrBr opprD !addrA.
     rewrite [a * f (q * x) + b * g (q * x) - a * f x] addrC.
     rewrite [(a * f (q * x) + b * g (q * x))] addrC.
@@ -192,11 +190,11 @@ Proof.
   move=> Hx.
   rewrite /Dq /dq /qnat.
   rewrite -{4}(mul1r x) -mulrBl expfzMl.
-    rewrite -GRing_add_div.
+    rewrite -add_div.
     rewrite [in x ^ n](_ : n = (n -1) +1) //.
       rewrite expfzDr // expr1z.
       rewrite mulrA -mulNr !red_frac_r //.
-      rewrite GRing_add_div //.
+      rewrite add_div //.
       rewrite -{2}[x ^ (n - 1)]mul1r.
       rewrite -mulrBl mulrC mulrA.
       by rewrite [in (q - 1)^-1 * (q ^ n - 1)] mulrC.
@@ -209,7 +207,7 @@ Lemma qderiv_prod f g x :
   x != 0 -> Dq (f ** g) x = f (q * x) * Dq g x + (g x) * Dq f x.
 Proof.
   move=> Hx.
-  rewrite /Dq dq_prod -GRing_add_div.
+  rewrite /Dq dq_prod -add_div.
     by rewrite !mulrA.
   by apply denom_is_nonzero.
 Qed.
@@ -238,7 +236,7 @@ Lemma qderiv_quot f g x : x != 0 -> g x != 0 -> g (q * x) != 0 ->
   Dq (f // g) x = (g x * Dq f x - f x * Dq g x) / (g x * g (q * x)).
 Proof.
   move=> Hx Hgx Hgqx.
-  rewrite -GRing_add_div.
+  rewrite -add_div.
     rewrite red_frac_l // mulNr.
     apply /rtransposition /(same_prod (g (q * x))) => //.
     rewrite mulrDl.
@@ -262,7 +260,7 @@ Lemma qderiv_quot' f g x : x != 0 -> g x != 0 -> g (q * x) != 0 ->
     (g (q * x) * Dq f x - f (q * x) * Dq g x) / (g x * g (q * x)).
 Proof.
   move=> Hx Hgx Hgqx.
-  rewrite -GRing_add_div.
+  rewrite -add_div.
     rewrite [g x * g (q * x)] mulrC.
     rewrite red_frac_l // mulNr.
     apply /rtransposition /(same_prod (g x)) => //.
@@ -333,7 +331,7 @@ Proof.
       rewrite -(@divff _ (q - 1)) //.
       rewrite [qnat n.+1] /qnat.
       rewrite [q * ((q ^ n.+1 - 1) / (q - 1))] mulrA.
-      rewrite (GRing_add_div _ _ (q -1)) //.
+      rewrite (add_div _ _ (q -1)) //.
       by rewrite mulrBr -exprSz mulr1 subrKA.
     by apply denom_is_nonzero.
 Qed.
@@ -456,11 +454,11 @@ Proof.
   case: m => m.
   - case: n => n.
     + by apply qpoly_nonneg_explaw.
-    + by rewrite qpoly_exp_pos_neg.
+    + rewrite qpoly_exp_pos_neg //. admit.
   - case: n => n.
     + by rewrite qpoly_exp_neg_pos.
     + by apply qpoly_exp_neg_neg.
-Qed.
+Admitted.
 
 (* q-derivative of q-polynomial for 0 *)
 Lemma qderiv_qpoly_0 a x :
