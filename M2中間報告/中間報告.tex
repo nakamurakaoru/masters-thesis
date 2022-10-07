@@ -20,14 +20,14 @@
 %\usepackage{graphics}
 \input{poster_packages.tex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newtheorem{df}{$\textrm{Def}$}[subsection]
-\newtheorem{ex}[df]{$\textrm{Ex}$}
-\newtheorem{prop}[df]{$\textrm{Prop}$}
-\newtheorem{lem}[df]{$\textrm{Lem}$}
-\newtheorem{cor}[df]{$\textrm{Cor}$}
-\newtheorem{rmk}[df]{$\textrm{Rmk}$}
-\newtheorem{thm}[df]{$\textrm{Thm}$}
-\newtheorem{axi}[df]{$\textrm{Axi}$}
+\newtheorem{df}{$\textrm{Definition}$}[subsection]
+\newtheorem{ex}[df]{$\textrm{Example}$}
+\newtheorem{prop}[df]{$\textrm{Proposition}$}
+\newtheorem{lem}[df]{$\textrm{Lemmma}$}
+\newtheorem{cor}[df]{$\textrm{Corollary}$}
+\newtheorem{rmk}[df]{$\textrm{Remark}$}
+\newtheorem{thm}[df]{$\textrm{Theorem}$}
+\newtheorem{axi}[df]{$\textrm{Axiom}$}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newcommand{\bdf}{\begin{shadebox} \begin{df}}
 \newcommand{\edf}{\end{df} \end{shadebox}}
@@ -174,7 +174,7 @@ Definition Dq f := dq f // dq id.
           $q \ne 1$ではなく$q - 1 \ne 0$という形にしている. 
   \item {\tt Notation}で関数同士の割り算の記法を定義している. 
   \item 2つの{\tt Definition}で$q$-差分と$q$-微分をそれぞれ定義している. 
-          {\tt $coloneqq$}以前に定義の名前と引数, 以後に具体的な定義が書いてある. 
+          {\tt $\coloneqq$}以前に定義の名前と引数, 以後に具体的な定義が書いてある. 
           例えば$q$-差分についてであれば, {\tt d\_q}が名前, {\tt f}と{\tt x}が引数, 
           {f (q * x) - f x}が定義である. ({\tt f}の後ろの{\tt : R $\to$ R}は{\tt f}の型である. 
           一方, もう一つの引数である{\tt x}には型を書いていない. これは, Coqには強力な
@@ -196,11 +196,26 @@ Definition Dq f := dq f // dq id.
   \]
   と定義する. 
 \edf
+この$[n]$に対して, $(x^n)' = n x^{n-1}$の$q$-類似が成り立つ.
+\blem[\cite{bib1} p2 Example (1.7)]
+  $n \in \Z_{>0}$について, 
+  \[
+    D_q x^n = [n] x ^{n - 1}
+  \]
+  が成り立つ. 
+\elem
+\bpf
+  定義に従って計算すればよく, 
+  \[
+    D_q x ^ n = \frac{(qx) ^ n - x ^ n}{(q - 1) x}
+                 = \frac{q^n - 1}{q - 1} x ^ {n - 1}
+                 = [n] x ^ {n - 1}
+  \] 
+\epf
+この定義と補題の形式化は以下のとおりである. 
 \begin{lstlisting}{Coq}
 Definition qnat n : R := (q ^ n - 1) / (q - 1).
-\end{lstlisting}
-この{\tt qnat}に対して, $(x^n)' = n x^{n-1}$の$q$-類似が成り立つ. 
-\begin{lstlisting}{Coq}
+
 Lemma qderiv_of_pow n x :
   x != 0 -> Dq (fun x => x ^ n) x = qnat n * x ^ (n - 1).
 Proof.
@@ -219,12 +234,49 @@ Proof.
   by apply mulf_neq0.
 Qed.
 \end{lstlisting}
-\cite{bib1}においては, この補題は Example(\cite{bib1} p2 (1.7)) として扱われ, 
-\[
-  D_q x^n = \frac{(qx)^n - x^n}{(q-1)x} = \frac{q^n - 1}{q - 1} x^{n - 1}
-\]
-というように1行で終わっているが, 形式化する場合には何倍もかかっている. これは, 積の交換法則や分配法則といった「当たり前」の部分も明示的に書く必要があるからである. 証明中に多く出現している{\tt rewrite}は等式の形をしている補題を使って証明すべき結論を書き換えるタクティックであり, {\it lem}が$A = B$という形の補題のとき, {\tt rewrite} {\it lem}で結論に現れる$A$を$B$に変える. \\
-$a \in \R$, $n \in \N$に対して, $(x - a)^n$の$q$-類似は以下のように形式化できる. 
+ここでも, コードについて少し説明を加える. 
+\begin{itemize}
+  \item {\tt Definition}と同様, {\tt Lemma}について, {\tt $\coloneqq$}の前に補題の名前と
+          引数が, 後に補題の主張が書いてある. 今回であれば, {\tt qderiv\_of\_pow}が補題の
+          名前で, {\tt n}と{\tt x}が引数である. 
+  \item {\tt Proof.}以下が補題の証明である. 
+  \item {\it def}が定義のとき, {\tt rewrite /{\it def}}で定義を展開している. 
+  \item {\it lem}が{\tt A = B}という形の補題のとき, {\tt rewrite {\it lem}}で結論に出現する
+          {\tt A}を{\tt B}に書き換えている. 
+  \item {\tt red\_frac\_r}は, 
+           \begin{lstlisting}{Coq}
+red_frac_r : forall x y z : R, z != 0 -> x * z / (y * z) = x / y \end{lstlisting}
+           という補題である. この補題を使うため, もともとはなかった{\tt $x \ne 0$}という
+           前提を加えている. 実際, $D_q$の定義において分母に$x$が出現するので, 
+           $x$が$0$でないという前提は妥当である.  
+\end{itemize}
+\brmk
+  {\tt qnat}という名前であるが, 実際には{\tt n}の型は{\tt nat}ではなく{\tt R}にしている. 
+  また, {\tt qderiv\_of\_pow}の{\tt n}の型は{\tt int}である. 
+\ermk
+\cite{bib1}では証明は1行で終わっているが, 形式化する場合には何倍もかかっている. これは, 積の交換法則や指数法則などの, 通常の数学では「当たり前」なことが自動では計算されず, {\tt rewrite mulrC}や{\tt rewrite expfzDr}というように{\tt rewrite}での書き換えを明示的に行わなければならないからである. \\
+続いて$(x - a)^n$の$q$-類似を定義し, その性質を調べる.  
+\bdf[\cite{bib1} p8 Definition (3.4)]
+  $x$, $a \in \R$, $n \in \Z_{\ge 0}$に対して, $(x - a)^n$の$q$-類似$(x - a)^n_q$を, 
+  \[
+  (x - a)^n_q = \begin{cases}
+                      1 & \text{if}\ n = 0 \\
+                      (x - a) (x - qa) \cdots (x - q^{n - 1} a) & \text{if}\ n \ge 1
+                    \end{cases}
+  \]
+  と定義する. 
+\edf
+\bprop
+  $n\in\Z_{>0}$に対し, 
+  \[
+    D_q(x-a)^n_q = [n](x-a)^{n-1}_q
+  \]
+  が成り立つ. 
+\eprop
+\bpf
+  $n$についての帰納法により示される. 
+\epf
+まず, $(x - a)^n_q$の定義を形式化すると, 
 \begin{lstlisting}{Coq}
 Fixpoint qpoly_nonneg a n x :=
   match n with
@@ -232,14 +284,7 @@ Fixpoint qpoly_nonneg a n x :=
   | n.+1 => (qpoly_nonneg a n x) * (x - q ^ n * a)
   end.
 \end{lstlisting}
-\cite{bib1}では, 
-\[
-  (x - a)^n_q = \begin{cases}
-                      1 & \text{if}\ n = 0 \\
-                      (x - a) (x - qa) \cdots (x - q^{n - 1} a) & \text{if}\ n \ge 1
-                    \end{cases}
-\]
-と定義している(\cite{bib1} p8 Definition (3.4))が, 形式化する際には{\tt Fixpoint}を用いて, 再帰関数として定義している. この qpoly\_nonneg について, 
+となる. {\tt Fixpoint}を用いて再帰的な定義をしており, {\tt match}を使って{\tt n}が{\tt 0}かどうかで場合分けしている. 補題の証明については 
 \begin{lstlisting}{Coq}
 Theorem qderiv_qpoly_nonneg a n x :
   x != 0 -> Dq (qpoly_nonneg a n.+1) x = qnat n.+1 * qpoly_nonneg a n x.
@@ -273,6 +318,7 @@ Proof.
     by apply denom_is_nonzero.
 Qed.
 \end{lstlisting}
+となる. ここで{\tt elim:\,n}は{\tt n}の帰納法に対応している. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{HoTT}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
