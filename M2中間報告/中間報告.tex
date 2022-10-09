@@ -169,7 +169,9 @@ Definition Dq f := dq f // dq id.
 \begin{itemize}
   \item 最初の2行で必要なライブラリの指定をしている. 
   \item {\tt Variable}でそのセクション内で共通して使う変数を宣言している. 
-          {\tt R}がCoqにおける実数の役割を果たす. 
+          {\tt R}がCoqにおける実数(正確には{\tt mathcomp}の{\tt algebra}の実数)の役割を
+          果たす. ここではまだ出てきていないが, {\tt nat}が$0$を含む自然数を, {\tt int}が整数に
+          対応する. 
   \item {\tt Hypothesis}で, $q$が1でないという仮定をしている. 使いやすさのため, 
           $q \ne 1$ではなく$q - 1 \ne 0$という形にしている. 
   \item {\tt Notation}で関数同士の割り算の記法を定義している. 
@@ -197,13 +199,13 @@ Definition Dq f := dq f // dq id.
   と定義する. 
 \edf
 この$[n]$に対して, $(x^n)' = n x^{n-1}$の$q$-類似が成り立つ.
-\blem[\cite{bib1} p2 Example (1.7)]
+\bprop[\cite{bib1} p2 Example (1.7)]
   $n \in \Z_{>0}$について, 
   \[
     D_q x^n = [n] x ^{n - 1}
   \]
   が成り立つ. 
-\elem
+\eprop
 \bpf
   定義に従って計算すればよく, 
   \[
@@ -252,7 +254,8 @@ red_frac_r : forall x y z : R, z != 0 -> x * z / (y * z) = x / y \end{lstlisting
 \end{itemize}
 \brmk
   {\tt qnat}という名前であるが, 実際には{\tt n}の型は{\tt nat}ではなく{\tt R}にしている. 
-  また, {\tt qderiv\_of\_pow}の{\tt n}の型は{\tt int}である. 
+  また, {\tt qderiv\_of\_pow}の{\tt n}の型は{\tt int}であるため, より一般化した形での形式化に
+  なっている. 
 \ermk
 \cite{bib1}では証明は1行で終わっているが, 形式化する場合には何倍もかかっている. これは, 積の交換法則や指数法則などの, 通常の数学では「当たり前」なことが自動では計算されず, {\tt rewrite mulrC}や{\tt rewrite expfzDr}というように{\tt rewrite}での書き換えを明示的に行わなければならないからである. \\
 続いて$(x - a)^n$の$q$-類似を定義し, その性質を調べる.  
@@ -266,7 +269,7 @@ red_frac_r : forall x y z : R, z != 0 -> x * z / (y * z) = x / y \end{lstlisting
   \]
   と定義する. 
 \edf
-\bprop
+\bprop \label{q_deriv_qpoly_nonneg}
   $n\in\Z_{>0}$に対し, 
   \[
     D_q(x-a)^n_q = [n](x-a)^{n-1}_q
@@ -318,7 +321,196 @@ Proof.
     by apply denom_is_nonzero.
 Qed.
 \end{lstlisting}
-となる. ここで{\tt elim:\,n}は{\tt n}の帰納法に対応している. 
+となる. ここで{\tt elim:\,n}は{\tt n}の帰納法に対応している. \\
+指数法則については, 一般には$(x - a)^{m + n} \neq (x - a)^m_q(x - a)^n_q$であり, 以下のようになる. 
+\bprop[\cite{bib1} p8 (3.6)]
+  $x,a\in\R$, $m,n\in\Z_{>0}$について, 
+  \[
+    (x-a)^{m+n}_q = (x-a)^m_q (x-q^ma)^n_q
+  \]
+  が成り立つ. 
+\eprop
+\bpf
+    \begin{align*}
+    (x-a)^{m+n}_q &= (x-a)(x-qa)\cdots(x-q^{m-1}a)
+                         \times (x-q^ma)(x-q^{m+1}a)\cdots(x-q^{m+n-1})\\
+                       &= (x-a)(x-qa)\cdots(x-q^{m-1}a)
+                         \times (x-q^ma)(x-q(q^mx))\cdots(x-q^{n-1}(q^ma))\\
+                       &= (x-a)^m_q(x-q^ma)^{n}_q
+  \end{align*}
+  より成立する.
+\epf
+この形式化は次のとおりである. 
+\begin{lstlisting}{Coq}
+Lemma qpoly_nonneg_explaw x a m n :
+  qpoly_nonneg a (m + n) x =
+    qpoly_nonneg a m x * qpoly_nonneg (q ^ m * a) n x.
+Proof.
+  elim: n.
+  - by rewrite addn0 /= mulr1.
+  - elim => [_|n _ IH].
+    + by rewrite addnS /= addn0 expr0z !mul1r.
+    + rewrite addnS [LHS]/= IH /= !mulrA.
+      by rewrite -[q ^ n.+1 * q ^ m] expfz_n0addr // addnC.
+Qed.
+\end{lstlisting}
+\cite{bib1}の証明では単に式変形しているが, {\tt qpoly\_nonneg}が再帰的に定義されているため, 形式化の証明では{\tt m}, {\tt n}に関する帰納法を用いている. \\
+この指数法則を用いて, $(x - a)^n_q$の$n$を負の数に拡張する. まず, \cite{bib1}の定義は
+\bdf[\cite{bib1} p9 (3.7)] \label{qpoly_neg}
+  $x$, $a \in \R$, $l\in\Z_{>0}$とする. このとき, 
+  \[
+    (x-a)^{-l}_q \coloneqq \frac{1}{(x-q^{-l}a)^l_q}
+  \]
+  と定める. 
+\edf
+であり, この形式化は, 
+\begin{lstlisting}{Coq}
+Definition qpoly_neg a n x := 1 / qpoly_nonneg (q ^ ((Negz n) + 1) * a) n x.
+\end{lstlisting}
+となる. ここで, {\tt Negz n}とは{\tt Negz n = - n.+1}をみたすものであって, {\tt int}は
+\begin{lstlisting}{Coq}
+Variant int : Set := Posz : nat -> int | Negz : nat -> int.
+\end{lstlisting}
+のように定義されている. よって, {\tt int}は$0$以上か負かで場合分けできるため, {\tt n :\,int}に対して, 
+\begin{lstlisting}{Coq}
+Definition qpoly a n x :=
+  match n with
+  | Posz n0 => qpoly_nonneg a n0 x
+  | Negz n0 => qpoly_neg a n0.+1 x
+  end.
+\end{lstlisting}
+と定義できる. \\
+整数に拡張した$(x - a)^n_q$も, $q$-微分にたいしてうまく振る舞う. 
+\bprop[\cite{bib1} p10 Proposition3.3]
+  $n \in \Z$について, 
+  \[
+    D_q x^n = [n] x ^{n - 1}
+  \]
+  が成り立つ. ただし, $n$が整数の場合にも, 自然数のときと同様, $[n]$の定義は
+  \[
+    \frac{q^n - 1}{q - 1}
+  \]
+  である. 
+\eprop
+\bpf
+  $n > 0$のときは Proposition \ref{q_deriv_qpoly_nonneg} であり, $n = 0$のときは$[0] = 0$からすぐにわかる. 
+  $n < 0$のときは, Definition \ref{qpoly_neg}と, 商の微分公式の$q$-類似版である
+  \[
+    D_q \left( \frac{f(x)}{g(x)} \right) = \frac{g(x) D_q f(x) - f(x) D_q g(x)}{g(x) g(qx)} \quad
+    \text{(\cite{bib1} p3 (1.13))}
+  \]
+  及び Proposition \ref{q_deriv_qpoly_nonneg}を用いて示される. 
+\epf
+この補題の証明の形式化が本章の目標である. \cite{bib1}と同じ方針で証明する. まず, $n = 0$のとき, 
+\begin{lstlisting}{Coq}
+Lemma qderiv_qpoly_0 a x :
+  Dq (qpoly a 0) x = qnat 0 * qpoly a (- 1) x.
+Proof. by rewrite Dq_const qnat_0 mul0r. Qed.
+\end{lstlisting}
+である. ここで, {\tt Dq\_const}は
+\begin{lstlisting}{Coq}
+Lemma Dq_const x c : Dq (fun x => c) x = 0.
+Proof. by rewrite /Dq /dq addrK' mul0r. Qed.
+\end{lstlisting}
+という定数関数の$q$-微分は$0$であるという補題である. 次に, $n < 0$のときは
+\begin{lstlisting}{Coq}
+Lemma qderiv_qpoly_neg a n x : q != 0 -> x != 0 ->
+  (x - q ^ (Negz n) * a) != 0 ->
+  qpoly_nonneg (q ^ (Negz n + 1) * a) n x != 0 ->
+  Dq (qpoly_neg a n) x = qnat (Negz n + 1) * qpoly_neg a (n.+1) x.
+Proof.
+  move=> Hq0 Hx Hqn Hqpoly.
+  destruct n.
+  - by rewrite /Dq /dq /qpoly_neg /= addrK' qnat_0 !mul0r.
+  - rewrite qderiv_quot //.
+      rewrite Dq_const mulr0 mul1r sub0r.
+      rewrite qderiv_qpoly_nonneg // qpoly_qx // -mulNr.
+      rewrite [qpoly_nonneg (q ^ (Negz n.+1 + 1) * a) n.+1 x *
+                (q ^ n.+1 * qpoly_nonneg (q ^ (Negz n.+1 + 1 - 1) *
+                  a) n.+1 x)] mulrC.
+      rewrite -mulf_div.
+      have -> : qpoly_nonneg (q ^ (Negz n.+1 + 1) * a) n x /
+                    qpoly_nonneg (q ^ (Negz n.+1 + 1) * a) n.+1 x =
+                      1 / (x - q ^ (- 1) * a).
+        rewrite -(mulr1
+                     (qpoly_nonneg (q ^ (Negz n.+1 + 1) * a) n x)) /=.
+        rewrite red_frac_l.
+          rewrite NegzE mulrA -expfzDr // addrA -addn2.
+          rewrite (_ : Posz (n + 2)%N = Posz n + 2) //.
+          rewrite -{1}(add0r (Posz n)).
+          by rewrite addrKA.
+        by rewrite /=; apply mulnon0 in Hqpoly.
+      rewrite mulf_div.
+      rewrite -[q ^ n.+1 *
+                 qpoly_nonneg (q ^ (Negz n.+1 + 1 - 1) * a) n.+1 x *
+                   (x - q ^ (-1) * a)]mulrA.
+      have -> : qpoly_nonneg (q ^ (Negz n.+1 + 1 - 1) * a) n.+1 x *
+                (x - q ^ (-1) * a) =
+                qpoly_nonneg (q ^ (Negz (n.+1)) * a) n.+2 x => /=.
+        have -> : Negz n.+1 + 1 - 1 = Negz n.+1.
+          by rewrite addrK.
+        have -> : q ^ n.+1 * (q ^ Negz n.+1 * a) = q ^ (-1) * a => //.
+        rewrite mulrA -expfzDr // NegzE.
+        have -> : Posz n.+1 - Posz n.+2 = - 1 => //.
+        rewrite -addn1 -[(n + 1).+1]addn1.
+        rewrite (_ : Posz (n + 1)%N = Posz n + 1) //.
+        rewrite (_ : Posz (n + 1 + 1)%N = Posz n + 1 + 1) //.
+        rewrite -(add0r (Posz n + 1)).
+        by rewrite addrKA.
+      rewrite /qpoly_neg /=.
+      rewrite (_ : Negz n.+2 + 1 = Negz n.+1) //.
+      rewrite -mulf_div.
+      congr (_ * _).
+      rewrite NegzE mulrC.
+      rewrite /qnat.
+      rewrite -mulNr mulrA.
+      congr (_ / _).
+      rewrite opprB mulrBr mulr1 mulrC divff.
+        rewrite invr_expz.
+        rewrite (_ : - Posz n.+2 + 1 = - Posz n.+1) //.
+        rewrite -addn1.
+        rewrite (_ : Posz (n.+1 + 1)%N = Posz n.+1 + 1) //.
+        rewrite addrC.
+        rewrite [Posz n.+1 + 1]addrC.
+        by rewrite -{1}(add0r 1) addrKA sub0r.
+      by rewrite expnon0 //.
+    rewrite qpoly_qx // mulf_neq0 //.
+      by rewrite expnon0.
+    rewrite qpoly_nonneg_head mulf_neq0 //.
+    rewrite (_ : Negz n.+1 + 1 - 1 = Negz n.+1) //.
+      by rewrite addrK.
+    move: Hqpoly => /=.
+    move/mulnon0.
+    by rewrite addrK mulrA -{2}(expr1z q) -expfzDr.
+Qed.
+\end{lstlisting}
+と, 非常に長くなっているが積の交換則や結合則などが多く, {\tt qderiv\_quot}が商の$q$-微分公式の形式化であるため, \cite{bib1}の証明をそのまま形式化したものになっている.  また, いくつかの項が$0$でないという条件がついているが, これらの項は Definition \ref{qpoly_neg} において分母に現れるため, {\tt qderiv\_of\_pow}のときと同様妥当であると考えられる. これらをまとめて, 
+\begin{lstlisting}{Coq}
+Theorem qderiv_qpoly a n x : q != 0 -> x != 0 ->
+  x - q ^ (n - 1) * a != 0 ->
+  qpoly (q ^ n * a) (- n) x != 0 ->
+  Dq (qpoly a n) x = qnat n * qpoly a (n - 1) x.
+Proof.
+  move=> Hq0 Hx Hxqa Hqpoly.
+  case: n Hxqa Hqpoly => [|/=] n Hxqa Hqpoly.
+  - destruct n.
+    + by rewrite qderiv_qpoly_0.
+    + rewrite qderiv_qpoly_nonneg //.
+      rewrite (_ : Posz n.+1 - 1 = n) //.
+      rewrite -addn1.
+      rewrite (_ : Posz (n + 1)%N = Posz n + 1) //.
+      by rewrite addrK.
+  - rewrite Dq_qpoly_int_to_neg qderiv_qpoly_neg //.
+        rewrite NegzK.
+        rewrite (_ : (n + 1).+1 = (n + 0).+2) //.
+        by rewrite addn0 addn1.
+      rewrite (_ : Negz (n + 1) = Negz n - 1) //.
+      by apply itransposition; rewrite NegzK.
+    by rewrite NegzK addn1.
+Qed.
+\end{lstlisting}
+と形式化できる. {\tt case:\,n}で{\tt n}が$0$以上か負かで場合分けを行い, {\tt destruct n}で$0$か$1$以上かの場合分けをしており, それぞれの場合で{\tt qderiv\_qpoly\_0}, {\tt qderiv\_qpoly\_nonneg}, {\tt qderiv\_qpoly\_neg}を使っていることが見て取れる. \\
+ここまでが現在形式化できている主な内容である. 今後は, まずは$(x - a)^{m + n}_q$の指数法則が$m$, $n$が整数の場合にも成り立つことの形式化を行い, 最終的には Jacobi の三重積公式(\cite{bib1} Theorem 11.1)の形式化を目標としたい. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{HoTT}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

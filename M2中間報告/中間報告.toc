@@ -2,5 +2,5 @@
 \contentsline {subsection}{\numberline {1.1}Coq}{1}
 \contentsline {subsection}{\numberline {1.2}$q$-類似}{2}
 \contentsline {subsection}{\numberline {1.3}形式化}{2}
-\contentsline {section}{\numberline {2}HoTT}{5}
-\contentsline {section}{\numberline {3}coqgenプロジェクト}{5}
+\contentsline {section}{\numberline {2}HoTT}{9}
+\contentsline {section}{\numberline {3}coqgenプロジェクト}{9}
