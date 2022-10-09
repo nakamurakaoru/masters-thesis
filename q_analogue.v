@@ -95,7 +95,6 @@ Qed.
 
 Lemma negdistr (a b : int) : - (a + b) = - a - b.
 Proof.
-Check addrK.
   have -> : - (a + b) = - a + a - (a + b).
     rewrite [- a + a] addrC.
     rewrite -{2}(add0r a) addrK.
@@ -409,6 +408,10 @@ Proof.
       rewrite red_frac_r.
         by rewrite divr1.
       by rewrite -Hmn.
+(* ssrnum *)
+(* eqr_nat *)
+(* natrD *)
+(*Search %:R.*)
   -
 Admitted.
 
