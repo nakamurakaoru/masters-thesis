@@ -88,8 +88,10 @@
 \newcommand{\set}[1]{\textrm{isSet({#1})}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
-\title{少人数クラス}
-\author{中村　薫}
+\title{少人数クラス内容報告（中間まとめ）}
+\author{アドバイザー $\colon$ Jacquess Garrigue教授\\
+           学籍番号 $\colon$ 322101289\\
+           氏名 $\colon$ 中村　薫}
 \date{\today}
 \maketitle
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -113,7 +115,7 @@ Coq による証明は, Curry-Howard 同型と呼ばれる,
   \text{命題} &\leftrightarrow \text{型} \\
   \text{証明} &\leftrightarrow \text{型に要素が存在する}
 \end{align*}
-という対応関係に基づいている. また, 各論理演算子について, 以下のように対応している
+という対応関係に基づいている. また, 論理演算子についても, 以下のような対応がある. 
 \begin{align*}
   P \text{ならば} Q &\quad P \rightarrow Q \\
   P \text{かつ} Q &\quad P \times Q \\
@@ -139,7 +141,7 @@ $q$-類似とは, $q \to 1$とすると通常の数学に一致するような�
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{形式化}
 様々な$q$-類似を考えるにあたって, まずは微分の$q$-類似から始める. 以下, $q$を$1$でない実数とする. 
-\bdf[\cite{bib1} p1 (1.1), p2 (1.5)]
+\bdf[\cite{Kac} p1 (1.1), p2 (1.5)]
   関数$f : \R \to \R$に対して, $f(x)$の$q$差分$d_q f(x)$を, 
   \[
     d_q f(x) \coloneqq f (qx) - f(x)
@@ -190,16 +192,16 @@ Definition Dq f := dq f // dq id.
   \] 
   が成り立つが, 本稿においては極限操作に関しての形式化は扱わない. 
 \ermk
-次に, $x ^ n$($n \in \N$)を$q$-微分した際にうまく振る舞うように自然数の$q$-類似を定義する. 
-\bdf[\cite{bib1} p2 (1.9)]
-  $n \in \N$に対して, $n$の$q$-類似$[n]$を, 
+次に, $x ^ n$ ($n \in \Z_{\ge 0}$)を$q$-微分した際にうまく振る舞うように自然数の$q$-類似を定義する. 
+\bdf[\cite{Kac} p2 (1.9)]
+  $n \in \Z_{\ge 0}$に対して, $n$の$q$-類似$[n]$を, 
   \[
     [n] \coloneqq \frac{q^n - 1}{q - 1}
   \]
   と定義する. 
 \edf
 この$[n]$に対して, $(x^n)' = n x^{n-1}$の$q$-類似が成り立つ.
-\bprop[\cite{bib1} p2 Example (1.7)]
+\bprop[\cite{Kac} p2 Example (1.7)]
   $n \in \Z_{>0}$について, 
   \[
     D_q x^n = [n] x ^{n - 1}
@@ -244,7 +246,7 @@ Qed.
   \item {\tt Proof.}以下が補題の証明である. 
   \item {\it def}が定義のとき, {\tt rewrite /{\it def}}で定義を展開している. 
   \item {\it lem}が{\tt A = B}という形の補題のとき, {\tt rewrite {\it lem}}で結論に出現する
-          {\tt A}を{\tt B}に書き換えている. 
+          {\tt A}を{\tt B}に書き換えている. 他のコマンドの使い方については \cite{Gar}等を参照. 
   \item {\tt red\_frac\_r}は, 
            \begin{lstlisting}{Coq}
 red_frac_r : forall x y z : R, z != 0 -> x * z / (y * z) = x / y \end{lstlisting}
@@ -257,9 +259,9 @@ red_frac_r : forall x y z : R, z != 0 -> x * z / (y * z) = x / y \end{lstlisting
   また, {\tt qderiv\_of\_pow}の{\tt n}の型は{\tt int}であるため, より一般化した形での形式化に
   なっている. 
 \ermk
-\cite{bib1}では証明は1行で終わっているが, 形式化する場合には何倍もかかっている. これは, 積の交換法則や指数法則などの, 通常の数学では「当たり前」なことが自動では計算されず, {\tt rewrite mulrC}や{\tt rewrite expfzDr}というように{\tt rewrite}での書き換えを明示的に行わなければならないからである. \\
+\cite{Kac}では証明は1行で終わっているが, 形式化する場合には何倍もかかっている. これは, 積の交換法則や指数法則などの, 通常の数学では「当たり前」なことが自動では計算されず, {\tt rewrite mulrC}や{\tt rewrite expfzDr}というように{\tt rewrite}での書き換えを明示的に行わなければならないからである. \\
 続いて$(x - a)^n$の$q$-類似を定義し, その性質を調べる.  
-\bdf[\cite{bib1} p8 Definition (3.4)]
+\bdf[\cite{Kac} p8 Definition (3.4)]
   $x$, $a \in \R$, $n \in \Z_{\ge 0}$に対して, $(x - a)^n$の$q$-類似$(x - a)^n_q$を, 
   \[
   (x - a)^n_q = \begin{cases}
@@ -323,7 +325,7 @@ Qed.
 \end{lstlisting}
 となる. ここで{\tt elim:\,n}は{\tt n}の帰納法に対応している. \\
 指数法則については, 一般には$(x - a)^{m + n} \neq (x - a)^m_q(x - a)^n_q$であり, 以下のようになる. 
-\bprop[\cite{bib1} p8 (3.6)]
+\bprop[\cite{Kac} p8 (3.6)]
   $x,a\in\R$, $m,n\in\Z_{>0}$について, 
   \[
     (x-a)^{m+n}_q = (x-a)^m_q (x-q^ma)^n_q
@@ -354,9 +356,9 @@ Proof.
       by rewrite -[q ^ n.+1 * q ^ m] expfz_n0addr // addnC.
 Qed.
 \end{lstlisting}
-\cite{bib1}の証明では単に式変形しているが, {\tt qpoly\_nonneg}が再帰的に定義されているため, 形式化の証明では{\tt m}, {\tt n}に関する帰納法を用いている. \\
-この指数法則を用いて, $(x - a)^n_q$の$n$を負の数に拡張する. まず, \cite{bib1}の定義は
-\bdf[\cite{bib1} p9 (3.7)] \label{qpoly_neg}
+\cite{Kac}の証明では単に式変形しているが, {\tt qpoly\_nonneg}が再帰的に定義されているため, 形式化の証明では{\tt m}, {\tt n}に関する帰納法を用いている. \\
+この指数法則を用いて, $(x - a)^n_q$の$n$を負の数に拡張する. まず, \cite{Kac}の定義は
+\bdf[\cite{Kac} p9 (3.7)] \label{qpoly_neg}
   $x$, $a \in \R$, $l\in\Z_{>0}$とする. このとき, 
   \[
     (x-a)^{-l}_q \coloneqq \frac{1}{(x-q^{-l}a)^l_q}
@@ -381,7 +383,7 @@ Definition qpoly a n x :=
 \end{lstlisting}
 と定義できる. \\
 整数に拡張した$(x - a)^n_q$も, $q$-微分にたいしてうまく振る舞う. 
-\bprop[\cite{bib1} p10 Proposition3.3]
+\bprop[\cite{Kac} p10 Proposition3.3]
   $n \in \Z$について, 
   \[
     D_q x^n = [n] x ^{n - 1}
@@ -397,11 +399,11 @@ Definition qpoly a n x :=
   $n < 0$のときは, Definition \ref{qpoly_neg}と, 商の微分公式の$q$-類似版である
   \[
     D_q \left( \frac{f(x)}{g(x)} \right) = \frac{g(x) D_q f(x) - f(x) D_q g(x)}{g(x) g(qx)} \quad
-    \text{(\cite{bib1} p3 (1.13))}
+    \text{(\cite{Kac} p3 (1.13))}
   \]
   及び Proposition \ref{q_deriv_qpoly_nonneg}を用いて示される. 
 \epf
-この補題の証明の形式化が本章の目標である. \cite{bib1}と同じ方針で証明する. まず, $n = 0$のとき, 
+この補題の証明の形式化が本章の目標である. \cite{Kac}と同じ方針で証明する. まず, $n = 0$のとき, 
 \begin{lstlisting}{Coq}
 Lemma qderiv_qpoly_0 a x :
   Dq (qpoly a 0) x = qnat 0 * qpoly a (- 1) x.
@@ -484,7 +486,7 @@ Proof.
     by rewrite addrK mulrA -{2}(expr1z q) -expfzDr.
 Qed.
 \end{lstlisting}
-と, 非常に長くなっているが積の交換則や結合則などが多く, {\tt qderiv\_quot}が商の$q$-微分公式の形式化であるため, \cite{bib1}の証明をそのまま形式化したものになっている.  また, いくつかの項が$0$でないという条件がついているが, これらの項は Definition \ref{qpoly_neg} において分母に現れるため, {\tt qderiv\_of\_pow}のときと同様妥当であると考えられる. これらをまとめて, 
+と, 非常に長くなっているが積の交換則や結合則などが多く, {\tt qderiv\_quot}が商の$q$-微分公式の形式化であるため, \cite{Kac}の証明をそのまま形式化したものになっている.  また, いくつかの項が$0$でないという条件がついているが, これらの項は Definition \ref{qpoly_neg} において分母に現れるため, {\tt qderiv\_of\_pow}のときと同様妥当であると考えられる. これらをまとめて, 
 \begin{lstlisting}{Coq}
 Theorem qderiv_qpoly a n x : q != 0 -> x != 0 ->
   x - q ^ (n - 1) * a != 0 ->
@@ -510,12 +512,10 @@ Proof.
 Qed.
 \end{lstlisting}
 と形式化できる. {\tt case:\,n}で{\tt n}が$0$以上か負かで場合分けを行い, {\tt destruct n}で$0$か$1$以上かの場合分けをしており, それぞれの場合で{\tt qderiv\_qpoly\_0}, {\tt qderiv\_qpoly\_nonneg}, {\tt qderiv\_qpoly\_neg}を使っていることが見て取れる. \\
-ここまでが現在形式化できている主な内容である. 今後は, まずは$(x - a)^{m + n}_q$の指数法則が$m$, $n$が整数の場合にも成り立つことの形式化を行い, 最終的には Jacobi の三重積公式(\cite{bib1} Theorem 11.1)の形式化を目標としたい. 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{HoTT}
+ここまでが現在形式化できている主な内容である. 今後は, まずは$(x - a)^{m + n}_q$の指数法則が$m$, $n$が整数の場合にも成り立つことの形式化を行い, 最終的には Jacobi の三重積公式(\cite{Kac} Theorem 11.1)の形式化を目標としたい. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{coqgenプロジェクト}
-coqgen プロジェクトとは, OCamlという関数型言語の型推論の正しさを Coq で確認することを目標としたプロジェクトであり, 具体的には OCaml から Coq へのコンパイラの作成と, コンパイルされたプログラムに対する証明を行っている. 本章では, RAとして本プロジェクトに参加し得られた結果の一部を扱う. 
+coqgen プロジェクトとは, OCamlという関数型言語の型推論の正しさを Coq で確認することを目標としたプロジェクトであり, 具体的には OCaml から Coq へのコンパイラの作成と, コンパイルされたプログラムに対する証明を行っている(詳細は \cite{coqgen} 参照のこと). 本章では, RAとして本プロジェクトに参加し得られた結果の一部を扱う. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{whileloop のコンパイル}
 OCaml での whileloop を使う例として, 
@@ -561,11 +561,194 @@ Definition fact (h : nat) (n : coq_type ml_int) : M (coq_type ml_int) :=
 となる. {\tt do}が多くやや複雑であるが, {\tt newref}, {\tt getref}, {\tt setref}がそれぞれ{\tt = ref}, {\tt !}, {\tt :=}に対応しているので, 全体としては同じ構造になっていることがわかる. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{insertion sort の証明}
+OCaml で insert sort は
+\begin{lstlisting}{Caml}
+let rec insert a l =
+  match l with
+  | [] -> [a]
+  | b :: l' -> if a <= b then a :: l else b :: insert a l'
+  
+let rec isort l =
+  match l with 
+  | [] -> []
+  | a :: l' -> insert a (isort l')  \end{lstlisting}
+と書ける. これを Coq にコンパイルすると, それぞれ
+\begin{lstlisting}{Coq}
+Fixpoint insert (h : nat) (T_1 : ml_type) (a : coq_type T_1)
+  (l : coq_type (ml_list T_1)) : M (coq_type (ml_list T_1)) :=
+  if h is h.+1 then
+    match l with
+    | @nil _ => Ret (a :: @nil (coq_type T_1))
+    | b :: l' =>
+      do v <- ml_le h T_1 a b;
+      if v then Ret (a :: l) else
+        do v <- insert h T_1 a l'; Ret (@cons (coq_type T_1) b v)
+    end
+  else FailGas. 
+
+Fixpoint isort (h : nat) (T_1 : ml_type) (l_1 : coq_type (ml_list T_1))
+  : M (coq_type (ml_list T_1)) :=
+  if h is h.+1 then
+    match l_1 with
+    | @nil _ => Ret (@nil (coq_type T_1))
+    | a :: l' => do v <- isort h T_1 l'; insert h T_1 a v
+    end
+  else FailGas.  \end{lstlisting}
+となる. 更に, 整列しているという状態は Coq では
+\begin{lstlisting}{Coq}
+Fixpoint sorted l :=
+  if l is a :: l' then all (le a) l' && sorted l' else true.  \end{lstlisting}
+と定義できる. 
+\brmk
+  プログラムそのものはコンパイルされたものを使うが, 証明すべき性質は OCaml のプログラムを
+  コンパイルするわけではなく, 直接 Coq で書くことになる. 
+\ermk
+示したいことは, isort で作られた列が上の意味で整列していることである. 主張及び証明は以下のとおりである. 
+\begin{lstlisting}{Coq}
+Theorem isort_ok h l l' : isort h ml_int l = Ret l' -> sorted l'.
+Proof.
+  elim: h l l' => [_ _ |h IH [|a l] l'] /(happly empty_env) //=.
+  - by move=> [] <-.
+  - destruct h => //.
+    case: (isort_pure h.+1 l) => -[l'' H].
+    + rewrite H bindretf.
+      case: (insert_pure h.+1 a l'') => -[l0 H'].
+      - rewrite H' => -[] <-.
+        by apply /(insert_ok H') /(IH l l'').
+      - by rewrite H'.
+    + by rewrite H bindfailf.
+Qed.  \end{lstlisting}
+ここで, 定理の先頭の{\tt isort h ml\_int l = Ret l'}は「計算が成功すれば」という条件である. 
+また, プログラムの証明そのものに大きく関る補題は
+\begin{lstlisting}
+Lemma insert_ok h a l l' : insert h ml_int a l = Ret l' ->
+  sorted l -> sorted l'.  \end{lstlisting}
+であり, {\tt isort\_pure}や{\tt bindretf}などの他の多くの補題はモナドの操作に関するものである. 
+実際, この証明を直接 Coq に書いた場合は
+\begin{lstlisting}{Coq}
+Theorem isort_ok l : sorted (isort l).
+Proof. elim: l => //= a l IH; by rewrite insert_ok. Qed.  \end{lstlisting}
+となり, 本質の部分は同じになっている. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{今後の展望}
+insertion sort は store を使わないプログラムであったため, 今後は forloop や whileloop などの store を使うプログラムの証明を行いたい. 
+また, 上で見た通り, コンパイルされたプログラムはモナドに覆われているため一般に証明は煩雑になるが, モナドに関する補題を用意することで直接書いた場合の証明に近づけることができる. これらのライブラリの充実も今後の目標としたい. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{HoTT}
+HoTT とは, Homotopy Type Theory の略であり, 
+\begin{align*}
+  \text{$a$が型$A$の要素である} &\leftrightarrow \text{$a$が空間$A$の点である} \\
+  \text{$a = b$である} &\leftrightarrow \text{点$a$と点$b$の間にパスが存在する}
+\end{align*}
+というように, 型理論に対してホモトピー的解釈を与えたものである. 本章では, HoTT の大きな特徴の一つである, univalence axiom について説明する. 大雑把にいえば, univalence axiom は「型$A$と型$B$が同型ならば, $A$と$B$は等しい」という公理である. この意味を正確にとらえるため, 型同士の等しさや同型を定義していく. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{型から型を作る}
+$A$と$B$の2つの型が与えられたとき, そこから関数型$A \to B$が構成できる. このとき, 
+\begin{align*}
+  f : A \to B,\ a : A &\Lra f(a) : B \\
+  a : A,\ b(x) : B &\Lra \lambda a. b : A \to B 
+\end{align*}
+である. より一般に, 型$A$と$A$上の型族$B \to \U$が与えられれば($\U$はユニバース), 依存関数型$\prod_{a : A} B(a)$が構成でき, 
+\begin{align*}
+  f :\prod_{a : A} B(a),\ a : A &\Lra f(a) : B(a) \\
+  a : A,\ b(x) : B(x) &\Lra \lambda a. b : \prod_{a : A} B(a) 
+\end{align*}
+である. さらに, 既存の型から新たな型を作るやり方として, 構成規則, 導入規則, 除去規則, 計算規則の4つを与える帰納的な方法がある. 例えば, 依存和型$\sum_{x : A} B(x)$は, 
+\begin{itemize}
+  \item 構成規則：$A : \U$, $B : A \to \U \Lra \sum_{x : A} B(x)$
+  \item 導入規則：$a : A$, $b : B(a) \Lra (a, b) : \sum_{x : A} B(x)$
+  \item 除去規則：ind$_{\sum_{x : A} B(x)} : \prod_{C : (\sum_{x : A} B(x)) \to \U} 
+                               \left(\prod_{a : A} \prod_{b : B(a)} C((a, b)) \right) \to 
+                                      \prod_{w : \sum_{x : A} B(x)} C(w)$
+  \item 計算規則：ind$_{\sum_{x : A} B(x)} (C, g, (a, b)) :\equiv g(a)(b)$
+\end{itemize}
+で定義できる. 除去規則は, 「任意の$w : \sum_{x : A} B(x)$について$C(w)$を示したければ, 任意の$a : A$, $b : B(a)$について$C((a, b))$を示せばよい」と読むことができる. 
+ここで, Curry-Howard 同型に基づいて考えると, 「ある要素$a$とある要素$b$が等しい」という命題は, なにかしらの型と対応するはずである. よってその型 identity type を, 
+\begin{itemize}
+  \item 構成規則：$A : \U \Lra \_ =_A \_ : \U$
+  \item 導入規則：refl$_a : \prod_{a : A} (a =_A a)$
+  \item 除去規則：ind$_{=_A} : \prod_{\left( C : \prod_{(x, y : A)} (x =_A y) \to \U \right)} 
+                                       \left( \prod_{(x : A)} C(x, x, {\rm refl}_x) \right) \to
+                                       \prod_{(x, y : A)} \prod_{(p : x =_A y)} C(x, y, p)$
+  \item 計算規則：ind$_{=_A} (C, c, x, x, {\rm refl}_x) : \equiv c(x)$
+\end{itemize}
+と定義する. 除去規則は, 依存和型のときと同様に考えると, 「任意の$x$, $y : A$, $x = y$について$C(x, y, p)$を示したければ, 任意の$x : A$について$C(x, x, \refl{x})$を示せばよい」となる. 
+\subsection{型の同型}
+ここで, 型と型の間の同型を定義したい. まず, 関数の間のホモトピーを定義する. 
+\bdf[\cite{hott} Definition 2.4.1]
+  $A : \U$, $P : A \to \U$とする. $f$, $g : \prod_{x : A} P(x)$に対して, 
+  \[
+    (f \sim g) :\equiv \prod_{x : A} (f(x) = g(x))
+  \]
+  と定める. 
+\edf
+次に, 「逆写像」を定義する. 
+\bdf[\cite{hott} Definition 2.4.6]
+  $A$, $B : \U$, $f : A \to B$とする. このとき, $f$の quasi-inverse qinv($f$)を, 
+  \[
+    \qinv(f) :\equiv \sum_{g : B \to A} ((f \circ g \sim \id_B) \times
+                                                   (g \circ f \sim \id_A))
+  \]
+\edf
+例えば, id$_A$の quasi-inverse はid$_A$自身である. さらに, この qinv を用いて, isequiv を, 
+\begin{itemize}
+  \item qinv($f$) $\to$ isequiv($f$)
+  \item isequiv($f$) $\to$ qinv($f$)
+  \item $e_1$, $e_2 :$isequiv($f$) ならば $e_1 = e_2$
+\end{itemize}
+をみたすものとして定義したい. ここでは, 
+\[
+  \iseq(f) :\equiv \left( \sum_{g : B \to A} (f \circ g \sim \id_B) \right) \times
+                           \left( \sum_{h : B \to A} (h \circ f \sim \id_A) \right) \quad
+                           \text{(\cite{hott} p73 (2.4.10))}
+\]
+と定めることにする. isequiv を使って型同士の同型を定義する. 
+\bdf[\cite{hott} p73 (2.4.11)]
+  $A$, $B : \U$について, 
+  \[
+    A \simeq B :\equiv \sum_{f : A \to B} \iseq(f)
+  \]
+  と定める. 
+\edf
+\bex
+$A$, $B$, $C : \U$について, 
+\begin{itemize}
+  \item $A \simeq A$
+  \item $A \simeq B \to B \simeq A$
+  \item $A \simeq B \to B \simeq C \to A \simeq C$
+\end{itemize}
+などが成り立つ. 
+\eex
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Univalence axiom}
+これまでに定義した$=$と$\simeq$を用いて, univalence axiom の主張を正しく述べる. まず, 
+\[
+  \textrm{idtoeqv} : \prod_{A, B : \U} (A =_{\U} B) \to (A \simeq B)
+\]
+を定める. この関数が存在することは, path induction よりわかる. このidtoeqvに対して, 
+\begin{shadebox}
+\begin{axi}[\cite{hott} Axiom 2.10.3]
+  \[
+    \textrm{ua} : \prod_{A, B : \U} \iseq(\textrm{idtoeqv}(A, B))
+  \]
+\end{axi}
+\end{shadebox}
+が univalence axiom である. とくに, この公理を仮定すれば, 
+\[
+  (A =_{\U} B) \simeq (A \simeq B)
+\]
+となる. さらに, 関数の外延性
+\[
+  \textrm{funext} : \left( \prod_{x : A} (f(x) = g(x)) \right) \to (f = g)
+\]
+が従うことも知られている. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{thebibliography}{9}
-  \bibitem{bib1} Victor Kac, Pokman Cheung, {\it{Quantum Calculus}}, Springer, 2001.
-  
-  \bibitem{bib2} The Univalent Foundations Program, 
-        {\it{Homotopy Type Theory: Univalent Foundations of Mathematics}}
+  \bibitem{Kac} Victor Kac, Pokman Cheung, {\it{Quantum Calculus}}, Springer, 2001.
+  \bibitem{Gar} \url{https://www.math.nagoya-u.ac.jp/~garrigue/lecture/2021_AW/                  
+                           ssrcoq2.pdf}
+  \bibitem{coqgen} \url{https://github.com/COCTI/ocaml/pull/3}
+  \bibitem{hott} The Univalent Foundations Program, 
+                      {\it{Homotopy Type Theory: Univalent Foundations of Mathematics}}
 \end{thebibliography}
 \end{document}

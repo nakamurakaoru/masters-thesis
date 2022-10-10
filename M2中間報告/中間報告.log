@@ -1,4 +1,4 @@
-This is e-pTeX, Version 3.14159265-p3.8.1-180518-2.6 (utf8.sjis) (TeX Live 2018/W32TeX) (preloaded format=platex 2018.7.29)  10 OCT 2022 16:39
+This is e-pTeX, Version 3.14159265-p3.8.1-180518-2.6 (utf8.sjis) (TeX Live 2018/W32TeX) (preloaded format=platex 2018.7.29)  11 OCT 2022 04:39
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -427,34 +427,34 @@ File: ot1txr.fd 2000/12/15 v3.1
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
 \c@lstlisting=\count118
-LaTeX Font Info:    Try loading font information for U+txsya on input line 94.
+LaTeX Font Info:    Try loading font information for U+txsya on input line 96.
 (c:/w32tex/share/texmf-dist/tex/latex/txr/utxsya.fd
 File: utxsya.fd 2000/12/15 v3.1
 )
-LaTeX Font Info:    Try loading font information for U+txsyb on input line 94.
+LaTeX Font Info:    Try loading font information for U+txsyb on input line 96.
 
 (c:/w32tex/share/texmf-dist/tex/latex/txr/utxsyb.fd
 File: utxsyb.fd 2000/12/15 v3.1
 )
-LaTeX Font Info:    Try loading font information for U+txmia on input line 94.
+LaTeX Font Info:    Try loading font information for U+txmia on input line 96.
 
 (c:/w32tex/share/texmf-dist/tex/latex/txr/utxmia.fd
 File: utxmia.fd 2000/12/15 v3.1
 )
-LaTeX Font Info:    Try loading font information for U+txsyc on input line 94.
+LaTeX Font Info:    Try loading font information for U+txsyc on input line 96.
 
 (c:/w32tex/share/texmf-dist/tex/latex/txr/utxsyc.fd
 File: utxsyc.fd 2000/12/15 v3.1
 )
-LaTeX Font Info:    Try loading font information for U+rsfs on input line 94.
+LaTeX Font Info:    Try loading font information for U+rsfs on input line 96.
 
 (c:/w32tex/share/texmf-dist/tex/latex/jknappen/ursfs.fd
 File: ursfs.fd 1998/03/24 rsfs font definition file (jk)
 )
 LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <14.4> not available
-(Font)              Font shape `JT1/gt/m/n' tried instead on input line 96.
+(Font)              Font shape `JT1/gt/m/n' tried instead on input line 98.
 LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <14.4> not available
-(Font)              Font shape `JY1/gt/m/n' tried instead on input line 96.
+(Font)              Font shape `JY1/gt/m/n' tried instead on input line 98.
  (./中間報告.toc
 LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <10.95> not available
 (Font)              Font shape `JT1/gt/m/n' tried instead on input line 1.
@@ -465,13 +465,13 @@ LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <10.95> not available
 \openout3 = `中間報告.toc'.
 
 LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <12> not available
-(Font)              Font shape `JT1/gt/m/n' tried instead on input line 99.
+(Font)              Font shape `JT1/gt/m/n' tried instead on input line 101.
 LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <12> not available
-(Font)              Font shape `JY1/gt/m/n' tried instead on input line 99.
+(Font)              Font shape `JY1/gt/m/n' tried instead on input line 101.
 
 (I search kanjifont definition file: . . ) (I search font definition file: . .
 . . . . . )
-LaTeX Font Info:    Try loading font information for OT1+txtt on input line 101
+LaTeX Font Info:    Try loading font information for OT1+txtt on input line 103
 .
  (c:/w32tex/share/texmf-dist/tex/latex/txr/ot1txtt.fd
 File: ot1txtt.fd 2000/12/15 v3.1
@@ -479,42 +479,49 @@ File: ot1txtt.fd 2000/12/15 v3.1
 
 ]
 LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <8> not available
-(Font)              Font shape `JT1/gt/m/n' tried instead on input line 142.
+(Font)              Font shape `JT1/gt/m/n' tried instead on input line 144.
 LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <8> not available
-(Font)              Font shape `JY1/gt/m/n' tried instead on input line 142.
+(Font)              Font shape `JY1/gt/m/n' tried instead on input line 144.
 LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <6> not available
-(Font)              Font shape `JT1/gt/m/n' tried instead on input line 142.
+(Font)              Font shape `JT1/gt/m/n' tried instead on input line 144.
 LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <6> not available
-(Font)              Font shape `JY1/gt/m/n' tried instead on input line 142.
-LaTeX Font Info:    Try loading font information for OMS+txr on input line 170.
+(Font)              Font shape `JY1/gt/m/n' tried instead on input line 144.
+ [2]
+LaTeX Font Info:    Try loading font information for OMS+txr on input line 172.
 
 
 (c:/w32tex/share/texmf-dist/tex/latex/txr/omstxr.fd
 File: omstxr.fd 2000/12/15 v3.1
 )
 LaTeX Font Info:    Font shape `OMS/txr/m/n' in size <10.95> not available
-(Font)              Font shape `OMS/txsy/m/n' tried instead on input line 170.
- [2]
+(Font)              Font shape `OMS/txsy/m/n' tried instead on input line 172.
+
 
 LaTeX Font Warning: Font shape `JT1/mc/m/it' undefined
-(Font)              using `JT1/mc/m/n' instead on input line 210.
+(Font)              using `JT1/mc/m/n' instead on input line 212.
 
 
 LaTeX Font Warning: Font shape `JY1/mc/m/it' undefined
-(Font)              using `JY1/mc/m/n' instead on input line 210.
+(Font)              using `JY1/mc/m/n' instead on input line 212.
 
-[3] [4] [5] [6] [7] [8] [9] [10] (./中間報告.aux)
+[3] [4] [5] [6] [7] [8] [9] [10] [11]
+LaTeX Font Info:    Try loading font information for U+eus on input line 651.
+
+(c:/w32tex/share/texmf-dist/tex/latex/amsfonts/ueus.fd
+File: ueus.fd 2013/01/14 v3.01 Euler Script
+) [12] [13] [14]
+(./中間報告.aux)
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
  ) 
 Here is how much of TeX's memory you used:
- 5638 strings out of 493249
- 69832 string characters out of 6146370
- 215614 words of memory out of 5000000
- 9482 multiletter control sequences out of 15000+600000
- 43940 words of font info for 147 fonts, out of 8000000 for 9000
+ 5705 strings out of 493249
+ 70623 string characters out of 6146370
+ 210614 words of memory out of 5000000
+ 9544 multiletter control sequences out of 15000+600000
+ 44540 words of font info for 150 fonts, out of 8000000 for 9000
  929 hyphenation exceptions out of 8191
- 35i,11n,58p,398b,1734s stack positions out of 5000i,500n,10000p,500000b,80000s
+ 35i,13n,58p,397b,1732s stack positions out of 5000i,500n,10000p,500000b,80000s
 
-Output written on 中間報告.dvi (10 pages, 80076 bytes).
+Output written on 中間報告.dvi (14 pages, 107628 bytes).
