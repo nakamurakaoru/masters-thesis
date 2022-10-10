@@ -515,9 +515,56 @@ Qed.
 \section{HoTT}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{coqgenプロジェクト}
+coqgen プロジェクトとは, OCamlという関数型言語の型推論の正しさを Coq で確認することを目標としたプロジェクトであり, 具体的には OCaml から Coq へのコンパイラの作成と, コンパイルされたプログラムに対する証明を行っている. 本章では, RAとして本プロジェクトに参加し得られた結果の一部を扱う. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{whileloop のコンパイル}
+OCaml での whileloop を使う例として, 
+\begin{lstlisting}{Ocaml}
+let fact n =
+  let i = ref n in let v = ref 1 in
+  while !i > 0 do v := !v * !i; i := !i - 1 done;  !v
+\end{lstlisting}
+という階乗を求めるプログラムをコンパイルすることを考える. 
+%OCaml の説明入れる%
+まず, Coqgen のライブラリに whileloopのための関数を用意しておく. 
+\begin{lstlisting}{Coq}
+Fixpoint whileloop (h : nat) (f : M bool) (b : M unit) : M unit :=
+  if h is h.+1 then
+    do v <- f; if v then (do _ <- b; whileloop h f b) else Ret tt
+  else FailGas.  \end{lstlisting}
+ここで, Coq の性質上, ガス{\tt h}とモナド{\tt M}が必要になる. 
+\begin{itemize}
+  \item Coq では, 停止するかわからない再帰関数を定義することはできない. そこで引数{\tt h}
+          を与え, ループを回すごとに1ずつ減らすことで停止性を保証している.   
+  \item Coq は純粋に数学的な関数しか扱えないため, OCaml の store や例外を表現する
+          ためにモナドを用いている. 型{\tt T} に対して, store を {\tt Env}, 例外を {\tt Exn}
+          で表し, 
+  		    \begin{lstlisting}{coq}
+Definition M T := Env -> Env * (T + Exn). \end{lstlisting}
+  		    と定義している.
+\end{itemize}
+この whileloop を使って, 以下のようにコンパイルされる. 
+\begin{lstlisting}{Coq}
+Definition fact (h : nat) (n : coq_type ml_int) : M (coq_type ml_int) :=
+  do i <- newref ml_int n;
+  do v <- newref ml_int 1%int63;
+  do _ <-
+  whileloop h (do v_1 <- getref ml_int i; ml_gt h ml_int v_1 0%int63)
+    (do _ <-
+    (do v_1 <-
+      (do v_1 <- getref ml_int i;
+      do v_2 <- getref ml_int v; Ret (Int63.mul v_2 v_1));
+      setref ml_int v v_1);
+    do v_1 <- (do v_1 <- getref ml_int i; Ret (Int63.sub v_1 1%int63));
+    setref ml_int i v_1);
+  getref ml_int v.  \end{lstlisting}
+となる. {\tt do}が多くやや複雑であるが, {\tt newref}, {\tt getref}, {\tt setref}がそれぞれ{\tt = ref}, {\tt !}, {\tt :=}に対応しているので, 全体としては同じ構造になっていることがわかる. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{insertion sort の証明}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{thebibliography}{9}
   \bibitem{bib1} Victor Kac, Pokman Cheung, {\it{Quantum Calculus}}, Springer, 2001.
+  
   \bibitem{bib2} The Univalent Foundations Program, 
         {\it{Homotopy Type Theory: Univalent Foundations of Mathematics}}
 \end{thebibliography}
