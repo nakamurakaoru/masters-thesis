@@ -2,6 +2,7 @@ From mathcomp Require Import all_ssreflect all_algebra.
 Import GRing.
 (*Import Numtheory.*)
 (* algebra の中の　ssrnum *)
+(* Unset Printing Notations.*)
 
 Axiom funext : forall A B (f g : A -> B), f =1 g -> f = g.
 
@@ -51,6 +52,20 @@ Proof.
   rewrite -[Posz n + 1 + m] addrA.
   rewrite -{1}(add0r (Posz n)).
   by rewrite addrKA -addn1 sub0r addnC.
+Qed.
+
+Lemma opp_oppE (n : int) : - - n = n.
+Proof.
+  by rewrite -(sub0r n) (opprB 0) subr0.
+Qed.
+
+Lemma eq_int_to_nat (m n : nat): m = n:> int -> m = n.
+Proof.
+  move=> Hmn.
+  have Hmn' : m == n:>int.
+    by apply /eqP.
+  rewrite -(eqr_int R) Num.Theory.eqr_nat in Hmn'.
+  by move/eqP in Hmn'.
 Qed.
 
 Lemma mulnon0 (a b : R) : a * b != 0 -> a != 0.
@@ -408,11 +423,20 @@ Proof.
       rewrite red_frac_r.
         by rewrite divr1.
       by rewrite -Hmn.
-(* ssrnum *)
-(* eqr_nat *)
-(* natrD *)
-(*Search %:R.*)
-  -
+    rewrite NegzE in Hmn.
+    apply itransposition in Hmn.
+    rewrite opp_oppE in Hmn.
+    apply eq_int_to_nat in Hmn.
+    by rewrite Hmn.
+  - rewrite /qpoly_neg.
+    rewrite (_ : qpoly_nonneg (q ^ (Negz n.+1 + 1) * (q ^ m * a)) n.+1 x 
+               = qpoly_nonneg (q ^ (Negz n.+1 + 1) * (q ^ m * a)) (m + l.+1) x).
+
+
+
+      rewrite [(q ^ (Negz n.+1 + 1) * (q ^ m * a))] mulrC.
+      rewrite qpoly_nonneg_explaw.
+    rewrite !NegzE in Hmn.
 Admitted.
 
 Lemma qpoly_exp_neg_pos a m n x :
