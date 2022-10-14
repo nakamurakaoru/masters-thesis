@@ -43,7 +43,19 @@ Proof.
   by rewrite mulrC.
 Qed.
 
-Lemma NegzK m n : Negz (m + n) + n = Negz m.
+Lemma negdistr (a b : int) : - (a + b) = - a - b.
+Proof.
+  have -> : - (a + b) = - a + a - (a + b).
+    rewrite [- a + a] addrC.
+    rewrite -{2}(add0r a) addrK.
+    by rewrite sub0r.
+  by rewrite addrKA.
+Qed.
+
+Lemma Negz_add m n : Negz (m.+1 + n) = Negz m + Negz n.
+Proof. by rewrite !NegzE -addnS (negdistr m.+1 n.+1)%N. Qed.
+
+Lemma Negz_addK m n : Negz (m + n) + n = Negz m.
 Proof.
   rewrite !NegzE addrC -addn1.
   rewrite (_ : Posz (m + n + 1)%N = Posz m + n + 1) //.
@@ -53,6 +65,12 @@ Proof.
   rewrite -{1}(add0r (Posz n)).
   by rewrite addrKA -addn1 sub0r addnC.
 Qed.
+
+Lemma NegzK n : Posz n.+1 + Negz n = 0.
+Proof. by rewrite NegzE addrN. Qed.
+
+Lemma NegzS n : Negz n.+1 + 1 = Negz n.
+Proof. by rewrite -addn1 Negz_addK. Qed.
 
 Lemma opp_oppE (n : int) : - - n = n.
 Proof.
@@ -88,15 +106,18 @@ Qed.
 Lemma addrK' (a : R) : a - a = 0.
 Proof. by rewrite -{1}(add0r a) addrK. Qed.
 
-Lemma NegzrK n c : Negz n.+1 + c - c = Negz n.+1.
-Proof. by rewrite addrK. Qed.
-
 (* 移項 *)
 Lemma rtransposition (a b c : R) : a + b = c -> a = c - b.
 Proof. by move=> <-; rewrite addrK. Qed.
 
 Lemma itransposition (l m n : int) : l + m = n -> l = n - m.
 Proof. by move=> <-; rewrite addrK. Qed.
+
+Lemma Negz_transp m n l : m + Negz n = l -> m = l + n.+1.
+Proof.
+  rewrite NegzE.
+  apply itransposition.
+Qed.
 
 (* 両辺にかける *)
 Lemma same_prod {a b} (c : R) : c != 0 -> a * c = b * c -> a = b.
@@ -106,15 +127,6 @@ Proof.
   rewrite -{2}(mulr1 b).
   rewrite -(@divff _ c) //.
   by rewrite !mulrA => ->.
-Qed.
-
-Lemma negdistr (a b : int) : - (a + b) = - a - b.
-Proof.
-  have -> : - (a + b) = - a + a - (a + b).
-    rewrite [- a + a] addrC.
-    rewrite -{2}(add0r a) addrK.
-    by rewrite sub0r.
-  by rewrite addrKA.
 Qed.
 
 (* 約分 *)
@@ -409,67 +421,106 @@ Proof.
 Qed.
 
 Lemma qpoly_exp_pos_neg a (m n : nat) x : q != 0 ->
+  qpoly_nonneg a m x != 0 ->
   qpoly_nonneg (q ^ (Posz m + Negz n) * a) n.+1 x != 0 ->
   qpoly a (Posz m + Negz n) x = qpoly a m x * qpoly (q ^ m * a) (Negz n) x.
 Proof.
-  move=> Hq0 Hqpoly /=.
+  move=> Hq0 Hqpolym Hqpolymn.
   case Hmn : (Posz m + Negz n) => [l|l]  /=.
   - rewrite /qpoly_neg mul1r.
     rewrite (_ : qpoly_nonneg a m x = qpoly_nonneg a (l + n.+1) x).
       rewrite qpoly_nonneg_explaw.
-      have -> : (q ^ (Negz n.+1 + 1) * (q ^ m * a)) = (q ^ l * a).
-        by rewrite mulrA -expfzDr // -addn1 NegzK addrC Hmn.
+      have -> : q ^ (Negz n.+1 + 1) * (q ^ m * a) = q ^ l * a.
+        by rewrite mulrA -expfzDr // -addn1 Negz_addK addrC Hmn.
       rewrite -{2}(mul1r (qpoly_nonneg (q ^ l * a) n.+1 x)).
       rewrite red_frac_r.
         by rewrite divr1.
       by rewrite -Hmn.
-    rewrite NegzE in Hmn.
-    apply itransposition in Hmn.
-    rewrite opp_oppE in Hmn.
+    apply Negz_transp in Hmn.
     apply eq_int_to_nat in Hmn.
     by rewrite Hmn.
   - rewrite /qpoly_neg.
     rewrite (_ : qpoly_nonneg (q ^ (Negz n.+1 + 1) * (q ^ m * a)) n.+1 x 
-               = qpoly_nonneg (q ^ (Negz n.+1 + 1) * (q ^ m * a)) (m + l.+1) x).
-
-
-
-      rewrite [(q ^ (Negz n.+1 + 1) * (q ^ m * a))] mulrC.
+               = qpoly_nonneg (q ^ (Negz n.+1 + 1) * (q ^ m * a))
+                              (l.+1 + m) x).
       rewrite qpoly_nonneg_explaw.
-    rewrite !NegzE in Hmn.
-Admitted.
+      have -> : q ^ (Negz n.+1 + 1) * (q ^ m * a) =
+                q ^ (Negz l.+1 + 1) * a.
+        by rewrite mulrA -expfzDr // !NegzS addrC Hmn.
+      have -> : q ^ l.+1 * (q ^ (Negz l.+1 + 1) * a) = a.
+        by rewrite mulrA -expfzDr // NegzS NegzK expr0z mul1r.
+      rewrite mulrA.
+      rewrite [qpoly_nonneg (q ^ (Negz l.+1 + 1) * a) l.+1 x *
+               qpoly_nonneg a m x] mulrC.
+      by rewrite red_frac_l.
+    move: Hmn.
+    move /Negz_transp /esym.
+    rewrite addrC.
+    move /Negz_transp /eq_int_to_nat.
+    by rewrite addnC => ->.
+Qed.
 
-Lemma qpoly_exp_neg_pos a m n x :
-  qpoly a (Negz m + n) x = qpoly a (Negz m) x * qpoly (q ^ Negz m * a) n x.
+Lemma qpoly_exp_neg_pos a m n x : q != 0 ->
+  qpoly_nonneg (q ^ Negz m * a) m.+1 x != 0 ->
+  qpoly_nonneg (q ^ Negz m * a) n x != 0 ->
+  qpoly a (Negz m + Posz n) x =
+  qpoly a (Negz m) x * qpoly (q ^ Negz m * a) n x.
 Proof.
-Admitted.
+  move=> Hq0 Hqpolym Hqpolyn.
+  case Hmn : (Negz m + n) => [l|l] /=.
+  - rewrite /qpoly_neg.
+    rewrite (_ : qpoly_nonneg (q ^ Negz m * a) n x =
+                 qpoly_nonneg (q ^ Negz m * a) (m.+1 + l) x).
+      rewrite qpoly_nonneg_explaw.
+      have -> : q ^ (Negz m.+1 + 1) * a = q ^ Negz m * a.
+        by rewrite -addn1 Negz_addK.
+      have -> : q ^ m.+1 * (q ^ Negz m * a) = a.
+        by rewrite mulrA -expfzDr // NegzK expr0z mul1r.
+      rewrite mulrC mulrA mulr1.
+      rewrite -{2}[qpoly_nonneg (q ^ Negz m * a) m.+1 x] mulr1.
+      rewrite red_frac_l //.
+      by rewrite divr1.
+    move: Hmn.
+    rewrite addrC.
+    move /Negz_transp /eq_int_to_nat.
+    by rewrite addnC => ->.
+  - rewrite /qpoly_neg.
+    rewrite (_ : qpoly_nonneg (q ^ (Negz m.+1 + 1) * a) m.+1 x 
+               = qpoly_nonneg (q ^ (Negz m.+1 + 1) * a)
+                              (n + l.+1) x).
+      rewrite qpoly_nonneg_explaw.
+      have -> : q ^ n * (q ^ (Negz m.+1 + 1) * a) =
+                q ^ (Negz l.+1 + 1) * a.
+        by rewrite mulrA -expfzDr // !NegzS addrC Hmn.
+      have -> : q ^ (Negz m.+1 + 1) * a = q ^ Negz m * a.
+        by rewrite NegzS.
+      by rewrite [RHS] mulrC mulrA red_frac_l.
+    move: Hmn.
+    rewrite addrC.
+    move /Negz_transp /esym.
+    rewrite addrC.
+    move /Negz_transp /eq_int_to_nat.
+    by rewrite addnC => ->.
+Qed.
 
 Theorem qpoly_exp_neg_neg a m n x : q != 0 ->
   qpoly a (Negz m + Negz n) x =
-    qpoly a (Negz m) x * qpoly (q ^ Negz m * a) (Negz n) x .
+  qpoly a (Negz m) x * qpoly (q ^ Negz m * a) (Negz n) x .
 Proof.
   move=> Hq0 /=.
   rewrite /qpoly_neg.
   have -> : (m + n).+2 = ((n.+1) + (m.+1))%N.
     by rewrite addnC addnS -addn2.
   rewrite qpoly_nonneg_explaw.
-  have -> : (q ^ n.+1 * (q ^ (Negz (n.+1 + m.+1) + 1) * a)) =
-              (q ^ (Negz m.+1 + 1) * a).
-    rewrite mulrA -expfzDr // addrC -addrA.
-    have -> : 1 + Posz n.+1 = Posz n.+1 + 1.
-      by rewrite addrC.
-    have -> : (n.+1 + m.+1)%N = (m.+1 + n.+1)%N.
-      by rewrite addnC.
-    by rewrite addrA  NegzK.
+  have -> : q ^ n.+1 * (q ^ (Negz (n.+1 + m.+1) + 1) * a) =
+              q ^ (Negz m.+1 + 1) * a.
+    rewrite mulrA -expfzDr //.
+    have -> : Posz n.+1 + (Negz (n.+1 + m.+1) + 1) = Negz m.+1 + 1 => //.
+    by rewrite Negz_add 2!addrA NegzK add0r.
   have -> : (q ^ (Negz n.+1 + 1) * (q ^ Negz m * a)) =
               (q ^ (Negz (n.+1 + m.+1) + 1) * a).
-    rewrite mulrA -expfzDr // -addrA [1 + Negz m] addrC addrA.
-    have -> : Negz n.+1 + Negz m = Negz (n.+1 + m.+1) => //.
-    rewrite !NegzE.
-    rewrite addnC -addnS addnC.
-    by rewrite (_ : Posz (n.+2 + m.+1)%N = Posz n.+2 + m.+1) // negdistr.
-  rewrite mulf_div.
-  rewrite mulr1.
+    by rewrite mulrA -expfzDr // NegzS -Negz_add addnS NegzS.
+  rewrite mulf_div mulr1.
   by rewrite [qpoly_nonneg (q ^ (Negz (n.+1 + m.+1) + 1) * a) n.+1 x *
             qpoly_nonneg (q ^ (Negz m.+1 + 1) * a) m.+1 x] mulrC.
 Qed.
@@ -481,9 +532,13 @@ Proof.
   case: m => m.
   - case: n => n.
     + by apply qpoly_nonneg_explaw.
-    + rewrite qpoly_exp_pos_neg //. admit.
+    + rewrite qpoly_exp_pos_neg //.
+        admit.
+      admit.
   - case: n => n.
-    + by rewrite qpoly_exp_neg_pos.
+    + apply qpoly_exp_neg_pos => //.
+        admit.
+      admit.
     + by apply qpoly_exp_neg_neg.
 Admitted.
 
@@ -601,12 +656,12 @@ Proof.
       rewrite (_ : Posz (n + 1)%N = Posz n + 1) //.
       by rewrite addrK.
   - rewrite Dq_qpoly_int_to_neg qderiv_qpoly_neg //.
-        rewrite NegzK.
+        rewrite Negz_addK.
         rewrite (_ : (n + 1).+1 = (n + 0).+2) //.
         by rewrite addn0 addn1.
       rewrite (_ : Negz (n + 1) = Negz n - 1) //.
-      by apply itransposition; rewrite NegzK.
-    by rewrite NegzK addn1.
+      by apply itransposition; rewrite Negz_addK.
+    by rewrite Negz_addK addn1.
 Qed.
 
 End q_analogue.
