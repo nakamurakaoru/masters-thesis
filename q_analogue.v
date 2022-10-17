@@ -385,7 +385,14 @@ Proof.
       by rewrite -[q ^ n.+1 * q ^ m] expfz_n0addr // addnC.
 Qed.
 
-Theorem qpoly_exp_non0 x a m n :
+Lemma qpoly_exp_non0l x a m n :
+  qpoly_nonneg a (m + n) x != 0 -> qpoly_nonneg a m x != 0.
+Proof.
+  rewrite qpoly_nonneg_explaw.
+  by apply mulnon0.
+Qed.
+
+Lemma qpoly_exp_non0r x a m n :
   qpoly_nonneg a (m + n) x != 0 -> qpoly_nonneg (q ^ m * a) n x != 0.
 Proof.
   rewrite qpoly_nonneg_explaw mulrC.
@@ -476,7 +483,7 @@ Proof.
       rewrite red_frac_l //.
       have -> : a = q ^ l.+1 * (q ^ (Posz m + Negz n) * a) => //.
         by rewrite mulrA -expfzDr // Hmn NegzK expr0z mul1r.
-      apply qpoly_exp_non0.
+      apply qpoly_exp_non0r.
       rewrite -Hmn' //.
     by rewrite Hmn'.
 Qed.
@@ -513,25 +520,18 @@ Proof.
       rewrite addrC in Hmn.
       by move /Negz_transp /eq_int_to_nat in Hmn.
     rewrite {2}Hmn'.
-(* 
-
-
-    rewrite (_ : qpoly_nonneg (q ^ (Negz m.+1 + 1) * a) m.+1 x 
-               = qpoly_nonneg (q ^ (Negz m.+1 + 1) * a)
-                              (n + l.+1) x). *)
-      rewrite qpoly_nonneg_explaw.
-      have -> : q ^ n * (q ^ (Negz m.+1 + 1) * a) =
+    rewrite qpoly_nonneg_explaw.
+    have -> : q ^ n * (q ^ (Negz m.+1 + 1) * a) =
                 q ^ (Negz l.+1 + 1) * a.
-        by rewrite mulrA -expfzDr // !NegzS addrC Hmn.
-      have -> : q ^ (Negz m.+1 + 1) * a = q ^ Negz m * a.
-        by rewrite NegzS.
-      rewrite [RHS] mulrC mulrA red_frac_l //.
-      admit.
-(*     by rewrite addnC => ->.
- *)
-Admitted.
+      by rewrite mulrA -expfzDr // !NegzS addrC Hmn.
+    have -> : q ^ (Negz m.+1 + 1) * a = q ^ Negz m * a.
+      by rewrite NegzS.
+    rewrite [RHS] mulrC mulrA red_frac_l //.
+    apply (qpoly_exp_non0l _ _ n l.+1).
+    by rewrite -Hmn'.
+Qed.
 
-Theorem qpoly_exp_neg_neg a m n x : q != 0 ->
+Lemma qpoly_exp_neg_neg a m n x : q != 0 ->
   qpoly a (Negz m + Negz n) x =
   qpoly a (Negz m) x * qpoly (q ^ Negz m * a) (Negz n) x .
 Proof.
@@ -553,20 +553,34 @@ Proof.
             qpoly_nonneg (q ^ (Negz m.+1 + 1) * a) m.+1 x] mulrC.
 Qed.
 
+Lemma inv_invE (x : R) : 1 / (1 / x) = x.
+Proof. by rewrite divKf // oner_neq0. Qed.
+
 Theorem qpoly_exp_law a m n x : q != 0 ->
+  (n < 0 -> 1 / qpoly (q ^ m * a) n x != 0) ->
+(*   (forall n',
+     n = Negz n' ->
+     qpoly_nonneg (q ^ (m + Negz n') * a) n'.+1 x != 0) *)
+  (m < 0 -> 1 / qpoly a m x != 0) ->
+(*   (forall m',
+     m = Negz m' ->
+     qpoly_nonneg (q ^ Negz m' * a) m'.+1 x != 0) *)
   qpoly a (m + n) x = qpoly a m x * qpoly (q ^ m * a) n x.
 Proof.
   move=> Hq0.
   case: m => m.
-  - case: n => n.
+  - case: n => n Hn Hm.
     + by apply qpoly_nonneg_explaw.
     + rewrite qpoly_exp_pos_neg //.
-      admit.
-  - case: n => n.
-    + apply qpoly_exp_neg_pos => //.
-      admit.
+      rewrite /qpoly /= /qpoly_neg inv_invE in Hn.
+      rewrite NegzS mulrA -expfzDr // addrC in Hn.
+      by apply Hn.
+  - case: n => n Hn Hm.
+    + rewrite qpoly_exp_neg_pos //.
+      rewrite /qpoly /= /qpoly_neg inv_invE NegzS in Hm.
+      by apply Hm.
     + by apply qpoly_exp_neg_neg.
-Admitted.
+Qed.
 
 (* q-derivative of q-polynomial for 0 *)
 Lemma qderiv_qpoly_0 a x :
