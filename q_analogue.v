@@ -43,6 +43,7 @@ Proof.
   by rewrite mulrC.
 Qed.
 
+(* -の分配則*)
 Lemma negdistr (a b : int) : - (a + b) = - a - b.
 Proof.
   have -> : - (a + b) = - a + a - (a + b).
@@ -73,9 +74,7 @@ Lemma NegzS n : Negz n.+1 + 1 = Negz n.
 Proof. by rewrite -addn1 Negz_addK. Qed.
 
 Lemma opp_oppE (n : int) : - - n = n.
-Proof.
-  by rewrite -(sub0r n) (opprB 0) subr0.
-Qed.
+Proof. by rewrite -(sub0r n) (opprB 0) subr0. Qed.
 
 Lemma eq_int_to_nat (m n : nat): m = n:> int -> m = n.
 Proof.
@@ -102,48 +101,49 @@ Proof.
   - by rewrite exprSz mulf_neq0.
 Qed.
 
-(* add cancel *)
+(* R上の　add cancel *)
 Lemma addrK' (a : R) : a - a = 0.
 Proof. by rewrite -{1}(add0r a) addrK. Qed.
 
-(* 移項 *)
+(* Rの移項 *)
 Lemma rtransposition (a b c : R) : a + b = c -> a = c - b.
 Proof. by move=> <-; rewrite addrK. Qed.
 
+(* intの移項 *)
 Lemma itransposition (l m n : int) : l + m = n -> l = n - m.
 Proof. by move=> <-; rewrite addrK. Qed.
 
+
 Lemma Negz_transp m n l : m + Negz n = l -> m = l + n.+1.
-Proof.
-  rewrite NegzE.
-  apply itransposition.
-Qed.
+Proof. rewrite NegzE; apply itransposition. Qed.
 
 (* 両辺にかける *)
 Lemma same_prod {a b} (c : R) : c != 0 -> a * c = b * c -> a = b.
 Proof.
   move=> Hc.
-  rewrite -{2}(mulr1 a).
-  rewrite -{2}(mulr1 b).
-  rewrite -(@divff _ c) //.
-  by rewrite !mulrA => ->.
+  by rewrite -{2}(mulr1 a) -{2}(mulr1 b)
+     -(@divff _ c) // !mulrA => ->.
 Qed.
 
-(* 約分 *)
-Lemma red_frac_r (x y z : R) : z != 0 -> x * z / (y * z) = x / y.
+(* 右側約分 *)
+Lemma red_frac_r (x y z : R) : z != 0 ->
+  x * z / (y * z) = x / y.
 Proof.
   move=> Hz.
   by rewrite -mulf_div divff // mulr1.
 Qed.
 
-Lemma red_frac_l (x y z : R) : z != 0 -> z * x / (z * y) = x / y.
+(* 左側約分 *)
+Lemma red_frac_l (x y z : R) : z != 0 ->
+  z * x / (z * y) = x / y.
 Proof.
   move=> Hz.
   by rewrite [z * x] mulrC [z * y] mulrC red_frac_r.
 Qed.
 
 (* 分母共通の和 *)
-Lemma add_div (x y z : R) : z != 0 -> x / z + y / z = (x + y) / z.
+Lemma add_div (x y z : R) : z != 0 ->
+  x / z + y / z = (x + y) / z.
 Proof.
   move=> nz0.
   by rewrite addf_div // -mulrDl red_frac_r.
@@ -184,10 +184,13 @@ Proof.
   move=> Hx.
   rewrite /Dq /dq !mulrA add_div.
     rewrite !mulrBr opprD !addrA.
-    rewrite [a * f (q * x) + b * g (q * x) - a * f x] addrC.
-    rewrite [(a * f (q * x) + b * g (q * x))] addrC.
+    rewrite [a * f (q * x) + b * g (q * x) - a * f x]
+              addrC.
+    rewrite [(a * f (q * x) + b * g (q * x))]
+              addrC.
     rewrite addrA.
-    rewrite [- (a * f x) + b * g (q * x) + a * f (q * x)] addrC.
+    rewrite [- (a * f x) + b * g (q * x) + a * f (q * x)]
+            addrC.
     by rewrite addrA.
   by apply denom_is_nonzero.
 Qed.
@@ -199,8 +202,8 @@ Definition qnat n : R := (q ^ n - 1) / (q - 1).
 Lemma qnat_0 : qnat 0 = 0.
 Proof. by rewrite /qnat expr0z addrK' mul0r. Qed.
 
-Lemma lim_qnat n :
-  forall e : R, e > 0 -> exists d, `|q - 1| < d -> `|n%:R - (qnat n)| < e.
+Lemma lim_qnat n : forall e : R, e > 0 ->
+  exists d, `|q - 1| < d -> `|n%:R - (qnat n)| < e.
 Proof.
   move=> e He.
   destruct n.
@@ -229,8 +232,8 @@ Proof.
 Qed.
 
 (* q-derivative product rule *)
-Lemma qderiv_prod f g x :
-  x != 0 -> Dq (f ** g) x = f (q * x) * Dq g x + (g x) * Dq f x.
+Lemma qderiv_prod f g x : x != 0 ->
+  Dq (f ** g) x = f (q * x) * Dq g x + (g x) * Dq f x.
 Proof.
   move=> Hx.
   rewrite /Dq dq_prod -add_div.
@@ -239,8 +242,8 @@ Proof.
 Qed.
 
 (* q-derivative product rule' *)
-Lemma qderiv_prod' f g x :
-  x != 0 ->  Dq (f ** g) x = (f x) * Dq g x + g (q * x) * Dq f x.
+Lemma qderiv_prod' f g x : x != 0 ->
+   Dq (f ** g) x = (f x) * Dq g x + g (q * x) * Dq f x.
 Proof.
   move=> Hx.
   by rewrite mulfC qderiv_prod // addrC.
@@ -259,14 +262,16 @@ Qed.
 
 (* q-derivative quotient rule *)
 Lemma qderiv_quot f g x : x != 0 -> g x != 0 -> g (q * x) != 0 ->
-  Dq (f // g) x = (g x * Dq f x - f x * Dq g x) / (g x * g (q * x)).
+  Dq (f // g) x =
+  (g x * Dq f x - f x * Dq g x) / (g x * g (q * x)).
 Proof.
   move=> Hx Hgx Hgqx.
   rewrite -add_div.
     rewrite red_frac_l // mulNr.
     apply /rtransposition /(same_prod (g (q * x))) => //.
     rewrite mulrDl.
-    rewrite -[f x * Dq g x / (g x * g (q * x)) * g (q * x)] mulrA.
+    rewrite -[f x * Dq g x / (g x * g (q * x)) * g (q * x)]
+              mulrA.
     rewrite [(g x * g (q * x))^-1 * g (q * x)] mulrC.
     rewrite mulrA red_frac_r //.
     rewrite -[Dq f x / g (q * x) * g (q * x)] mulrA.
@@ -281,9 +286,11 @@ Proof.
 Qed.
 
 (* q-derivative quotient rule' *)
-Lemma qderiv_quot' f g x : x != 0 -> g x != 0 -> g (q * x) != 0 ->
+Lemma qderiv_quot' f g x : x != 0 ->
+  g x != 0 -> g (q * x) != 0 ->
   Dq (f // g) x =
-    (g (q * x) * Dq f x - f (q * x) * Dq g x) / (g x * g (q * x)).
+  (g (q * x) * Dq f x
+   - f (q * x) * Dq g x) / (g x * g (q * x)).
 Proof.
   move=> Hx Hgx Hgqx.
   rewrite -add_div.
@@ -291,7 +298,8 @@ Proof.
     rewrite red_frac_l // mulNr.
     apply /rtransposition /(same_prod (g x)) => //.
     rewrite mulrDl.
-    rewrite [f (q * x) * Dq g x / (g (q * x) * g x) * g x] mulrC.
+    rewrite [f (q * x) * Dq g x / (g (q * x) * g x) * g x]
+              mulrC.
     rewrite [g (q * x) * g x] mulrC.
     rewrite mulrA red_frac_l //.
     rewrite -[Dq f x / g x * g x] mulrA.
@@ -313,7 +321,8 @@ Fixpoint qpoly_nonneg a n x :=
   end.
 
 Lemma qpoly_nonneg_head a n x:
-   qpoly_nonneg a n.+1 x = (x - a) * qpoly_nonneg (q * a) n x.
+   qpoly_nonneg a n.+1 x =
+  (x - a) * qpoly_nonneg (q * a) n x.
 Proof.
   elim: n => [|n IH] /=.
   - by rewrite expr0z !mul1r mulr1.
@@ -330,8 +339,9 @@ Proof.
 Qed.*)
 
 (* q-derivative of q-polynomial for nat *)
-Theorem qderiv_qpoly_nonneg a n x :
-  x != 0 -> Dq (qpoly_nonneg a n.+1) x = qnat n.+1 * qpoly_nonneg a n x.
+Theorem qderiv_qpoly_nonneg a n x : x != 0 ->
+  Dq (qpoly_nonneg a n.+1) x =
+  qnat n.+1 * qpoly_nonneg a n x.
 Proof.
   move=> Hx.
   elim: n => [|n IH].
