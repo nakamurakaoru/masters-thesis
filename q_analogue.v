@@ -375,6 +375,13 @@ Proof.
       by rewrite -[q ^ n.+1 * q ^ m] expfz_n0addr // addnC.
 Qed.
 
+Theorem qpoly_exp_non0 x a m n :
+  qpoly_nonneg a (m + n) x != 0 -> qpoly_nonneg (q ^ m * a) n x != 0.
+Proof.
+  rewrite qpoly_nonneg_explaw mulrC.
+  by apply mulnon0.
+Qed.
+
 (* q-polynomial for neg *)
 Definition qpoly_neg a n x := 1 / qpoly_nonneg (q ^ ((Negz n) + 1) * a) n x.
 
@@ -421,11 +428,10 @@ Proof.
 Qed.
 
 Lemma qpoly_exp_pos_neg a (m n : nat) x : q != 0 ->
-  qpoly_nonneg a m x != 0 ->
   qpoly_nonneg (q ^ (Posz m + Negz n) * a) n.+1 x != 0 ->
   qpoly a (Posz m + Negz n) x = qpoly a m x * qpoly (q ^ m * a) (Negz n) x.
 Proof.
-  move=> Hq0 Hqpolym Hqpolymn.
+  move=> Hq0 Hqpolymn.
   case Hmn : (Posz m + Negz n) => [l|l]  /=.
   - rewrite /qpoly_neg mul1r.
     rewrite (_ : qpoly_nonneg a m x = qpoly_nonneg a (l + n.+1) x).
@@ -440,6 +446,11 @@ Proof.
     apply eq_int_to_nat in Hmn.
     by rewrite Hmn.
   - rewrite /qpoly_neg.
+    have Hmn' : n.+1 = (l.+1 + m)%N.
+      move /Negz_transp /esym in Hmn.
+      rewrite addrC in Hmn.
+      move /Negz_transp /eq_int_to_nat in Hmn.
+      by rewrite addnC in Hmn.
     rewrite (_ : qpoly_nonneg (q ^ (Negz n.+1 + 1) * (q ^ m * a)) n.+1 x 
                = qpoly_nonneg (q ^ (Negz n.+1 + 1) * (q ^ m * a))
                               (l.+1 + m) x).
@@ -452,12 +463,12 @@ Proof.
       rewrite mulrA.
       rewrite [qpoly_nonneg (q ^ (Negz l.+1 + 1) * a) l.+1 x *
                qpoly_nonneg a m x] mulrC.
-      by rewrite red_frac_l.
-    move: Hmn.
-    move /Negz_transp /esym.
-    rewrite addrC.
-    move /Negz_transp /eq_int_to_nat.
-    by rewrite addnC => ->.
+      rewrite red_frac_l //.
+      have -> : a = q ^ l.+1 * (q ^ (Posz m + Negz n) * a) => //.
+        by rewrite mulrA -expfzDr // Hmn NegzK expr0z mul1r.
+      apply qpoly_exp_non0.
+      rewrite -Hmn' //.
+    by rewrite Hmn'.
 Qed.
 
 Lemma qpoly_exp_neg_pos a m n x : q != 0 ->
@@ -528,6 +539,8 @@ Qed.
 Theorem qpoly_exp_law a m n x : q != 0 ->
   qpoly a (m + n) x = qpoly a m x * qpoly (q ^ m * a) n x.
 Proof.
+Print int.
+Search (int -> Posz _).
   move=> Hq0.
   case: m => m.
   - case: n => n.
