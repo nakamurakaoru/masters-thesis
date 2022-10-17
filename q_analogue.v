@@ -556,7 +556,6 @@ Search (int -> Posz _).
   - case: n => n.
     + by apply qpoly_nonneg_explaw.
     + rewrite qpoly_exp_pos_neg //.
-        admit.
       admit.
   - case: n => n.
     + apply qpoly_exp_neg_pos => //.
