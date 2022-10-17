@@ -483,22 +483,23 @@ Qed.
 
 Lemma qpoly_exp_neg_pos a m n x : q != 0 ->
   qpoly_nonneg (q ^ Negz m * a) m.+1 x != 0 ->
-  qpoly_nonneg (q ^ Negz m * a) n x != 0 ->
   qpoly a (Negz m + Posz n) x =
   qpoly a (Negz m) x * qpoly (q ^ Negz m * a) n x.
 Proof.
-  move=> Hq0 Hqpolym Hqpolyn.
+  move=> Hq0 Hqpolym.
   case Hmn : (Negz m + n) => [l|l] /=.
   - rewrite /qpoly_neg.
     rewrite (_ : qpoly_nonneg (q ^ Negz m * a) n x =
-                 qpoly_nonneg (q ^ Negz m * a) (m.+1 + l) x).
+                 qpoly_nonneg (q ^ Negz m * a)
+                   (m.+1 + l) x).
       rewrite qpoly_nonneg_explaw.
       have -> : q ^ (Negz m.+1 + 1) * a = q ^ Negz m * a.
         by rewrite -addn1 Negz_addK.
       have -> : q ^ m.+1 * (q ^ Negz m * a) = a.
         by rewrite mulrA -expfzDr // NegzK expr0z mul1r.
       rewrite mulrC mulrA mulr1.
-      rewrite -{2}[qpoly_nonneg (q ^ Negz m * a) m.+1 x] mulr1.
+      rewrite -{2}[qpoly_nonneg (q ^ Negz m * a) m.+1 x]
+                    mulr1.
       rewrite red_frac_l //.
       by rewrite divr1.
     move: Hmn.
@@ -506,23 +507,29 @@ Proof.
     move /Negz_transp /eq_int_to_nat.
     by rewrite addnC => ->.
   - rewrite /qpoly_neg.
+    have Hmn' : m.+1 = (n + l.+1)%N.
+      rewrite addrC in Hmn.
+      move /Negz_transp /esym in Hmn.
+      rewrite addrC in Hmn.
+      by move /Negz_transp /eq_int_to_nat in Hmn.
+    rewrite {2}Hmn'.
+(* 
+
+
     rewrite (_ : qpoly_nonneg (q ^ (Negz m.+1 + 1) * a) m.+1 x 
                = qpoly_nonneg (q ^ (Negz m.+1 + 1) * a)
-                              (n + l.+1) x).
+                              (n + l.+1) x). *)
       rewrite qpoly_nonneg_explaw.
       have -> : q ^ n * (q ^ (Negz m.+1 + 1) * a) =
                 q ^ (Negz l.+1 + 1) * a.
         by rewrite mulrA -expfzDr // !NegzS addrC Hmn.
       have -> : q ^ (Negz m.+1 + 1) * a = q ^ Negz m * a.
         by rewrite NegzS.
-      by rewrite [RHS] mulrC mulrA red_frac_l.
-    move: Hmn.
-    rewrite addrC.
-    move /Negz_transp /esym.
-    rewrite addrC.
-    move /Negz_transp /eq_int_to_nat.
-    by rewrite addnC => ->.
-Qed.
+      rewrite [RHS] mulrC mulrA red_frac_l //.
+      admit.
+(*     by rewrite addnC => ->.
+ *)
+Admitted.
 
 Theorem qpoly_exp_neg_neg a m n x : q != 0 ->
   qpoly a (Negz m + Negz n) x =
@@ -549,8 +556,6 @@ Qed.
 Theorem qpoly_exp_law a m n x : q != 0 ->
   qpoly a (m + n) x = qpoly a m x * qpoly (q ^ m * a) n x.
 Proof.
-Print int.
-Search (int -> Posz _).
   move=> Hq0.
   case: m => m.
   - case: n => n.
@@ -559,7 +564,6 @@ Search (int -> Posz _).
       admit.
   - case: n => n.
     + apply qpoly_exp_neg_pos => //.
-        admit.
       admit.
     + by apply qpoly_exp_neg_neg.
 Admitted.
