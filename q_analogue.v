@@ -712,6 +712,36 @@ Fixpoint q_fact n := match n with
 Definition q_coef n j :=
   q_fact n / (q_fact j * q_fact (n - j)).
 
+(* Lemma q_fact1 n : (n <= 0)%N -> q_fact n = 1.
+Proof.
+  move=> Hn.
+  have -> : (n = 0)%N => //.
+  apply /eqP.
+  by rewrite -(subn0 n) subn_eq0 //. 
+Qed. *)
+
+(*Lemma q_coef_jn n j : (n - j <= 0)%N ->
+  q_coef n j = q_fact n / q_fact j.
+Proof.
+  move=> Hjn.
+  rewrite /q_coef.
+  by rewrite (q_fact1 (n - j)%N) // mulr1.
+Qed. *)
+
+(* Lemma q_fact_jn n j : (n - j <= 0)%N ->
+  q_fact j = q_fact (n - (n - j)).
+Proof.
+Qed. *)
+
+Lemma q_coefE n j : (j <= n)%N ->
+  q_coef n (n - j) = q_coef n j.
+Proof.
+  move=> Hjn.
+  rewrite /q_coef.
+  rewrite subKn //.
+  by rewrite [q_fact (n - j) * q_fact j] mulrC.
+Qed.
+
 End q_analogue.
 
 Section q_chain_rule.
