@@ -704,6 +704,14 @@ Proof.
     by rewrite Negz_addK addn1.
 Qed.
 
+Fixpoint q_fact n := match n with
+  | 0 => 1
+  | n.+1 => q_fact n * qnat n
+  end.
+
+Definition q_coef n j :=
+  q_fact n / (q_fact j * q_fact (n - j)).
+
 End q_analogue.
 
 Section q_chain_rule.
