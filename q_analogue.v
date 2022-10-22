@@ -125,6 +125,13 @@ Proof.
      -(@divff _ c) // !mulrA => ->.
 Qed.
 
+Lemma denomK (x y : R) : y != 0 ->
+  (x / y) * y = x.
+Proof.
+  move=> Hy.
+  by rewrite -mulrA mulVf // mulr1.
+Qed.
+
 (* 右側約分 *)
 Lemma red_frac_r (x y z : R) : z != 0 ->
   x * z / (y * z) = x / y.
@@ -156,6 +163,21 @@ Proof.
   rewrite -{2}(mul1r x) -mulrBl.
   by apply mulf_neq0.
 Qed.
+
+Lemma sum_shift m n (F : nat -> R) :
+  \sum_(m <= i < n) F i = \sum_(0 <= i < (n - m)) F (i + m)%N.
+Proof.
+Admitted.
+
+Lemma sum_distr n (F : nat -> R) a:
+  \sum_(0 <= i < n.+1) F i * a = a * \sum_(0 <= i < n.+1) F i.
+Proof.
+  elim: n => [|n IH].
+  - by rewrite !big_nat1 mulrC.
+  - rewrite (@big_cat_nat _ _ _ n.+1) //=.
+(*     rewrite [RHS] (@big_cat_nat _ _ _ n.+1 0) //=.
+    rewrite !big_nat1. *)
+Admitted.
 
 (* main *)
 (* q-differential *)
@@ -196,28 +218,81 @@ Proof.
 Qed.
 
 (* q-analogue of natural number *)
-Definition qnat n : R := (q ^ n - 1) / (q - 1).
+Definition q_nat n : R := (q ^ n - 1) / (q - 1).
 
-(* qnat 0 is 0 *)
-Lemma qnat_0 : qnat 0 = 0.
-Proof. by rewrite /qnat expr0z addrK' mul0r. Qed.
+(* q_nat 0 is 0 *)
+Lemma q_nat_0 : q_nat 0 = 0.
+Proof. by rewrite /q_nat expr0z addrK' mul0r. Qed.
 
-Lemma lim_qnat n : forall e : R, e > 0 ->
-  exists d, `|q - 1| < d -> `|n%:R - (qnat n)| < e.
+Lemma q_nat1 : q_nat 1 = 1.
+Proof. by rewrite /q_nat expr1z divff. Qed.
+
+Lemma q_natE (n : nat) : q_nat n.+1 = \sum_(0 <= i < n.+1) (q ^ i).
+Proof.
+  elim: n => [|n IH].
+  - by rewrite q_nat1 big_nat1 expr0z.
+  - have -> : q_nat n.+2 = q_nat n.+1 + q ^ n.+1.
+      apply (same_prod (q - 1)) => //.
+      by rewrite mulrDl !denomK // mulrBr mulr1 -exprSzr
+                [RHS] addrC subrKA.
+    rewrite IH.
+    rewrite [RHS] (@big_cat_nat _ _ _ n.+1) //=.
+    by rewrite big_nat1.
+Qed.
+
+Lemma q_nat_cat (n j : nat) : (j < n)%N ->
+  q_nat n.+1 = q_nat j.+1 + q ^ j.+1 * q_nat (n.+1 - j.+1)%N .
+Proof.
+  move=> Hjm.
+  rewrite !q_natE.
+  rewrite (@big_cat_nat _ _ _ j.+1) //=.
+    rewrite (sum_shift j.+1).
+    have -> : (n.+1 - j.+1)%N = (n.+1 - j.+1 - 1).+1.
+      set m := (n.+1 - j.+1)%N.
+      rewrite -addn1 subnK //.
+      rewrite /m.
+      rewrite subn_gt0.
+      have -> : j.+1 = (j + 1)%N. by rewrite -addn1.
+      have -> : n.+1 = (n + 1)%N. by rewrite -addn1.
+      by rewrite ltn_add2r.
+    have H : forall m l, \sum_(0 <= i < m.+1) q ^ (i + l)%N =
+                         \sum_(0 <= i < m.+1) q ^ i * q ^ l.
+      move=> m l.
+      elim: m => [|m IH].
+      - by rewrite !big_nat1 {1}exprzD_nat.
+      - rewrite (@big_cat_nat _ _ _ m.+1) //=.
+        rewrite [RHS] (@big_cat_nat _ _ _ m.+1) //=.
+        by rewrite !big_nat1 !IH exprzD_nat.
+    rewrite H.
+    rewrite sum_distr.
+    by rewrite q_natE.
+  by apply (@ltn_trans n).
+Qed.
+
+(*Lemma prod_qpoly_nonneg a n x :
+  qpoly_nonneg a n.+1 x = \prod_(0 <= i < n.+1) (x -  q ^ i * a).
+Proof.
+  elim: n => [/=|n IH].
+  - by rewrite big_nat1 mul1r.
+  - rewrite (@big_cat_nat _ _ _ n.+1) //=.
+    by rewrite big_nat1 -IH.
+Qed.*)
+Lemma lim_q_nat n : forall e : R, e > 0 ->
+  exists d, `|q - 1| < d -> `|n%:R - (q_nat n)| < e.
 Proof.
   move=> e He.
   destruct n.
   - eexists => _.
-    by rewrite qnat_0 addrK' Num.Theory.normr0.
+    by rewrite q_nat_0 addrK' Num.Theory.normr0.
   - exists (e / n%:R).
 Admitted.
 
 (* q-derivative of x ^ n *)
 Lemma qderiv_of_pow n x :
-  x != 0 -> Dq (fun x => x ^ n) x = qnat n * x ^ (n - 1).
+  x != 0 -> Dq (fun x => x ^ n) x = q_nat n * x ^ (n - 1).
 Proof.
   move=> Hx.
-  rewrite /Dq /dq /qnat.
+  rewrite /Dq /dq /q_nat.
   rewrite -{4}(mul1r x) -mulrBl expfzMl.
     rewrite -add_div.
     rewrite [in x ^ n](_ : n = (n -1) +1) //.
@@ -341,11 +416,11 @@ Qed.*)
 (* q-derivative of q-polynomial for nat *)
 Theorem qderiv_qpoly_nonneg a n x : x != 0 ->
   Dq (qpoly_nonneg a n.+1) x =
-  qnat n.+1 * qpoly_nonneg a n x.
+  q_nat n.+1 * qpoly_nonneg a n x.
 Proof.
   move=> Hx.
   elim: n => [|n IH].
-  - rewrite /Dq /dq /qpoly_nonneg /qnat.
+  - rewrite /Dq /dq /qpoly_nonneg /q_nat.
     rewrite !mul1r mulr1 expr1z.
     rewrite opprB subrKA !divff //.
     by rewrite denom_is_nonzero.
@@ -357,15 +432,15 @@ Proof.
     rewrite opprB subrKA divff //.
       rewrite mulr1 exprSz.
       rewrite -[q * q ^ n * a] mulrA -(mulrBr q) IH.
-      rewrite -[q * (x - q ^ n * a) * (qnat n.+1 * qpoly_nonneg a n x)] mulrA.
-      rewrite [(x - q ^ n * a) * (qnat n.+1 * qpoly_nonneg a n x)] mulrC.
-      rewrite -[qnat n.+1 * qpoly_nonneg a n x * (x - q ^ n * a)] mulrA.
+      rewrite -[q * (x - q ^ n * a) * (q_nat n.+1 * qpoly_nonneg a n x)] mulrA.
+      rewrite [(x - q ^ n * a) * (q_nat n.+1 * qpoly_nonneg a n x)] mulrC.
+      rewrite -[q_nat n.+1 * qpoly_nonneg a n x * (x - q ^ n * a)] mulrA.
       rewrite (_ : qpoly_nonneg a n x * (x - q ^ n * a) = qpoly_nonneg a n.+1 x) //.
       rewrite mulrA.
       rewrite -{1}(mul1r (qpoly_nonneg a n.+1 x)).
       rewrite -mulrDl addrC.
       rewrite -(@divff _ (q - 1)) //.
-      rewrite [qnat n.+1] /qnat.
+      rewrite [q_nat n.+1] /q_nat.
       rewrite [q * ((q ^ n.+1 - 1) / (q - 1))] mulrA.
       rewrite (add_div _ _ (q -1)) //.
       by rewrite mulrBr -exprSz mulr1 subrKA.
@@ -584,8 +659,8 @@ Qed.
 
 (* q-derivative of q-polynomial for 0 *)
 Lemma qderiv_qpoly_0 a x :
-  Dq (qpoly a 0) x = qnat 0 * qpoly a (- 1) x.
-Proof. by rewrite Dq_const qnat_0 mul0r. Qed.
+  Dq (qpoly a 0) x = q_nat 0 * qpoly a (- 1) x.
+Proof. by rewrite Dq_const q_nat_0 mul0r. Qed.
 
 Lemma qpoly_qx a m n x : q != 0 ->
   qpoly_nonneg (q ^ m * a) n (q * x) =
@@ -614,11 +689,11 @@ Qed.
 Theorem qderiv_qpoly_neg a n x : q != 0 -> x != 0 ->
   (x - q ^ (Negz n) * a) != 0 ->
   qpoly_nonneg (q ^ (Negz n + 1) * a) n x != 0 ->
-  Dq (qpoly_neg a n) x = qnat (Negz n + 1) * qpoly_neg a (n.+1) x.
+  Dq (qpoly_neg a n) x = q_nat (Negz n + 1) * qpoly_neg a (n.+1) x.
 Proof.
   move=> Hq0 Hx Hqn Hqpoly.
   destruct n.
-  - by rewrite /Dq /dq /qpoly_neg /= addrK' qnat_0 !mul0r.
+  - by rewrite /Dq /dq /qpoly_neg /= addrK' q_nat_0 !mul0r.
   - rewrite qderiv_quot //.
       rewrite Dq_const mulr0 mul1r sub0r.
       rewrite qderiv_qpoly_nonneg // qpoly_qx // -mulNr.
@@ -659,7 +734,7 @@ Proof.
       rewrite -mulf_div.
       congr (_ * _).
       rewrite NegzE mulrC.
-      rewrite /qnat.
+      rewrite /q_nat.
       rewrite -mulNr mulrA.
       congr (_ / _).
       rewrite opprB mulrBr mulr1 mulrC divff.
@@ -684,7 +759,7 @@ Qed.
 Theorem qderiv_qpoly a n x : q != 0 -> x != 0 ->
   x - q ^ (n - 1) * a != 0 ->
   qpoly (q ^ n * a) (- n) x != 0 ->
-  Dq (qpoly a n) x = qnat n * qpoly a (n - 1) x.
+  Dq (qpoly a n) x = q_nat n * qpoly a (n - 1) x.
 Proof.
   move=> Hq0 Hx Hxqa Hqpoly.
   case: n Hxqa Hqpoly => [|/=] n Hxqa Hqpoly.
@@ -706,10 +781,10 @@ Qed.
 
 Fixpoint q_fact n := match n with
   | 0 => 1
-  | n.+1 => q_fact n * qnat n
+  | n.+1 => q_fact n * q_nat n
   end.
 
-Definition q_coef n j :=
+Definition q_bicoef n j :=
   q_fact n / (q_fact j * q_fact (n - j)).
 
 (* Lemma q_fact1 n : (n <= 0)%N -> q_fact n = 1.
@@ -720,7 +795,7 @@ Proof.
   by rewrite -(subn0 n) subn_eq0 //. 
 Qed. *)
 
-(*Lemma q_coef_jn n j : (n - j <= 0)%N ->
+(*Lemma q_bicoef_jn n j : (n - j <= 0)%N ->
   q_coef n j = q_fact n / q_fact j.
 Proof.
   move=> Hjn.
@@ -733,13 +808,20 @@ Qed. *)
 Proof.
 Qed. *)
 
-Lemma q_coefE n j : (j <= n)%N ->
-  q_coef n (n - j) = q_coef n j.
+Lemma q_bicoefE n j : (j <= n)%N ->
+  q_bicoef n (n - j) = q_bicoef n j.
 Proof.
   move=> Hjn.
-  rewrite /q_coef.
+  rewrite /q_bicoef.
   rewrite subKn //.
   by rewrite [q_fact (n - j) * q_fact j] mulrC.
+Qed.
+
+Lemma q_pascal n j :
+  q_bicoef n j = q_bicoef (n - 1) (j - 1) +
+                 q ^ j * q_bicoef (n - 1) j.
+Proof.
+  
 Qed.
 
 End q_analogue.
