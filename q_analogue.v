@@ -101,6 +101,13 @@ Proof.
   - by rewrite exprSz mulf_neq0.
 Qed.
 
+Lemma exp_ispos (x : R) (n : nat) : x > 1 -> x ^ n.+1 > 1.
+Proof.
+  elim: n => [|n IH] Ix //=.
+  rewrite exprSz.
+  by apply /Num.Theory.mulr_egt1 /IH.
+Qed.
+
 (* R上の　add cancel *)
 Lemma addrK' (a : R) : a - a = 0.
 Proof. by rewrite -{1}(add0r a) addrK. Qed.
@@ -254,7 +261,7 @@ Proof.
     by rewrite big_nat1.
 Qed.
 
-Lemma q_nat_cat (n j : nat) : (j < n)%N ->
+Lemma q_nat_cat {n} j : (j < n)%N ->
   q_nat n.+1 = q_nat j.+1 + q ^ j.+1 * q_nat (n.+1 - j.+1)%N .
 Proof.
   move=> Hjn.
@@ -283,6 +290,23 @@ Proof.
       by rewrite !big_nat1 !IH exprzD_nat.
   by rewrite H sum_distr q_natE.
 Qed.
+
+Lemma q_nat_ispos n : q_nat n.+1 > 0.
+Proof.
+  rewrite /q_nat.
+  case H : (q - 1 >= 0).
+  - have H' : 0 < q - 1.
+      rewrite Num.Theory.lt0r.
+      by apply /andP.
+    apply Num.Theory.divr_gt0 => //.
+    rewrite Num.Theory.subr_gt0.
+    apply exp_ispos.
+    by rewrite -Num.Theory.subr_gt0.
+  - admit.
+Admitted.
+
+Lemma q_nat_non0 n : q_nat n.+1 != 0.
+Proof. by apply /Num.Theory.lt0r_neq0 /q_nat_ispos. Qed.
 
 (*Lemma prod_qpoly_nonneg a n x :
   qpoly_nonneg a n.+1 x = \prod_(0 <= i < n.+1) (x -  q ^ i * a).
@@ -796,8 +820,16 @@ Qed.
 
 Fixpoint q_fact n := match n with
   | 0 => 1
-  | n.+1 => q_fact n * q_nat n
+  | n.+1 => q_fact n * q_nat n.+1
   end.
+
+Lemma q_fact_non0 n : q_fact n != 0.
+Proof.
+  elim: n => [|n IH] //=.
+  - by apply oner_neq0.
+  - Search (_ * _ != 0).
+    apply mulf_neq0 => //.
+Admitted.
 
 Definition q_bicoef n j :=
   q_fact n / (q_fact j * q_fact (n - j)).
@@ -832,11 +864,26 @@ Proof.
   by rewrite [q_fact (n - j) * q_fact j] mulrC.
 Qed.
 
-Lemma q_pascal n j :
-  q_bicoef n j = q_bicoef (n - 1) (j - 1) +
-                 q ^ j * q_bicoef (n - 1) j.
+Lemma q_pascal n j : (j < n)%N ->
+  q_bicoef n.+1 j.+1 = q_bicoef n j +
+                 q ^ j * q_bicoef n j.+1.
 Proof.
-  
+  move=> Hjn.
+  rewrite [LHS] /q_bicoef.
+  rewrite [q_fact n.+1] /=.
+  rewrite (q_nat_cat j) //.
+  Search (_ * (_ + _)).
+  rewrite mulrDr.
+  rewrite -add_div.
+    have -> : q_fact n * q_nat j.+1 / (q_fact j.+1 * q_fact (n.+1 - j.+1)) =
+              q_bicoef n j.
+      rewrite -mulrA -(mul1r (q_nat j.+1)).
+      rewrite [q_fact j.+1 * q_fact (n.+1 - j.+1)] mulrC /=.
+      rewrite [q_fact (n.+1 - j.+1) * (q_fact j * q_nat j.+1)] mulrA.
+      rewrite red_frac_r.
+        rewrite mul1r subSS.
+        by rewrite [q_fact (n - j) * q_fact j] mulrC.
+      
 Qed.
 
 End q_analogue.
