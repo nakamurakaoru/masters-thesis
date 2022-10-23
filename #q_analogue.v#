@@ -3,6 +3,7 @@ Import GRing.
 (*Import Numtheory.*)
 (* algebra の中の　ssrnum *)
 (* Unset Printing Notations.*)
+(* Num.Theory.nmulrn_rle0 *)
 
 Axiom funext : forall A B (f g : A -> B), f =1 g -> f = g.
 
@@ -76,7 +77,7 @@ Proof. by rewrite -addn1 Negz_addK. Qed.
 Lemma opp_oppE (x : R) : - - x = x.
 Proof. by rewrite -(sub0r x) (opprB 0) subr0. Qed.
 
-Lemma opp_oppE' (x : R) : - x * - x = x * x.
+Lemma opp_oppE' (x y : R) : - x * - y = x * y.
 Proof. by rewrite mulrN mulNr opp_oppE. Qed.
 
 Lemma eq_int_to_nat (m n : nat): m = n:> int -> m = n.
@@ -111,13 +112,75 @@ Proof.
   by apply /Num.Theory.mulr_egt1 /IH.
 Qed.
 
+Lemma mul_norm (x y : R) : `|x * y| = `|x| * `|y|.
+Proof.
+  case Hx0 : (x != 0).
+  - case Hy0 : (y != 0).
+    + case Hx : (0 <= x).
+      - case Hy : (0 <= y).
+        + rewrite !Num.Theory.ger0_norm //.
+          by apply Num.Theory.mulr_ge0.
+        + rewrite (@Num.Theory.ger0_norm _ x) //.
+          rewrite !Num.Theory.ltr0_norm //.
+              by rewrite mulrN.
+            by rewrite mc_1_10.Num.Theory.ltrNge Hy.
+          rewrite Num.Theory.pmulr_rlt0.
+            by rewrite mc_1_10.Num.Theory.ltrNge Hy.
+          rewrite  mc_1_10.Num.Theory.ltr_def //.
+          by apply /andP; split.
+      - case Hy : (0 <= y).
+        + rewrite (@Num.Theory.ger0_norm _ y) //.
+          rewrite !Num.Theory.ltr0_norm //.
+              by rewrite mulNr.
+            by rewrite mc_1_10.Num.Theory.ltrNge Hx.
+          rewrite Num.Theory.pmulr_llt0.
+            by rewrite mc_1_10.Num.Theory.ltrNge Hx.
+          rewrite  mc_1_10.Num.Theory.ltr_def //.
+          by apply /andP; split.
+        + rewrite Num.Theory.ger0_norm.
+            rewrite !Num.Theory.ltr0_norm //.
+    +
+  -
+
+
+move/eqP in Hx0.
+
+
+
+  case Hx0 : (x == 0).
+  - move: Hx0.
+    move/eqP => ->.
+    by rewrite mul0r !mc_1_10.Num.Theory.normr0 mul0r.
+  - case Hy0 : (y == 0).
+    + move: Hy0.
+      move/eqP => ->.
+      by rewrite mulr0 !mc_1_10.Num.Theory.normr0 mulr0.
+    + case Hx : (0 <= x).
+      - case Hy : (0 <= y).
+        move/eqP in Hx0.
+Search (_ <> _) (_ != _).
+        + rewrite !Num.Theory.ger0_norm //.
+          by apply Num.Theory.mulr_ge0.
+        + rewrite (@Num.Theory.ger0_norm _ x) //.
+          rewrite !Num.Theory.ltr0_norm //.
+              by rewrite mulrN.
+            by rewrite mc_1_10.Num.Theory.ltrNge Hy.
+          rewrite Num.Theory.pmulr_rlt0 mc_1_10.Num.Theory.ltr_def //.
+            apply /andP.
+            split.
+            - Search (?x == ?y) false (?x != ?y).
+            -
+Search (_ < _) (_ != _) (_ <= _).
+    -
+Admitted.
+
 Lemma exp_lt1 (x : R) (n : nat) : `|x| < 1 -> x ^ n.+1 < 1.
 Proof.
   move=> Hx.
   apply Num.Theory.ltr_normlW.
   elim: n => [|n IH] //=.
   rewrite exprSz.
-Search (`|_| * `|_|).
+Search (`|_|) (_ * _).
 Search (`|_| < ?x) (_ < ?x).
 Qed.
 
