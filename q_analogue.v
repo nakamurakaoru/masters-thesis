@@ -164,20 +164,34 @@ Proof.
   by apply mulf_neq0.
 Qed.
 
-Lemma sum_shift m n (F : nat -> R) :
+(* Lemma sum_shift m n (F : nat -> R) :
   \sum_(m <= i < n) F i = \sum_(0 <= i < (n - m)) F (i + m)%N.
 Proof.
-Admitted.
+Admitted. *)
+
+Lemma sum_shift m n (F : nat -> R) :
+  \sum_(m <= i < m + n.+1) F i = \sum_(0 <= i < n.+1) F (i + m)%N.
+Proof.
+  elim: n => [|n IH].
+  - by rewrite addn1 !big_nat1 add0n.
+  - rewrite (@big_cat_nat R _ _ (m + n.+1) m (m + n.+2)) //=.
+        rewrite (@big_cat_nat R _ _ n.+1 0 n.+2) //=.
+        by rewrite [(m + n.+2)%N] addnS IH !big_nat1 addnC.
+      by apply leq_addr.
+    by rewrite leq_add2l.
+Qed.
 
 Lemma sum_distr n (F : nat -> R) a:
   \sum_(0 <= i < n.+1) F i * a = a * \sum_(0 <= i < n.+1) F i.
 Proof.
   elim: n => [|n IH].
   - by rewrite !big_nat1 mulrC.
-  - rewrite (@big_cat_nat _ _ _ n.+1) //=.
-(*     rewrite [RHS] (@big_cat_nat _ _ _ n.+1 0) //=.
-    rewrite !big_nat1. *)
-Admitted.
+  - rewrite (@big_cat_nat R _ _ n.+1 0 n.+2) //=.
+    rewrite (@big_cat_nat R _ _ n.+1 0 n.+2) //=.
+    rewrite !big_nat1 mulrDr IH.
+    have -> : F n.+1 * a = a * F n.+1 => //.
+    by rewrite mulrC.
+Qed.
 
 (* main *)
 (* q-differential *)
@@ -243,30 +257,31 @@ Qed.
 Lemma q_nat_cat (n j : nat) : (j < n)%N ->
   q_nat n.+1 = q_nat j.+1 + q ^ j.+1 * q_nat (n.+1 - j.+1)%N .
 Proof.
-  move=> Hjm.
+  move=> Hjn.
+  have Hjn' : (j < n.+1)%N.
+    by apply (@ltn_trans n).
+  have Hjn'' : (0 < n.+1 - j.+1)%N.
+    rewrite subn_gt0.
+    have -> : j.+1 = (j + 1)%N. by rewrite -addn1.
+    have -> : n.+1 = (n + 1)%N. by rewrite -addn1.
+    by rewrite ltn_add2r.
   rewrite !q_natE.
   rewrite (@big_cat_nat _ _ _ j.+1) //=.
-    rewrite (sum_shift j.+1).
-    have -> : (n.+1 - j.+1)%N = (n.+1 - j.+1 - 1).+1.
-      set m := (n.+1 - j.+1)%N.
-      rewrite -addn1 subnK //.
-      rewrite /m.
-      rewrite subn_gt0.
-      have -> : j.+1 = (j + 1)%N. by rewrite -addn1.
-      have -> : n.+1 = (n + 1)%N. by rewrite -addn1.
-      by rewrite ltn_add2r.
-    have H : forall m l, \sum_(0 <= i < m.+1) q ^ (i + l)%N =
-                         \sum_(0 <= i < m.+1) q ^ i * q ^ l.
-      move=> m l.
-      elim: m => [|m IH].
-      - by rewrite !big_nat1 {1}exprzD_nat.
-      - rewrite (@big_cat_nat _ _ _ m.+1) //=.
-        rewrite [RHS] (@big_cat_nat _ _ _ m.+1) //=.
-        by rewrite !big_nat1 !IH exprzD_nat.
-    rewrite H.
-    rewrite sum_distr.
-    by rewrite q_natE.
-  by apply (@ltn_trans n).
+  have -> : n.+1 = (j.+1 + (n.+1 - j.+1 - 1).+1)%N.
+    by rewrite addnS addnBA // subnKC // -{2}addn1 addnK.
+  rewrite (sum_shift j.+1).
+  have -> : (j.+1 + (n.+1 - j.+1 - 1).+1 - j.+1)%N =
+            (n.+1 - j.+1 - 1).+1.
+    by rewrite addnC addnK.
+  have H : forall m l, \sum_(0 <= i < m.+1) q ^ (i + l)%N =
+                       \sum_(0 <= i < m.+1) q ^ i * q ^ l.
+    move=> m l.
+    elim: m => [|m IH].
+    - by rewrite !big_nat1 {1}exprzD_nat.
+    - rewrite (@big_cat_nat _ _ _ m.+1) //=.
+      rewrite [RHS] (@big_cat_nat _ _ _ m.+1) //=.
+      by rewrite !big_nat1 !IH exprzD_nat.
+  by rewrite H sum_distr q_natE.
 Qed.
 
 (*Lemma prod_qpoly_nonneg a n x :
