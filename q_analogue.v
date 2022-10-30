@@ -112,7 +112,7 @@ Proof.
   by apply /Num.Theory.mulr_egt1 /IH.
 Qed.
 
-Lemma mul_norm (x y : R) : `|x * y| = `|x| * `|y|.
+(* Lemma mul_norm (x y : R) : `|x * y| = `|x| * `|y|.
 Proof.
   case Hx0 : (x != 0).
   - case Hy0 : (y != 0).
@@ -151,15 +151,15 @@ Proof.
   - move: Hx0.
     move/eqP => ->.
     by rewrite mul0r !mc_1_10.Num.Theory.normr0 mul0r.
-Qed.
+Qed. *)
 
-Lemma exp_lt1 (x : R) (n : nat) : `|x| < 1 -> `|x ^ n.+1| < 1.
+(* Lemma exp_lt1 (x : R) (n : nat) : `|x| < 1 -> `|x ^ n.+1| < 1.
 Proof.
   move=> Hx.
   elim: n => [|n IH] //=.
   rewrite exprSz mul_norm.
   by apply Num.Theory.mulr_ilt1.
-Qed.
+Qed. *)
 
 (* R上の　add cancel *)
 Lemma addrK' (a : R) : a - a = 0.
@@ -352,7 +352,7 @@ Proof.
   by rewrite H sum_distr q_natE.
 Qed.
 
-Lemma q_nat_ispos n : -1 < q -> q_nat n.+1 > 0.
+(* Lemma q_nat_ispos n : -1 < q -> q_nat n.+1 > 0.
 Proof.
   move=> Hq1.
   rewrite /q_nat.
@@ -374,7 +374,7 @@ Proof.
     rewrite Num.Theory.ltr_norml.
     apply /andP; split => //.
     by rewrite -Num.Theory.subr_gt0.
-Qed.
+Qed. *)
 
 (* Lemma q_nat_non0 n : q_nat n.+1 != 0.
 Proof. by apply /Num.Theory.lt0r_neq0 /q_nat_ispos. Qed. *)
