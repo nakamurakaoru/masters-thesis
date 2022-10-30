@@ -1,15 +1,30 @@
-From mathcomp Require Import all_ssreflect all_algebra.
+(* From mathcomp Require Import all_ssreflect all_algebra.
 Import GRing.
 (*Import Numtheory.*)
 (* algebra の中の　ssrnum *)
 (* Unset Printing Notations.*)
+
 (* Num.Theory.nmulrn_rle0 *)
 (* apply Num.Theory.ltr_normlW. `|x| < y -> x < y*)
 Axiom funext : forall A B (f g : A -> B), f =1 g -> f = g.
 
-Section q_analogue.
+From mathcomp Require Import all_ssreflect ssralg ssrint ssrnum matrix.
+From mathcomp Require Import interval rat.
+From mathcomp Require Import boolp classical_sets.
+From mathcomp Require Import functions set_interval mathcomp_extra.
+From mathcomp Require Import reals ereal signed topology normedtype landau.
+From mathcomp Require Import sequences.
+
+Unset Strict Implicit.
+Unset Printing Implicit Defensive.
+Import Order.TTheory GRing.Theory Num.Def Num.Theory.
+Import numFieldNormedType.Exports.
+
+Local Open Scope classical_set_scope.
 Local Open Scope ring_scope.
-Variable (R : rcfType) (q : R).
+
+Section q_analogue.
+Variable (R : realType) (q : R).
 Hypothesis Hq : q - 1 != 0.
 
 Notation "f ** g" := (fun x => f x * g x) (at level 49).
@@ -552,7 +567,7 @@ Proof.
       rewrite -(@divff _ (q - 1)) //.
       rewrite [q_nat n.+1] /q_nat.
       rewrite [q * ((q ^ n.+1 - 1) / (q - 1))] mulrA.
-      rewrite (add_div _ _ (q -1)) //.
+      rewrite (add_div _ _ (q - 1)) //.
       by rewrite mulrBr -exprSz mulr1 subrKA.
     by apply denom_is_nonzero.
 Qed.
@@ -590,8 +605,7 @@ Definition qpoly_neg a n x := 1 / qpoly_nonneg (q ^ ((Negz n) + 1) * a) n x.
 (* q-poly_nat 0 = q-poly_neg 0 *)
 Lemma qpoly_0 a x : qpoly_neg a 0 x = qpoly_nonneg a 0 x.
 Proof.
-  rewrite /qpoly_neg /= -[RHS] (@divff _ 1) //.
-  by apply oner_neq0.
+  by rewrite /qpoly_neg /= -[RHS] (@divff _ 1) //.
 Qed.
 
 Theorem qpoly_neg_inv a n x :
@@ -712,7 +726,8 @@ Proof.
     have -> : q ^ (Negz m.+1 + 1) * a = q ^ Negz m * a.
       by rewrite NegzS.
     rewrite [RHS] mulrC mulrA red_frac_l //.
-    apply (qpoly_exp_non0l _ _ n l.+1).
+Check qpoly_exp_non0l.
+    apply (@qpoly_exp_non0l x _ n l.+1).
     by rewrite -Hmn'.
 Qed.
 
@@ -976,7 +991,7 @@ End q_analogue.
 
 Section q_chain_rule.
 Local Open Scope ring_scope.
-Variable (R : rcfType).
+Variable (R : realType).
 
 Lemma qchain q u f a b x : dq R q u x != 0 -> u = (fun x => a * x ^ b) ->
   Dq R q (f \o u) x = (Dq R (q^b) f (u x)) * (Dq R q u x).
