@@ -226,6 +226,9 @@ Qed.
 Lemma opp_frac (x y : R) : - x / - y = x / y.
 Proof. by rewrite -mulrN1 -(mulrN1 y) red_frac_r //. Qed.
 
+Lemma inv_invE (x : R) : 1 / (1 / x) = x.
+Proof. by rewrite divKf // oner_neq0. Qed.
+
 (* 分母共通の和 *)
 Lemma add_div (x y z : R) : z != 0 ->
   x / z + y / z = (x + y) / z.
@@ -618,6 +621,11 @@ Definition qpoly a n x :=
   | Negz n0 => qpoly_neg a n0.+1 x
   end.
 
+Definition qpoly_denom a n x := match n with
+  | Posz n0 => 1
+  | Negz n0 => qpoly_nonneg (q ^ Negz n0 * a) n0.+1 x
+  end.
+
 Lemma Dq_qpoly_int_to_neg a n x :
   Dq (qpoly a (Negz n)) x = Dq (qpoly_neg a (n + 1)) x.
 Proof. by rewrite /Dq /dq /= addn1. Qed.
@@ -721,7 +729,7 @@ Proof.
     have -> : q ^ (Negz m.+1 + 1) * a = q ^ Negz m * a.
       by rewrite NegzS.
     rewrite [RHS] mulrC mulrA red_frac_l //.
-Check qpoly_exp_non0l.
+
     apply (@qpoly_exp_non0l x _ n l.+1).
     by rewrite -Hmn'.
 Qed.
@@ -748,32 +756,19 @@ Proof.
             qpoly_nonneg (q ^ (Negz m.+1 + 1) * a) m.+1 x] mulrC.
 Qed.
 
-Lemma inv_invE (x : R) : 1 / (1 / x) = x.
-Proof. by rewrite divKf // oner_neq0. Qed.
-
 Theorem qpoly_exp_law a m n x : q != 0 ->
-  (n < 0 -> 1 / qpoly (q ^ m * a) n x != 0) ->
-(*   (forall n',
-     n = Negz n' ->
-     qpoly_nonneg (q ^ (m + Negz n') * a) n'.+1 x != 0) *)
-  (m < 0 -> 1 / qpoly a m x != 0) ->
-(*   (forall m',
-     m = Negz m' ->
-     qpoly_nonneg (q ^ Negz m' * a) m'.+1 x != 0) *)
+  qpoly_denom a m x != 0 ->
+  qpoly_denom (q ^ m * a) n x != 0 ->
   qpoly a (m + n) x = qpoly a m x * qpoly (q ^ m * a) n x.
 Proof.
   move=> Hq0.
-  case: m => m.
-  - case: n => n Hn Hm.
+  case: m => m Hm.
+  - case: n => n Hn.
     + by apply qpoly_nonneg_explaw.
     + rewrite qpoly_exp_pos_neg //.
-      rewrite /qpoly /= /qpoly_neg inv_invE in Hn.
-      rewrite NegzS mulrA -expfzDr // addrC in Hn.
-      by apply Hn.
-  - case: n => n Hn Hm.
+      by rewrite addrC expfzDr // -mulrA.
+  - case: n => n Hn.
     + rewrite qpoly_exp_neg_pos //.
-      rewrite /qpoly /= /qpoly_neg inv_invE NegzS in Hm.
-      by apply Hm.
     + by apply qpoly_exp_neg_neg.
 Qed.
 
