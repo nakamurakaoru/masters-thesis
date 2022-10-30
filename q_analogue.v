@@ -6,7 +6,7 @@ Import GRing.
 
 (* Num.Theory.nmulrn_rle0 *)
 (* apply Num.Theory.ltr_normlW. `|x| < y -> x < y*)
-Axiom funext : forall A B (f g : A -> B), f =1 g -> f = g.
+Axiom funext : forall A B (f g : A -> B), f =1 g -> f = g.*)
 
 From mathcomp Require Import all_ssreflect ssralg ssrint ssrnum matrix.
 From mathcomp Require Import interval rat.
@@ -15,7 +15,7 @@ From mathcomp Require Import functions set_interval mathcomp_extra.
 From mathcomp Require Import reals ereal signed topology normedtype landau.
 From mathcomp Require Import sequences.
 
-Unset Strict Implicit.
+(* Unset Strict Implicit. *)
 Unset Printing Implicit Defensive.
 Import Order.TTheory GRing.Theory Num.Def Num.Theory.
 Import numFieldNormedType.Exports.
@@ -224,12 +224,7 @@ Proof.
 Qed.
 
 Lemma opp_frac (x y : R) : - x / - y = x / y.
-Proof.
-  rewrite -mulrN1 -(mulrN1 y) red_frac_r //.
-  move: (oner_neq0 R).
-  rewrite -{1}(mulr1 1) -{1}(opp_oppE').
-  by apply mulnon0.
-Qed.
+Proof. by rewrite -mulrN1 -(mulrN1 y) red_frac_r //. Qed.
 
 (* 分母共通の和 *)
 Lemma add_div (x y z : R) : z != 0 ->
