@@ -31,26 +31,6 @@ Notation "f ** g" := (fun x => f x * g x) (at level 49).
 Notation "f // g" := (fun x => f x / g x) (at level 49).
 Notation "a */ f" := (fun x => a * (f x)) (at level 49).
 
-(*Definition cvg a b (f : R -> R) := forall e : R, e > 0 -> 
-  exists d, (forall x,`|x - a| < d -> `|f x - b| < e).*)
-
-(*Lemma lim_add a b c (f g : R -> R) : cvg a b f -> cvg a c g ->
-  cvg a (b + c) (f \+ g).
-Proof.
-  rewrite /cvg.
-  move=> fa_b ga_c e He0.
-  move:(fa_b (e/2%:R)) => [].
-    apply Num.Theory.divr_gt0 => //.
-    by apply Num.Theory.ltr0n.
-  move=> d1 fa_b'.
-  move:(ga_c (e/2%:R)) => [].
-    apply Num.Theory.divr_gt0 => //.
-    by apply Num.Theory.ltr0n.
-  move=> d2 ga_c'.
-  exists (Num.min d1 d2).
-  move=> x Hd.
-Admitted.*)
-
 (* tools *)
 (* 関数の積の交換 *)
 Lemma mulfC (f g : R -> R) : f ** g = g ** f.
@@ -187,7 +167,6 @@ Proof. by move=> <-; rewrite addrK. Qed.
 (* intの移項 *)
 Lemma itransposition (l m n : int) : l + m = n -> l = n - m.
 Proof. by move=> <-; rewrite addrK. Qed.
-
 
 Lemma Negz_transp m n l : m + Negz n = l -> m = l + n.+1.
 Proof. rewrite NegzE; apply itransposition. Qed.
@@ -444,7 +423,7 @@ Lemma qderiv_prod' f g x : x != 0 ->
    Dq (f ** g) x = (f x) * Dq g x + g (q * x) * Dq f x.
 Proof.
   move=> Hx.
-  by rewrite mulfC qderiv_prod // addrC.
+  by rewrite (mulfC f g) qderiv_prod // addrC.
 Qed.
 
 (* reduce fraction in q-derivative *)
