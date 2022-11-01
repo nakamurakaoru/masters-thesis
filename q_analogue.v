@@ -673,6 +673,13 @@ Admitted. *)
 Definition q_bicoef n j :=
   q_fact n / (q_fact j * q_fact (n - j)).
 
+Lemma q_bicoefnn n : q_fact n != 0 -> q_bicoef n n = 1.
+Proof.
+  move=> H.
+  rewrite /q_bicoef.
+  by rewrite -{3}(addn0 n) addKn /= mulr1 divff.
+Qed.
+
 (* Lemma q_fact1 n : (n <= 0)%N -> q_fact n = 1.
 Proof.
   move=> Hn.
@@ -733,6 +740,20 @@ Proof.
     rewrite subnSK //.
   by apply mulf_neq0.
 Qed.
+
+Lemma Gauss_binomial x a n : q_fact n != 0 ->
+  qpoly (-a) (Posz n) x =
+  \sum_(0 <= i < n.+1)
+    ((q_bicoef n i) * q ^ (Posz i * (Posz i - 1) / 2)
+                    * (-a)^ i * x ^ (Posz n - Posz i)).
+Proof.
+  elim: n => [_ |/= n IH Hfact] //=.
+  - by rewrite big_nat1 /q_bicoef !mulr1 !mul1r invr1.
+  - rewrite (@big_cat_nat R _ _ n.+1 0 n.+2) //=.
+    rewrite big_nat1 //=.
+    rewrite IH.
+      rewrite q_bicoefnn // addrN expr0z mulr1 mul1r.
+Admitted.
 
 End q_analogue.
 
