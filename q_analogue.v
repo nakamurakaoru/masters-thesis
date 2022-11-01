@@ -14,6 +14,7 @@ From mathcomp Require Import boolp classical_sets.
 From mathcomp Require Import functions set_interval mathcomp_extra.
 From mathcomp Require Import reals ereal signed topology normedtype landau.
 From mathcomp Require Import sequences.
+From mathcomp Require Import all_algebra.
 Require Import q_tools.
 
 (* Unset Strict Implicit. *)
@@ -46,6 +47,11 @@ Qed.
 
 (* q-derivative *)
 Definition Dq f := dq f // dq id.
+
+Fixpoint hoDq n f := match n with
+  | 0 => f
+  | n.+1 => Dq (hoDq n f)
+  end.
 
 (* q-derivative for const is 0 *)
 Lemma Dq_const x c : Dq (fun x => c) x = 0.
@@ -740,6 +746,65 @@ Proof.
     rewrite subnSK //.
   by apply mulf_neq0.
 Qed.
+
+Fixpoint hoD D n (f : R -> R) := match n with
+  | 0 => f
+  | n.+1 => D (hoD D n f)
+  end.
+
+Definition isleniar (D : (R -> R) -> (R -> R)) :=
+  forall a b f g, D ((a */ f) \+ (b */ g)) = a */ D f + b */ D g .
+
+Definition isfderiv D n (P : nat -> {poly R}) := match n with
+  | 0 => D (fun x => (P 0%N).[x]) = 0
+  | n.+1 => D (fun x => (P n.+1).[x]) = fun x => (P n).[x]
+  end .
+
+(* f should be a polynomial *)
+Theorem general_Taylor D n (P : nat -> {poly R}) f x a :
+  isleniar D -> isfderiv D n P ->
+  (P 0%N).[a] = 1 ->
+  (forall n, (P n.+1).[a] = 0) ->
+  (forall n, size (P n) = n) ->
+  f x = \sum_(0 <= i < n.+1)
+          ((hoD D n f) a * (P i).[x]).
+Proof.
+Admitted.
+
+Theorem general_Taylor' D n (P : nat -> R -> R) f x a :
+  f x = \sum_(0 <= i < n.+1)
+          ((hoD D n f) a * P i x).
+Proof.
+Admitted.
+
+Theorem q_Taylor' f x n c {e} :
+  (forall x, f x = \sum_(0 <= i < n.+1) e i * x^i) ->
+  f x =  \sum_(0 <= i < n.+1)
+             ((hoDq i f) c * qpoly c (Posz i ) x / q_fact i).
+Proof.
+
+(*   elim: n => [|n IH] Hf //=.
+  - rewrite !big_nat1 //=.
+    have Hf' : forall x, f x = e 0%N.
+      move=> x'.
+      by rewrite Hf big_nat1 expr0z mulr1.
+    by rewrite (Hf' x) (Hf' c) mulr1 divr1.
+  - rewrite (@big_cat_nat R _ _ n.+1 0 n.+2) //=.
+    rewrite IH.
+    rewrite big_nat1.
+    have H : forall n, *)
+Admitted.
+
+Theorem q_Taylor f x n c {E : nat -> R} :
+  f = \poly_(i < n.+1) E(i) ->
+  f.[x] =  \sum_(0 <= i < n.+1)
+             ((hoDq i (fun x => f.[x])) c * qpoly c (Posz i ) x / q_fact i).
+Proof.
+  elim: n => [|n IH] Hf //=.
+  - rewrite big_nat1 mulr1 divr1 //=.
+    rewrite (@size1_polyC R f) //=.
+  -
+Admitted.
 
 Lemma Gauss_binomial x a n : q_fact n != 0 ->
   qpoly (-a) (Posz n) x =
