@@ -752,16 +752,36 @@ Fixpoint hoD D n (f : R -> R) := match n with
   | n.+1 => D (hoD D n f)
   end.
 
+Notation "D \^ n" := (hoD D n) (at level 49).
+
+Definition deriv_to_poly (D : (R -> R) -> (R -> R)) (p : {poly R})
+  := D (fun x => p.[x]).
+
+Notation "D # p" := (deriv_to_poly D p) (at level 49).
+
 Definition isleniar (D : (R -> R) -> (R -> R)) :=
   forall a b f g, D ((a */ f) \+ (b */ g)) = a */ D f + b */ D g .
 
 Definition isfderiv D n (P : nat -> {poly R}) := match n with
-  | 0 => D (fun x => (P 0%N).[x]) = 0
-  | n.+1 => D (fun x => (P n.+1).[x]) = fun x => (P n).[x]
+  | 0 => D # (P 0%N) = 0
+  | n.+1 => D # (P n.+1) = fun x => (P n).[x]
   end .
 
-(* f should be a polynomial *)
-Theorem general_Taylor D n (P : nat -> {poly R}) f x a :
+Theorem general_Taylor D n P (f : {poly R}) x a :
+  isleniar D -> isfderiv D n P ->
+  (P 0%N).[a] = 1 ->
+  (forall n, (P n.+1).[a] = 0) ->
+  (forall n, size (P n) = n) ->
+  size f = n.+1 ->
+  f.[x] = \sum_(0 <= i < n.+1)
+          ((D \^ n # f) a * (P i).[x]).
+Proof.
+(* V := vectorspace of polynomials of degree not lager than n *)
+(* P 0 ... P n is basis of V *)
+Admitted.
+
+(* f is a function ver *)
+(* Theorem general_Taylor D n (P : nat -> {poly R}) f x a :
   isleniar D -> isfderiv D n P ->
   (P 0%N).[a] = 1 ->
   (forall n, (P n.+1).[a] = 0) ->
@@ -769,13 +789,7 @@ Theorem general_Taylor D n (P : nat -> {poly R}) f x a :
   f x = \sum_(0 <= i < n.+1)
           ((hoD D n f) a * (P i).[x]).
 Proof.
-Admitted.
-
-Theorem general_Taylor' D n (P : nat -> R -> R) f x a :
-  f x = \sum_(0 <= i < n.+1)
-          ((hoD D n f) a * P i x).
-Proof.
-Admitted.
+Admitted. *)
 
 Theorem q_Taylor' f x n c {e} :
   (forall x, f x = \sum_(0 <= i < n.+1) e i * x^i) ->
