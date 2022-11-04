@@ -780,13 +780,13 @@ Notation "D # p" := (deriv_to_poly D p) (at level 49).
 Definition islinear (D : (R -> R) -> (R -> R)) :=
   forall a b f g, D ((a */ f) \+ (b */ g)) = a */ D f + b */ D g .
 
-Definition isfderiv D n (P : nat -> {poly R}) := match n with
-  | 0 => D # (P 0%N) = 0
-  | n.+1 => D # (P n.+1) = fun x => (P n).[x]
+Definition isfderiv D n (P : nat -> {poly R}) x := match n with
+  | 0 => (D # (P 0%N)) x = 0
+  | n.+1 => (D # (P n.+1)) x = (fun x => (P n).[x]) x
   end.
 
 Theorem general_Taylor D n P (f : {poly R}) x a :
-  islinear D -> isfderiv D n P ->
+  islinear D -> isfderiv D n P x ->
   (P 0%N).[a] = 1 ->
   (forall n, (P n.+1).[a] = 0) ->
   (forall n, size (P n) = n.+1) ->
@@ -812,14 +812,14 @@ Proof.
     by rewrite !big_nat1 hornerM polyCV hornerC mulrA.
 Qed.
 
-Lemma Dq_isfderiv n a :
-  isfderiv Dq n (fun i : nat => qpoly_nonneg_poly a i / (q_fact i)%:P).
+Lemma Dq_isfderiv n a x :
+  isfderiv Dq n (fun i : nat => qpoly_nonneg_poly a i / (q_fact i)%:P) x.
 Proof.
   rewrite /isfderiv.
   rewrite /deriv_to_poly.
-
   destruct n => //=.
-  - admit.
+  - rewrite polyCV invr1 mulr1.
+    apply Dq_const.
   - rewrite /(_ # _).
 
 
