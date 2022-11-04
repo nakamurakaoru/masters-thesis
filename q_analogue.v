@@ -58,21 +58,25 @@ Lemma Dq_const x c : Dq (fun x => c) x = 0.
 Proof. by rewrite /Dq /dq addrK' mul0r. Qed.
 
 (* q-derivative is linear *)
-Lemma Dq_is_linear f g a b x :
-  x != 0 -> Dq ((a */ f) \+ (b */ g)) x = a * (Dq f x) + b * (Dq g x).
+Lemma Dq_is_linear a b f g x :
+  Dq ((a */ f) \+ (b */ g)) x = a * (Dq f x) + b * (Dq g x).
 Proof.
-  move=> Hx.
-  rewrite /Dq /dq !mulrA add_div.
-    rewrite !mulrBr opprD !addrA.
-    rewrite [a * f (q * x) + b * g (q * x) - a * f x]
+  rewrite /Dq /dq !mulrA.
+  case Hx : (x == 0).
+  - move: Hx => /eqP ->.
+    by rewrite mulr0 !addrK' !mulr0 -mulrDl addr0.
+  - rewrite add_div.
+      rewrite !mulrBr opprD !addrA.
+      rewrite [a * f (q * x) + b * g (q * x) - a * f x]
               addrC.
-    rewrite [(a * f (q * x) + b * g (q * x))]
+      rewrite [(a * f (q * x) + b * g (q * x))]
               addrC.
-    rewrite addrA.
-    rewrite [- (a * f x) + b * g (q * x) + a * f (q * x)]
-            addrC.
-    by rewrite addrA.
-  by apply denom_is_nonzero.
+      rewrite addrA.
+      rewrite [- (a * f x) + b * g (q * x) + a * f (q * x)]
+              addrC.
+      by rewrite addrA.
+  apply denom_is_nonzero => //.
+  by rewrite Hx.
 Qed.
 
 (* q-analogue of natural number *)
@@ -280,6 +284,20 @@ Fixpoint qpoly_nonneg a n x :=
   | 0 => 1
   | n.+1 => (qpoly_nonneg a n x) * (x - q ^ n * a)
   end.
+
+Fixpoint qpoly_nonneg_poly a n :=
+  match n with
+  | 0 => 1
+  | n.+1 => (qpoly_nonneg_poly a n) * ('X - (q ^ n * a)%:P)
+  end.
+
+Theorem qpoly_nonnegE a n x :
+  qpoly_nonneg a n x = (qpoly_nonneg_poly a n).[x].
+Proof.
+  elim: n => [|n IH] //=.
+  - by rewrite hornerC.
+  - by rewrite hornerM -IH hornerXsubC.
+Qed.
 
 Lemma qpoly_nonneg_head a n x:
    qpoly_nonneg a n.+1 x =
@@ -759,25 +777,73 @@ Definition deriv_to_poly (D : (R -> R) -> (R -> R)) (p : {poly R})
 
 Notation "D # p" := (deriv_to_poly D p) (at level 49).
 
-Definition isleniar (D : (R -> R) -> (R -> R)) :=
+Definition islinear (D : (R -> R) -> (R -> R)) :=
   forall a b f g, D ((a */ f) \+ (b */ g)) = a */ D f + b */ D g .
 
 Definition isfderiv D n (P : nat -> {poly R}) := match n with
   | 0 => D # (P 0%N) = 0
   | n.+1 => D # (P n.+1) = fun x => (P n).[x]
-  end .
+  end.
 
 Theorem general_Taylor D n P (f : {poly R}) x a :
-  isleniar D -> isfderiv D n P ->
+  islinear D -> isfderiv D n P ->
   (P 0%N).[a] = 1 ->
   (forall n, (P n.+1).[a] = 0) ->
-  (forall n, size (P n) = n) ->
+  (forall n, size (P n) = n.+1) ->
   size f = n.+1 ->
   f.[x] = \sum_(0 <= i < n.+1)
-          ((D \^ n # f) a * (P i).[x]).
+          ((D \^ i # f) a * (P i).[x]).
 Proof.
 (* V := vectorspace of polynomials of degree not lager than n *)
 (* P 0 ... P n is basis of V *)
+
+(* Definition lfun_vectMixin := VectMixin lfun_vect_iso.
+Canonical lfun_vectType := VectType R 'Hom(aT, rT) lfun_vectMixin.
+Fact lfun_vect_iso : Vector.axiom (Vector.dim aT * Vector.dim rT) 'Hom(aT, rT). *)
+Admitted.
+
+Lemma sum_poly_div n F (P : nat -> {poly R}) C x :
+  \sum_(0 <= i < n.+1) (F i * (P i).[x] / C i) =
+  \sum_(0 <= i < n.+1) (F i * (P i / (C i)%:P).[x]) .
+Proof.
+  elim: n => [|n IH].
+  - by rewrite !big_nat1 hornerM polyCV hornerC mulrA.
+  - rewrite !(@big_cat_nat _ _ _ n.+1 0 n.+2) //= IH.
+    by rewrite !big_nat1 hornerM polyCV hornerC mulrA.
+Qed.
+
+Lemma Dq_isfderiv n a :
+  isfderiv Dq n (fun i : nat => qpoly_nonneg_poly a i / (q_fact i)%:P).
+Proof.
+  rewrite /isfderiv.
+  rewrite /deriv_to_poly.
+
+  destruct n => //=.
+  - admit.
+  - rewrite /(_ # _).
+
+
+  elim: n => [|n IH] //=.
+  - rewrite polyCV invr1 mulr1. admit.
+(*     rewrite -polyC1. *)
+  - rewrite /isfderiv in IH.
+Admitted.
+
+Theorem q_Taylor n (f : {poly R}) x a :
+  size f = n.+1 ->
+  f.[x] =  \sum_(0 <= i < n.+1)
+             ((Dq \^ i) # f) a * qpoly_nonneg a i x / q_fact i.
+Proof.
+  under eq_bigr do rewrite qpoly_nonnegE.
+  rewrite sum_poly_div.
+  apply general_Taylor => /=.
+  - move=> a' b f' g.
+    apply funext => x'.
+    by apply Dq_is_linear.
+  - by apply Dq_isfderiv.
+  - 
+  -
+  -
 Admitted.
 
 (* f is a function ver *)
@@ -807,17 +873,6 @@ Proof.
     rewrite IH.
     rewrite big_nat1.
     have H : forall n, *)
-Admitted.
-
-Theorem q_Taylor f x n c {E : nat -> R} :
-  f = \poly_(i < n.+1) E(i) ->
-  f.[x] =  \sum_(0 <= i < n.+1)
-             ((hoDq i (fun x => f.[x])) c * qpoly c (Posz i ) x / q_fact i).
-Proof.
-  elim: n => [|n IH] Hf //=.
-  - rewrite big_nat1 mulr1 divr1 //=.
-    rewrite (@size1_polyC R f) //=.
-  -
 Admitted.
 
 Lemma Gauss_binomial x a n : q_fact n != 0 ->
