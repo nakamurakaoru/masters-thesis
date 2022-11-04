@@ -291,7 +291,18 @@ Fixpoint qpoly_nonneg_poly a n :=
   | n.+1 => (qpoly_nonneg_poly a n) * ('X - (q ^ n * a)%:P)
   end.
 
-Theorem qpoly_nonnegE a n x :
+Lemma qpoly_size a n : size (qpoly_nonneg_poly a n) = n.+1.
+Proof.
+  elim: n => [|n IH] => //=.
+  - by rewrite size_poly1.
+  - Search (size _) (_ * _).
+    rewrite size_Mmonic.
+        by rewrite IH size_XsubC addn2.
+      by rewrite -size_poly_gt0 IH.
+    by apply monicXsubC.
+Qed.
+
+Lemma qpoly_nonnegE a n x :
   qpoly_nonneg a n x = (qpoly_nonneg_poly a n).[x].
 Proof.
   elim: n => [|n IH] //=.
@@ -307,6 +318,9 @@ Proof.
   - by rewrite expr0z !mul1r mulr1.
   - by rewrite !mulrA -IH exprSzr.
 Qed.
+
+Lemma qpoly0 a n : qpoly_nonneg a n.+1 a = 0.
+Proof. by rewrite qpoly_nonneg_head addrK' mul0r. Qed.
 
 (*Lemma prod_qpoly_nonneg a n x :
   qpoly_nonneg a n.+1 x = \prod_(0 <= i < n.+1) (x -  q ^ i * a).
@@ -686,6 +700,15 @@ Proof.
   by apply mulnon0.
 Qed.
 
+Lemma q_fact_lenon0 m n : q_fact (m + n) != 0 -> q_fact m != 0.
+Proof.
+  elim: n => [|n IH].
+  - by rewrite addn0.
+  - rewrite addnS /=.
+    move/ mulnon0.
+    apply IH.
+Qed.
+
 (* Lemma q_fact_non0 n : q_fact n != 0.
 Proof.
   elim: n => [|n IH] //=.
@@ -789,7 +812,7 @@ Theorem general_Taylor D n P (f : {poly R}) x a :
   islinear D -> isfderiv D n P x ->
   (P 0%N).[a] = 1 ->
   (forall n, (P n.+1).[a] = 0) ->
-  (forall n, size (P n) = n.+1) ->
+  (forall m, (m <= n)%N -> size (P m) = m.+1) ->
   size f = n.+1 ->
   f.[x] = \sum_(0 <= i < n.+1)
           ((D \^ i # f) a * (P i).[x]).
@@ -812,67 +835,46 @@ Proof.
     by rewrite !big_nat1 hornerM polyCV hornerC mulrA.
 Qed.
 
+(* Lemma Dq_isfderiv' n a x : match n with
+  | 0 => (Dq (fun x => (qpoly_nonneg_poly a 0 / (q_fact 0)%:P).[x])) x = 0
+  | n.+1 => (Dq (fun x => (qpoly_nonneg_poly a n.+1 / (q_fact n.+1)%:P).[x])) x =
+            (fun x => (qpoly_nonneg_poly a n / (q_fact n)%:P).[x]) x
+  end.
+Proof.
+Admitted. *)
+
 Lemma Dq_isfderiv n a x :
   isfderiv Dq n (fun i : nat => qpoly_nonneg_poly a i / (q_fact i)%:P) x.
 Proof.
   rewrite /isfderiv.
   rewrite /deriv_to_poly.
   destruct n => //=.
-  - rewrite polyCV invr1 mulr1.
-    apply Dq_const.
-  - rewrite /(_ # _).
-
-
-  elim: n => [|n IH] //=.
-  - rewrite polyCV invr1 mulr1. admit.
-(*     rewrite -polyC1. *)
-  - rewrite /isfderiv in IH.
+  - by rewrite polyCV invr1 mulr1 /Dq /dq !hornerC addrK' mul0r.
+  - rewrite !polyCV /Dq /dq !hornerM !hornerXsubC !hornerC.
+    rewrite -!qpoly_nonnegE.
 Admitted.
 
 Theorem q_Taylor n (f : {poly R}) x a :
+  q_fact n != 0 ->
   size f = n.+1 ->
   f.[x] =  \sum_(0 <= i < n.+1)
              ((Dq \^ i) # f) a * qpoly_nonneg a i x / q_fact i.
 Proof.
   under eq_bigr do rewrite qpoly_nonnegE.
-  rewrite sum_poly_div.
-  apply general_Taylor => /=.
+  rewrite sum_poly_div => Hfact.
+  apply general_Taylor.
   - move=> a' b f' g.
     apply funext => x'.
     by apply Dq_is_linear.
   - by apply Dq_isfderiv.
-  - 
-  -
-  -
-Admitted.
-
-(* f is a function ver *)
-(* Theorem general_Taylor D n (P : nat -> {poly R}) f x a :
-  isleniar D -> isfderiv D n P ->
-  (P 0%N).[a] = 1 ->
-  (forall n, (P n.+1).[a] = 0) ->
-  (forall n, size (P n) = n) ->
-  f x = \sum_(0 <= i < n.+1)
-          ((hoD D n f) a * (P i).[x]).
-Proof.
-Admitted. *)
-
-Theorem q_Taylor' f x n c {e} :
-  (forall x, f x = \sum_(0 <= i < n.+1) e i * x^i) ->
-  f x =  \sum_(0 <= i < n.+1)
-             ((hoDq i f) c * qpoly c (Posz i ) x / q_fact i).
-Proof.
-
-(*   elim: n => [|n IH] Hf //=.
-  - rewrite !big_nat1 //=.
-    have Hf' : forall x, f x = e 0%N.
-      move=> x'.
-      by rewrite Hf big_nat1 expr0z mulr1.
-    by rewrite (Hf' x) (Hf' c) mulr1 divr1.
-  - rewrite (@big_cat_nat R _ _ n.+1 0 n.+2) //=.
-    rewrite IH.
-    rewrite big_nat1.
-    have H : forall n, *)
+  - by rewrite invr1 mulr1 hornerC.
+  - move=> m.
+    by rewrite hornerM -qpoly_nonnegE qpoly0 mul0r.
+  - move=> m Hm.
+    rewrite polyCV mulrC size_Cmul.
+      by rewrite qpoly_size.
+    apply /invr_neq0.
+    apply /q_fact_lenon0.
 Admitted.
 
 Lemma Gauss_binomial x a n : q_fact n != 0 ->
@@ -888,6 +890,36 @@ Proof.
     rewrite IH.
       rewrite q_bicoefnn // addrN expr0z mulr1 mul1r.
 Admitted.
+
+
+(* f is a function ver *)
+(* Theorem general_Taylor D n (P : nat -> {poly R}) f x a :
+  isleniar D -> isfderiv D n P ->
+  (P 0%N).[a] = 1 ->
+  (forall n, (P n.+1).[a] = 0) ->
+  (forall n, size (P n) = n) ->
+  f x = \sum_(0 <= i < n.+1)
+          ((hoD D n f) a * (P i).[x]).
+Proof.
+Admitted. *)
+
+(* Theorem q_Taylor' f x n c {e} :
+  (forall x, f x = \sum_(0 <= i < n.+1) e i * x^i) ->
+  f x =  \sum_(0 <= i < n.+1)
+             ((hoDq i f) c * qpoly c (Posz i ) x / q_fact i).
+Proof.
+
+(*   elim: n => [|n IH] Hf //=.
+  - rewrite !big_nat1 //=.
+    have Hf' : forall x, f x = e 0%N.
+      move=> x'.
+      by rewrite Hf big_nat1 expr0z mulr1.
+    by rewrite (Hf' x) (Hf' c) mulr1 divr1.
+  - rewrite (@big_cat_nat R _ _ n.+1 0 n.+2) //=.
+    rewrite IH.
+    rewrite big_nat1.
+    have H : forall n, *)
+Admitted. *)
 
 End q_analogue.
 
