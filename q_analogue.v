@@ -25,6 +25,15 @@ Import numFieldNormedType.Exports.
 Local Open Scope classical_set_scope.
 Local Open Scope ring_scope.
 
+Lemma archimedes (m n : nat) :
+  (m <= n)%N -> exists k, n = (m + k)%N.
+Proof.
+  elim: m => [|m IH] H.
+  - exists n.
+    by rewrite add0n.
+  - 
+Qed.
+
 Section q_analogue.
 Variable (R : realType) (q : R).
 Hypothesis Hq : q - 1 != 0.
