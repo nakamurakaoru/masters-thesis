@@ -25,15 +25,6 @@ Import numFieldNormedType.Exports.
 Local Open Scope classical_set_scope.
 Local Open Scope ring_scope.
 
-Lemma archimedes (m n : nat) :
-  (m <= n)%N -> exists k, n = (m + k)%N.
-Proof.
-  elim: m => [|m IH] H.
-  - exists n.
-    by rewrite add0n.
-  - 
-Qed.
-
 Section q_analogue.
 Variable (R : realType) (q : R).
 Hypothesis Hq : q - 1 != 0.
@@ -834,43 +825,37 @@ Canonical lfun_vectType := VectType R 'Hom(aT, rT) lfun_vectMixin.
 Fact lfun_vect_iso : Vector.axiom (Vector.dim aT * Vector.dim rT) 'Hom(aT, rT). *)
 Admitted.
 
-Lemma sum_poly_div n F (P : nat -> {poly R}) C x :
-  \sum_(0 <= i < n.+1) (F i * (P i).[x] / C i) =
-  \sum_(0 <= i < n.+1) (F i * (P i / (C i)%:P).[x]) .
-Proof.
-  elim: n => [|n IH].
-  - by rewrite !big_nat1 hornerM polyCV hornerC mulrA.
-  - rewrite !(@big_cat_nat _ _ _ n.+1 0 n.+2) //= IH.
-    by rewrite !big_nat1 hornerM polyCV hornerC mulrA.
-Qed.
-
-(* Lemma Dq_isfderiv' n a x : match n with
-  | 0 => (Dq (fun x => (qpoly_nonneg_poly a 0 / (q_fact 0)%:P).[x])) x = 0
-  | n.+1 => (Dq (fun x => (qpoly_nonneg_poly a n.+1 / (q_fact n.+1)%:P).[x])) x =
-            (fun x => (qpoly_nonneg_poly a n / (q_fact n)%:P).[x]) x
-  end.
-Proof.
-Admitted. *)
-
-Lemma Dq_isfderiv n a x :
+Lemma Dq_isfderiv n a x : x != 0 -> q_fact n != 0 ->
   isfderiv Dq n (fun i : nat => qpoly_nonneg_poly a i / (q_fact i)%:P) x.
 Proof.
+  move=> Hx Hfact.
   rewrite /isfderiv.
   rewrite /deriv_to_poly.
   destruct n => //=.
   - by rewrite polyCV invr1 mulr1 /Dq /dq !hornerC addrK' mul0r.
   - rewrite !polyCV /Dq /dq !hornerM !hornerXsubC !hornerC.
     rewrite -!qpoly_nonnegE.
-Admitted.
+    have -> : (qpoly_nonneg a n (q * x) * (q * x - q ^ n * a) /
+              (q_fact n * q_nat n.+1) -
+              qpoly_nonneg a n x * (x - q ^ n * a) /
+              (q_fact n * q_nat n.+1)) / (q * x - x) =
+              Dq (qpoly_nonneg a n.+1) x / q_fact n.+1.
+      by rewrite /Dq /dq /= -mulrBl denom_comm.
+    rewrite qderiv_qpoly_nonneg //=.
+    rewrite [q_fact n * q_nat n.+1] mulrC red_frac_l //.
+    by apply q_fact_nat_non0.
+Qed.
 
 Theorem q_Taylor n (f : {poly R}) x a :
+  x != 0 ->
   q_fact n != 0 ->
   size f = n.+1 ->
   f.[x] =  \sum_(0 <= i < n.+1)
              ((Dq \^ i) # f) a * qpoly_nonneg a i x / q_fact i.
 Proof.
+  move=> Hx Hfact.
   under eq_bigr do rewrite qpoly_nonnegE.
-  rewrite sum_poly_div => Hfact.
+  rewrite sum_poly_div.
   apply general_Taylor.
   - move=> a' b f' g.
     apply funext => x'.
@@ -883,8 +868,11 @@ Proof.
     rewrite polyCV mulrC size_Cmul.
       by rewrite qpoly_size.
     apply /invr_neq0.
-    apply /q_fact_lenon0.
-Admitted.
+    move: Hfact.
+    have -> : n = (m + (n - m))%N.
+      by rewrite subnKC.
+    by apply /q_fact_lenon0.
+Qed.
 
 Lemma Gauss_binomial x a n : q_fact n != 0 ->
   qpoly (-a) (Posz n) x =
@@ -892,6 +880,8 @@ Lemma Gauss_binomial x a n : q_fact n != 0 ->
     ((q_bicoef n i) * q ^ (Posz i * (Posz i - 1) / 2)
                     * (-a)^ i * x ^ (Posz n - Posz i)).
 Proof.
+  
+
   elim: n => [_ |/= n IH Hfact] //=.
   - by rewrite big_nat1 /q_bicoef !mulr1 !mul1r invr1.
   - rewrite (@big_cat_nat R _ _ n.+1 0 n.+2) //=.
@@ -899,7 +889,6 @@ Proof.
     rewrite IH.
       rewrite q_bicoefnn // addrN expr0z mulr1 mul1r.
 Admitted.
-
 
 (* f is a function ver *)
 (* Theorem general_Taylor D n (P : nat -> {poly R}) f x a :
