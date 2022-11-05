@@ -4,6 +4,7 @@ From mathcomp Require Import boolp classical_sets.
 From mathcomp Require Import functions set_interval mathcomp_extra.
 From mathcomp Require Import reals ereal signed topology normedtype landau.
 From mathcomp Require Import sequences.
+From mathcomp Require Import all_algebra.
 
 (* Unset Strict Implicit. *)
 Unset Printing Implicit Defensive.
@@ -235,10 +236,8 @@ Proof.
   by apply mulf_neq0.
 Qed.
 
-(* Lemma sum_shift m n (F : nat -> R) :
-  \sum_(m <= i < n) F i = \sum_(0 <= i < (n - m)) F (i + m)%N.
-Proof.
-Admitted. *)
+Lemma denom_comm (x y z : R) : x / y / z = x / z / y.
+Proof. by rewrite -mulrA [y^-1 / z] mulrC mulrA. Qed.
 
 Lemma sum_shift m n (F : nat -> R) :
   \sum_(m <= i < m + n.+1) F i = \sum_(0 <= i < n.+1) F (i + m)%N.
@@ -262,5 +261,15 @@ Proof.
     rewrite !big_nat1 mulrDr IH.
     have -> : F n.+1 * a = a * F n.+1 => //.
     by rewrite mulrC.
+Qed.
+
+Lemma sum_poly_div n F (P : nat -> {poly R}) C x :
+  \sum_(0 <= i < n.+1) (F i * (P i).[x] / C i) =
+  \sum_(0 <= i < n.+1) (F i * (P i / (C i)%:P).[x]) .
+Proof.
+  elim: n => [|n IH].
+  - by rewrite !big_nat1 hornerM polyCV hornerC mulrA.
+  - rewrite !(@big_cat_nat _ _ _ n.+1 0 n.+2) //= IH.
+    by rewrite !big_nat1 hornerM polyCV hornerC mulrA.
 Qed.
 End q_tools.
