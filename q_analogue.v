@@ -319,8 +319,88 @@ Proof.
   - by rewrite !mulrA -IH exprSzr.
 Qed.
 
-Lemma qpoly0 a n : qpoly_nonneg a n.+1 a = 0.
+Lemma qpolyxa a n : qpoly_nonneg a n.+1 a = 0.
 Proof. by rewrite qpoly_nonneg_head addrK' mul0r. Qed.
+
+Lemma eq_nat_to_int (m n : nat): m = n -> m = n:> int.
+Proof.
+(*   move=> Hmn.
+  have Hmn' : m == n.
+    by apply /eqP.
+  rewrite -(Num.Theory.eqr_nat R) in Hmn'.
+  Check eqr_int.
+  rewrite eqr_int in Hmn'.
+  rewrite -(eqr_int R) Num.Theory.eqr_nat in Hmn'.
+  by move/eqP in Hmn'.
+ *)
+Check eqr_int.
+Admitted.
+
+(* Lemma idivff (x : int) : x != 0 -> x / x = 1.
+Proof.
+  rewrite -{2}(mul1r x).
+  rewrite mulrK //.
+  move=> Hx.
+  apply /eqP.
+  rewrite -(eqr_int R).
+  apply /eqP.
+  Unset Printing Notations.
+  Search GRing.inv.
+  rewrite  -[RHS](@divff R x%:~R).
+
+  have H : (x / x == 1).
+  rewrite divff.
+Qed. *)
+
+(* What is (_ / 2) ? *)
+(* (_ / 2)%:R or (_ / 2)%:int ? *)
+Lemma qpolyx0 a n : q != 0 ->
+  qpoly_nonneg (- a) n 0 = q ^ (Posz n * (Posz n - 1) / 2) * a ^ n.
+Proof.
+  elim: n => [|n IH] Hq0 //=.
+  - by rewrite mul0r !expr0z mulr1.
+  - (* destruct n.
+      by rewrite !mul1r sub0r opp_oppE expr1z.
+    case Hq0 : (q == 0).
+    + move: Hq0 => /eqP ->.
+      rewrite qpoly_nonneg_head.
+      destruct n.
+        rewrite /= opp_oppE add0r mulr1 expr1z sub0r mul0r oppr0 mulr0.
+        have -> : (2 - 1)%:R = 1%:R.
+          move=> R'.
+          apply /eqP.
+          rewrite (Num.Theory.eqr_nat R).
+          apply eq_nat_to_int.
+          by rewrite subn1.
+        rewrite mulr1. (@divrr R).
+          by rewrite expr1z mul0r.
+        rewrite /(_ \is a GRing.unit).
+        rewrite /(mem GRing.unit).
+Search (?x / ?x).
+Check @divrr R.
+        have -> : Posz 2 / 2 = 1.
+          have H : Posz 2 / 2 == Posz 2 / 2:>R.
+            rewrite 
+          rewrite divff.
+
+ rewrite [2 / 2] divff.
+Check eqr_int R.
+          apply (eq_int_to_nat R (Posz 2)).
+        rewrite red_frac_l.
+ mulr0.
+
+    +
+ *)
+  - rewrite IH // sub0r -mulrN opp_oppE.
+    rewrite [q ^ n * a] mulrC.
+    rewrite mulrA mulrC !mulrA.
+    rewrite -expfzDr //.
+    have -> : Posz n + Posz n * (Posz n - 1) / 2 =
+              Posz n.+1 * (Posz n.+1 - 1) / 2.
+      rewrite !mulrDr !mulr1 !mulrN1.
+      admit.
+    by rewrite exprSzr mulrA.
+Admitted.
 
 (*Lemma prod_qpoly_nonneg a n x :
   qpoly_nonneg a n.+1 x = \prod_(0 <= i < n.+1) (x -  q ^ i * a).
@@ -863,7 +943,7 @@ Proof.
   - by apply Dq_isfderiv.
   - by rewrite invr1 mulr1 hornerC.
   - move=> m.
-    by rewrite hornerM -qpoly_nonnegE qpoly0 mul0r.
+    by rewrite hornerM -qpoly_nonnegE qpolyxa mul0r.
   - move=> m Hm.
     rewrite polyCV mulrC size_Cmul.
       by rewrite qpoly_size.
