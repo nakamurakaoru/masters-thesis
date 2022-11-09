@@ -322,40 +322,10 @@ Qed.
 Lemma qpolyxa a n : qpoly_nonneg a n.+1 a = 0.
 Proof. by rewrite qpoly_nonneg_head addrK' mul0r. Qed.
 
-Lemma eq_nat_to_int (m n : nat): m = n -> m = n:> int.
-Proof.
-(*   move=> Hmn.
-  have Hmn' : m == n.
-    by apply /eqP.
-  rewrite -(Num.Theory.eqr_nat R) in Hmn'.
-  Check eqr_int.
-  rewrite eqr_int in Hmn'.
-  rewrite -(eqr_int R) Num.Theory.eqr_nat in Hmn'.
-  by move/eqP in Hmn'.
- *)
-Check eqr_int.
-Admitted.
-
-(* Lemma idivff (x : int) : x != 0 -> x / x = 1.
-Proof.
-  rewrite -{2}(mul1r x).
-  rewrite mulrK //.
-  move=> Hx.
-  apply /eqP.
-  rewrite -(eqr_int R).
-  apply /eqP.
-  Unset Printing Notations.
-  Search GRing.inv.
-  rewrite  -[RHS](@divff R x%:~R).
-
-  have H : (x / x == 1).
-  rewrite divff.
-Qed. *)
-
 (* What is (_ / 2) ? *)
 (* (_ / 2)%:R or (_ / 2)%:int ? *)
 Lemma qpolyx0 a n : q != 0 ->
-  qpoly_nonneg (- a) n 0 = q ^ (Posz n * (Posz n - 1) / 2) * a ^ n.
+  qpoly_nonneg (- a) n 0 = q ^ (n%:R * (n%:R - 1) / 2%:R)%R * a ^ n.
 Proof.
   elim: n => [|n IH] Hq0 //=.
   - by rewrite mul0r !expr0z mulr1.
@@ -389,14 +359,17 @@ Check eqr_int R.
         rewrite red_frac_l.
  mulr0.
 
-    +
- *)
+    + *)
   - rewrite IH // sub0r -mulrN opp_oppE.
     rewrite [q ^ n * a] mulrC.
     rewrite mulrA mulrC !mulrA.
     rewrite -expfzDr //.
-    have -> : Posz n + Posz n * (Posz n - 1) / 2 =
-              Posz n.+1 * (Posz n.+1 - 1) / 2.
+    have -> : (Posz n + n%:R * (n%:R - 1) / 2) =
+              n.+1%:R * (n.+1%:R - 1) / 2.
+Unset Printing Notations.
+
+Check same_prod R 2.
+Check denomK R n%:R 2%:R.
       rewrite !mulrDr !mulr1 !mulrN1.
       admit.
     by rewrite exprSzr mulrA.
@@ -604,7 +577,6 @@ Proof.
     have -> : q ^ (Negz m.+1 + 1) * a = q ^ Negz m * a.
       by rewrite NegzS.
     rewrite [RHS] mulrC mulrA red_frac_l //.
-
     apply (@qpoly_exp_non0l x _ n l.+1).
     by rewrite -Hmn'.
 Qed.
@@ -960,7 +932,7 @@ Lemma Gauss_binomial x a n : q_fact n != 0 ->
     ((q_bicoef n i) * q ^ (Posz i * (Posz i - 1) / 2)
                     * (-a)^ i * x ^ (Posz n - Posz i)).
 Proof.
-  
+  Search (\sum_(0 <= _ < _.+1) _).
 
   elim: n => [_ |/= n IH Hfact] //=.
   - by rewrite big_nat1 /q_bicoef !mulr1 !mul1r invr1.

@@ -95,6 +95,20 @@ Proof.
   by move/eqP in Hmn'.
 Qed.
 
+(* Lemma eq_nat_to_int (m n : nat): m = n -> m = n:> int.
+Proof.
+(*   move=> Hmn.
+  have Hmn' : m == n.
+    by apply /eqP.
+  rewrite -(Num.Theory.eqr_nat R) in Hmn'.
+  Check eqr_int.
+  rewrite eqr_int in Hmn'.
+  rewrite -(eqr_int R) Num.Theory.eqr_nat in Hmn'.
+  by move/eqP in Hmn'.
+ *)
+Check eqr_int.
+Admitted. *)
+
 Lemma mulnon0 (a b : R) : a * b != 0 -> a != 0.
 Proof.
   move/eqP.
@@ -261,6 +275,18 @@ Proof.
     rewrite !big_nat1 mulrDr IH.
     have -> : F n.+1 * a = a * F n.+1 => //.
     by rewrite mulrC.
+Qed.
+
+Lemma sum n : (2 * (\sum_(0 <= i < n.+1) Posz i) = Posz n * n.+1)%R.
+Proof.
+  elim:n => [|n IH].
+  - by rewrite big_nat1 mulr0 mul0r.
+  - rewrite !(@big_cat_nat _ _ _ n.+1 0 n.+2) //= mulrDr IH.
+    rewrite big_nat1.
+    rewrite -(mulrDl _ _ (Posz n.+1)) mulrC.
+    have -> : Posz n + 2 = n.+2 => //.
+    rewrite addn2.
+Search (_ * _) (_ - _). IH.
 Qed.
 
 Lemma sum_poly_div n F (P : nat -> {poly R}) C x :
