@@ -88,26 +88,13 @@ Proof. by rewrite mulrN mulNr opp_oppE. Qed.
 
 Lemma eq_int_to_nat (m n : nat): m = n:> int -> m = n.
 Proof.
-  move=> Hmn.
-  have Hmn' : m == n:>int.
-    by apply /eqP.
-  rewrite -(eqr_int R) Num.Theory.eqr_nat in Hmn'.
-  by move/eqP in Hmn'.
+  move /eqP.
+  rewrite -(eqr_int R) Num.Theory.eqr_nat.
+  by move/eqP.
 Qed.
 
-(* Lemma eq_nat_to_int (m n : nat): m = n -> m = n:> int.
-Proof.
-(*   move=> Hmn.
-  have Hmn' : m == n.
-    by apply /eqP.
-  rewrite -(Num.Theory.eqr_nat R) in Hmn'.
-  Check eqr_int.
-  rewrite eqr_int in Hmn'.
-  rewrite -(eqr_int R) Num.Theory.eqr_nat in Hmn'.
-  by move/eqP in Hmn'.
- *)
-Check eqr_int.
-Admitted. *)
+Lemma eq_nat_to_int (m n : nat): m = n -> m = n:> int.
+Proof. by move=> ->. Qed.
 
 Lemma mulnon0 (a b : R) : a * b != 0 -> a != 0.
 Proof.
@@ -285,8 +272,8 @@ Proof.
     rewrite big_nat1.
     rewrite -(mulrDl _ _ (Posz n.+1)) mulrC.
     have -> : Posz n + 2 = n.+2 => //.
-    rewrite addn2.
-Search (_ * _) (_ - _). IH.
+    apply eq_nat_to_int.
+    by rewrite addn2.
 Qed.
 
 Lemma sum_poly_div n F (P : nat -> {poly R}) C x :
