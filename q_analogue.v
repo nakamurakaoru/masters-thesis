@@ -322,28 +322,31 @@ Qed.
 Lemma qpolyxa a n : qpoly_nonneg a n.+1 a = 0.
 Proof. by rewrite qpoly_nonneg_head addrK' mul0r. Qed.
 
+Lemma exp0rz' n : (GRing.zero R) ^ (Posz n.+1) = 0.
+Proof. by rewrite exprSz mul0r. Qed.
+
+Lemma eq_nat_to_R (m n : nat) : m = n -> (m = n)%R.
+Proof. by move=> ->. Qed.
+
 (* What is (_ / 2) ? *)
 (* (_ / 2)%:R or (_ / 2)%:int ? *)
-Lemma qpolyx0 a n : q != 0 ->
+Lemma qpolyx0 a n :
   qpoly_nonneg (- a) n 0 = q ^ (n%:R * (n%:R - 1) / 2%:R)%R * a ^ n.
 Proof.
-  elim: n => [|n IH] Hq0 //=.
+(*   elim: n => [|n IH] //=.
   - by rewrite mul0r !expr0z mulr1.
-  - (* destruct n.
+  - destruct n.
       by rewrite !mul1r sub0r opp_oppE expr1z.
     case Hq0 : (q == 0).
     + move: Hq0 => /eqP ->.
       rewrite qpoly_nonneg_head.
       destruct n.
         rewrite /= opp_oppE add0r mulr1 expr1z sub0r mul0r oppr0 mulr0.
-        have -> : (2 - 1)%:R = 1%:R.
-          move=> R'.
-          apply /eqP.
-          rewrite (Num.Theory.eqr_nat R).
-          apply eq_nat_to_int.
-          by rewrite subn1.
-        rewrite mulr1. (@divrr R).
-          by rewrite expr1z mul0r.
+        have -> : (Posz 2 - 1) = 1%:R.
+          admit.
+        rewrite mulr1.
+        have -> : (2 / 2 = 1)%R.
+          rewrite expr1z mul0r.
         rewrite /(_ \is a GRing.unit).
         rewrite /(mem GRing.unit).
 Search (?x / ?x).
@@ -359,7 +362,7 @@ Check eqr_int R.
         rewrite red_frac_l.
  mulr0.
 
-    + *)
+    +
   - rewrite IH // sub0r -mulrN opp_oppE.
     rewrite [q ^ n * a] mulrC.
     rewrite mulrA mulrC !mulrA.
@@ -372,7 +375,7 @@ Check same_prod R 2.
 Check denomK R n%:R 2%:R.
       rewrite !mulrDr !mulr1 !mulrN1.
       admit.
-    by rewrite exprSzr mulrA.
+    by rewrite exprSzr mulrA. *)
 Admitted.
 
 (*Lemma prod_qpoly_nonneg a n x :
