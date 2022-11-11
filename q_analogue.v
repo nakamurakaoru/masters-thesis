@@ -328,8 +328,6 @@ Proof. by rewrite exprSz mul0r. Qed.
 Lemma eq_nat_to_R (m n : nat) : m = n -> (m = n)%R.
 Proof. by move=> ->. Qed.
 
-(* What is (_ / 2) ? *)
-(* (_ / 2)%:R or (_ / 2)%:int ? *)
 Lemma qpolyx0 a n :
   qpoly_nonneg (- a) n 0 = q ^ (n%:R * (n%:R - 1) / 2%:R)%R * a ^ n.
 Proof.
