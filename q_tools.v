@@ -60,6 +60,23 @@ Proof.
   by rewrite addrKA.
 Qed.
 
+Lemma halfdistr m n : ~ odd m ->
+  Posz (m + n)./2 = Posz m./2 + n./2.
+Proof.
+  move=> em.
+  rewrite halfD.
+  have -> : odd m && odd n = false => //=.
+  apply /andP /not_andP.
+  by left.
+Qed.
+
+Lemma half_add n : Posz n.+1 + (n.+1 * n)./2 = (n.+2 * (n.+1))./2.
+Proof.
+  rewrite -{1}(doubleK n.+1) -halfdistr.
+    by rewrite -muln2 -mulnDr addnC addn2 mulnC.
+  by rewrite odd_double.
+Qed.
+
 Lemma Negz_add m n : Negz (m.+1 + n) = Negz m + Negz n.
 Proof. by rewrite !NegzE -addnS (negdistr m.+1 n.+1)%N. Qed.
 
@@ -96,6 +113,9 @@ Qed.
 Lemma eq_nat_to_int (m n : nat): m = n -> m = n:> int.
 Proof. by move=> ->. Qed.
 
+Lemma eq_nat_to_R (m n : nat) : m = n -> (m = n)%R.
+Proof. by move=> ->. Qed.
+
 Lemma mulnon0 (a b : R) : a * b != 0 -> a != 0.
 Proof.
   move/eqP.
@@ -103,6 +123,9 @@ Proof.
   move/eqP ->.
   by rewrite mul0r.
 Qed.
+
+Lemma exp0rz' n : (GRing.zero R) ^ (Posz n.+1) = 0.
+Proof. by rewrite exprSz mul0r. Qed.
 
 Lemma expnon0 (x : R) (n : nat) : x != 0 -> x ^ n != 0.
 Proof.
