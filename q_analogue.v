@@ -329,8 +329,8 @@ Lemma eq_nat_to_R (m n : nat) : m = n -> (m = n)%R.
 Proof. by move=> ->. Qed.
 
 Lemma qpolyx0 a n :
-  qpoly_nonneg (- a) n 0 = q ^ (n%:R * (n%:R - 1) / 2%:R)%R * a ^ n.
-Proof.
+  qpoly_nonneg (- a) n 0 = q ^+ (n * (n - 1) ./2) * a ^ n.
+Proof. 
 (*   elim: n => [|n IH] //=.
   - by rewrite mul0r !expr0z mulr1.
   - destruct n.
@@ -841,34 +841,37 @@ Proof.
   by apply mulf_neq0.
 Qed.
 
-Fixpoint hoD D n (f : R -> R) := match n with
+Fixpoint hoD {A} D n (f : A) := match n with
   | 0 => f
   | n.+1 => D (hoD D n f)
   end.
 
 Notation "D \^ n" := (hoD D n) (at level 49).
 
-Definition deriv_to_poly (D : (R -> R) -> (R -> R)) (p : {poly R})
-  := D (fun x => p.[x]).
+Definition islinear (D : {poly R} -> {poly R}) :=
+  forall a b f g, D ((a * f) + (b * g)) = a * D f + b * D g .
 
-Notation "D # p" := (deriv_to_poly D p) (at level 49).
-
-Definition islinear (D : (R -> R) -> (R -> R)) :=
-  forall a b f g, D ((a */ f) \+ (b */ g)) = a */ D f + b */ D g .
-
-Definition isfderiv D n (P : nat -> {poly R}) x := match n with
-  | 0 => (D # (P 0%N)) x = 0
-  | n.+1 => (D # (P n.+1)) x = (fun x => (P n).[x]) x
+Definition isfderiv D n (P : nat -> {poly R}) := match n with
+  | 0 => (D (P 0%N)) = 0
+  | n.+1 => (D (P n.+1)) = P n
   end.
 
-Theorem general_Taylor D n P (f : {poly R}) x a :
-  islinear D -> isfderiv D n P x ->
+Lemma poly_basis n (P : nat -> {poly R}) (f : {poly R}) :
+  (forall m, (m <= n)%N -> size (P m) = m.+1) ->
+  size f = n.+1 ->
+  exists (c : nat -> R), f = \sum_(0 <= i < n.+1)
+          (c i *: (P i)).
+Proof.
+Admitted.
+
+Theorem general_Taylor D n P (f : {poly R}) a :
+  islinear D -> isfderiv D n P ->
   (P 0%N).[a] = 1 ->
   (forall n, (P n.+1).[a] = 0) ->
   (forall m, (m <= n)%N -> size (P m) = m.+1) ->
   size f = n.+1 ->
-  f.[x] = \sum_(0 <= i < n.+1)
-          ((D \^ i # f) a * (P i).[x]).
+  f = \sum_(0 <= i < n.+1)
+          (((D \^ i) f).[a] *: (P i)).
 Proof.
 (* V := vectorspace of polynomials of degree not lager than n *)
 (* P 0 ... P n is basis of V *)
