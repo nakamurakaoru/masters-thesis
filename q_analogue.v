@@ -826,10 +826,41 @@ Fixpoint hoD {A} D n (f : A) := match n with
 Notation "D \^ n" := (hoD D n) (at level 49).
 
 Definition islinear (D : {poly R} -> {poly R}) :=
-  forall a b f g, D ((a * f) + (b * g)) = a * D f + b * D g .
+  forall a b f g, D ((a *: f) + (b *: g)) = a *: D f + b *: D g.
 
-Definition isfderiv D n (P : nat -> {poly R}) := match n with
-  | 0 => (D (P 0%N)) = 0
+Lemma linear0 D : islinear D -> D 0 = 0.
+Proof.
+  move=> HlD.
+  by rewrite -(addr0 0) -(scale0r 0%:P) HlD !scale0r.
+Qed.
+
+Lemma nth_islinear D n : islinear D -> islinear (D \^ n).
+Proof.
+  elim: n => [|n IH] //=.
+  move=> HlD a b f g.
+  by rewrite IH.
+Qed.
+
+Lemma linear_distr D n c F : islinear D ->
+  D (\sum_(0 <= i < n.+1) c i *: F i) = \sum_(0 <= i < n.+1) c i *: D (F i).
+Proof.
+  move=> HlD.
+  elim: n => [|n IH].
+  - rewrite !big_nat1.
+    have -> : c 0%N *: F 0%N = c 0%N *: F 0%N + 0 *: 0%:P.
+      by rewrite scale0r addr0.
+    by rewrite HlD scale0r addr0.
+  - rewrite (@big_cat_nat _ _ _ n.+1) //=.
+    rewrite big_nat1.
+    rewrite -(scale1r (\sum_(0 <= i < n.+1) c i *: F i)).
+    rewrite HlD scale1r IH.
+    rewrite [RHS] (@big_cat_nat _ _ _ n.+1) //=.
+    by rewrite big_nat1.
+Qed.
+
+Definition isfderiv D (P : nat -> {poly R}) := forall n,
+ match n with
+  | 0 => (D (P n)) = 0
   | n.+1 => (D (P n.+1)) = P n
   end.
 
@@ -851,8 +882,70 @@ Proof.
   - admit.
 Admitted.
 
+Lemma hornersumD n P (a : R) :
+  (\sum_(0 <= j < n.+1) P j).[a] = (\sum_(0 <= j < n.+1) (P j).[a]).
+Proof.
+  elim: n => [|n IH] //=.
+  - by rewrite !big_nat1.
+  - rewrite (@big_cat_nat _ _ _ n.+1) //= big_nat1.
+    rewrite hornerD IH.
+    by rewrite [RHS] (@big_cat_nat _ _ _ n.+1) //= big_nat1.
+Qed.
+
+Lemma sum0 n : \sum_(0 <= i < n.+1) (GRing.zero R) = 0.
+Proof.
+  elim: n => [|n IH].
+  - by rewrite big_nat1.
+  - by rewrite (@big_cat_nat _ _ _ n.+1) //= big_nat1 IH addr0.
+Qed.
+
+Lemma nthisfderiv_pos j D P : isfderiv D P ->
+  forall i, (i >= j)%N -> (D \^ j) (P i) = P (i - j)%N.
+Proof.
+  move=> Hd i.
+  elim: j => [|j IH] Hij //=.
+  - by rewrite subn0.
+  - rewrite IH.
+      have -> : (i - j)%N = (i - j.+1)%N.+1.
+        rewrite -subSn // subSS.
+      by apply (Hd _.+1).
+    by apply ltnW.
+Qed.
+
+(* Lemma nthisfderiv_0 j D P : islinear D -> isfderiv D P ->
+  forall i, (i < j)%N -> (D \^ j) (P i) = 0.
+Proof.
+  move=> HlD Hd i.
+  elim: j => [|j IH] Hij //=.
+  case Hij' : (i == j).
+  - move: (Hij') => /eqP ->.
+    rewrite nthisfderiv_pos // subnn.
+    by apply (Hd 0%N).
+  - rewrite IH ?linear0 //.
+    admit.
+Admitted. *)
+
+Lemma sum_isfderiv_0 n c D (P : nat -> {poly R}) :
+  islinear D -> isfderiv D P ->
+  \sum_(0 <= i < n.+1) c i *: (D \^ n.+1) (P i) = 0.
+Proof.
+  elim: n => [/= |n IH] HlD Hd.
+  - rewrite big_nat1.
+    have -> : D (P 0%N) = 0.
+      by apply (Hd 0%N).
+    by rewrite scaler0.
+  - rewrite (@big_cat_nat _ _ _ n.+1) //.
+    rewrite big_nat1 (lock n.+1) /= -lock.
+    rewrite -linear_distr // IH //.
+    rewrite linear0 // add0r.
+    rewrite nthisfderiv_pos // subnn.
+    have -> : D (P 0%N) = 0.
+      by apply (Hd 0%N).
+    by rewrite scaler0.
+Qed.
+
 Theorem general_Taylor D n P (f : {poly R}) a :
-  islinear D -> isfderiv D n P ->
+  islinear D -> isfderiv D P ->
   (P 0%N).[a] = 1 ->
   (forall n, (P n.+1).[a] = 0) ->
   (forall m, (m <= n)%N -> size (P m) = m.+1) ->
@@ -861,7 +954,46 @@ Theorem general_Taylor D n P (f : {poly R}) a :
           (((D \^ i) f).[a] *: (P i)).
 Proof.
   move=> Hl Hd HP0 HP HdP Hdf.
-  move: (poly_basis n P f HdP Hdf) => [c] H.
+  move: (poly_basis n P f HdP Hdf) => [c] Hf.
+  have Hc0 : c 0%N = ((D \^ 0) f).[a] => /=.
+    rewrite Hf.
+    destruct n.
+      by rewrite big_nat1 hornerZ HP0 mulr1.
+    rewrite hornersumD.
+    rewrite (@big_cat_nat _ _ _ 1) //= big_nat1.
+    rewrite hornerZ HP0 mulr1.
+    have -> : n.+2 = (1 + n.+1)%N.
+      by rewrite addnC addnS addn0.
+    rewrite sum_shift.
+    under eq_bigr do rewrite hornerZ addn1 HP mulr0.
+    by rewrite sum0 addr0.
+  have ithD : forall j, (j.+1 <= n)%N ->
+    (D \^ j.+1) f = \sum_(j.+1 <= i < n.+1) c i *: P (i - j.+1)%N.
+    move=> j Hj.
+    rewrite Hf linear_distr.
+      rewrite {1}(lock j.+1).
+      rewrite (@big_cat_nat _ _ _ j.+1) //=.
+      rewrite -lock.
+      rewrite sum_isfderiv_0 //.
+        rewrite add0r.
+        have nthD : forall i, (D \^ j.+1) (P i) = P (i - j.+1)%N.
+          move=> i.
+          rewrite nthisfderiv_pos //.
+          admit.
+        by under eq_bigr do rewrite nthD.
+      by apply leqW.
+    by apply nth_islinear.
+  have coef : forall j, (j <= n)%N -> c j = ((D \^ j) f).[a].
+    move=> j Hj.
+    destruct j => //.
+    rewrite ithD //.
+    rewrite (@big_cat_nat _ _ _ j.+2) //=.
+    rewrite big_nat1.
+    rewrite hornerD.
+    rewrite subnn hornerZ HP0 mulr1.
+    admit.
+  rewrite {1}Hf.
+  admit.
 (* V := vectorspace of polynomials of degree not lager than n *)
 (* P 0 ... P n is basis of V *)
 
