@@ -839,6 +839,16 @@ Lemma poly_basis n (P : nat -> {poly R}) (f : {poly R}) :
   exists (c : nat -> R), f = \sum_(0 <= i < n.+1)
           (c i *: (P i)).
 Proof.
+  elim: n => [|n IH] HP Hf //=.
+  - exists (fun n => f`_0 / (P 0%N)`_0).
+    rewrite big_nat1.
+    rewrite (@size1_polyC _ f).
+      rewrite {2}(@size1_polyC _ (P 0%N)) /=.
+        rewrite -mul_polyC.
+        admit.
+      by apply /eq_leq /HP.
+    by apply eq_leq.
+  - admit.
 Admitted.
 
 Theorem general_Taylor D n P (f : {poly R}) a :
@@ -850,6 +860,8 @@ Theorem general_Taylor D n P (f : {poly R}) a :
   f = \sum_(0 <= i < n.+1)
           (((D \^ i) f).[a] *: (P i)).
 Proof.
+  move=> Hl Hd HP0 HP HdP Hdf.
+  move: (poly_basis n P f HdP Hdf) => [c] H.
 (* V := vectorspace of polynomials of degree not lager than n *)
 (* P 0 ... P n is basis of V *)
 
