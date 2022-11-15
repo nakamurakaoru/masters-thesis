@@ -828,6 +828,12 @@ Notation "D \^ n" := (hoD D n) (at level 49).
 Definition islinear (D : {poly R} -> {poly R}) :=
   forall a b f g, D ((a *: f) + (b *: g)) = a *: D f + b *: D g.
 
+Lemma linear_add D f g : islinear D -> D (f + g) = D f + D g.
+Proof.
+  move=> HlD.
+  by rewrite -(scale1r f) -(scale1r g) HlD !scale1r.
+Qed.
+
 Lemma linear0 D : islinear D -> D 0 = 0.
 Proof.
   move=> HlD.
@@ -856,6 +862,20 @@ Proof.
     rewrite HlD scale1r IH.
     rewrite [RHS] (@big_cat_nat _ _ _ n.+1) //=.
     by rewrite big_nat1.
+Qed.
+
+Lemma linear_distr' D j n c F : islinear D -> (j < n)%N ->
+  D (\sum_(j.+1 <= i < n.+1) c i *: F i) =
+  \sum_(j.+1 <= i < n.+1) c i *: D (F i).
+Proof.
+  move=> HlD Hjn.
+  have Hjn' : (j < n.+1)%N.
+    by apply ltnW.
+  move: (linear_distr D n c F HlD).
+  rewrite (@big_cat_nat _ _ _ j.+1) //=.
+  rewrite linear_add // linear_distr //.
+  rewrite (@big_cat_nat _ _ _ j.+1 0 n.+1) //=.
+  by move /same_addl.
 Qed.
 
 Definition isfderiv D (P : nat -> {poly R}) := forall n,
@@ -910,6 +930,36 @@ Proof.
         rewrite -subSn // subSS.
       by apply (Hd _.+1).
     by apply ltnW.
+Qed.
+
+Lemma sum_onefderiv_pos j n c D P : islinear D -> isfderiv D P ->
+  (j <= n)%N -> 
+  \sum_(j.+1 <= i < n.+1) c i *: D (P (i - j)%N) =
+  \sum_(j.+1 <= i < n.+1) c i *: P (i - j.+1)%N.
+Proof.
+  move=> HlD Hd Hjn.
+Admitted.
+
+Lemma sum_fderiv_pos j n D P c : islinear D -> isfderiv D P ->
+  (j <= n)%N ->
+  \sum_(j <= i < n.+1) c i *: (D \^ j) (P i) =
+  \sum_(j <= i < n.+1) c i *: P (i - j)%N.
+Proof.
+  move=> HlD Hd.
+  elim:j => [|j IH] Hjn.
+  - elim: n Hjn => [|n IH'] Hjn.
+    + by rewrite !big_nat1 subn0.
+    + rewrite (@big_cat_nat _ _ _ n.+1) //= big_nat1 IH' //.
+      by rewrite [RHS] (@big_cat_nat _ _ _ n.+1) //= big_nat1 subn0.
+  - have Hjn' : (j < n.+1)%N.
+      by apply leqW.
+    move: (IH (ltnW Hjn)).
+    rewrite (@big_cat_nat _ _ _ j.+1) //= big_nat1.
+    rewrite nthisfderiv_pos // subnn.
+    rewrite (@big_cat_nat _ _ _ j.+1 j) //= big_nat1 subnn.
+    move /(same_addl (c j *: P 0%N)) => IH'.
+    rewrite -linear_distr' // IH' linear_distr' //.
+    by apply sum_onefderiv_pos.
 Qed.
 
 (* Lemma nthisfderiv_0 j D P : islinear D -> isfderiv D P ->
@@ -975,12 +1025,12 @@ Proof.
       rewrite (@big_cat_nat _ _ _ j.+1) //=.
       rewrite -lock.
       rewrite sum_isfderiv_0 //.
-        rewrite add0r.
-        have nthD : forall i, (D \^ j.+1) (P i) = P (i - j.+1)%N.
+        by rewrite add0r sum_fderiv_pos.
+(*         have nthD : forall i, (D \^ j.+1) (P i) = P (i - j.+1)%N.
           move=> i.
           rewrite nthisfderiv_pos //.
           admit.
-        by under eq_bigr do rewrite nthD.
+        by under eq_bigr do rewrite nthD. *)
       by apply leqW.
     by apply nth_islinear.
   have coef : forall j, (j <= n)%N -> c j = ((D \^ j) f).[a].
@@ -1002,7 +1052,7 @@ Canonical lfun_vectType := VectType R 'Hom(aT, rT) lfun_vectMixin.
 Fact lfun_vect_iso : Vector.axiom (Vector.dim aT * Vector.dim rT) 'Hom(aT, rT). *)
 Admitted.
 
-Lemma Dq_isfderiv n a x : x != 0 -> q_fact n != 0 ->
+(* Lemma Dq_isfderiv n a x : x != 0 -> q_fact n != 0 ->
   isfderiv Dq n (fun i : nat => qpoly_nonneg_poly a i / (q_fact i)%:P) x.
 Proof.
   move=> Hx Hfact.
@@ -1021,7 +1071,15 @@ Proof.
     rewrite qderiv_qpoly_nonneg //=.
     rewrite [q_fact n * q_nat n.+1] mulrC red_frac_l //.
     by apply q_fact_nat_non0.
-Qed.
+Qed. *)
+
+Definition polyderiv (D : (R -> R) -> (R -> R)) (p : {poly R}) :=
+  D (fun (x : R) => p.[x]).
+
+Notation "D # p" := (polyderiv D p) (at level 49).
+
+Lemma poly_happly p p' (x : R) : p = p' -> p.[x] = p'.[x].
+Proof. by move=> ->. Qed.
 
 Theorem q_Taylor n (f : {poly R}) x a :
   x != 0 ->
@@ -1030,10 +1088,13 @@ Theorem q_Taylor n (f : {poly R}) x a :
   f.[x] =  \sum_(0 <= i < n.+1)
              ((Dq \^ i) # f) a * qpoly_nonneg a i x / q_fact i.
 Proof.
-  move=> Hx Hfact.
+  move=> Hx Hfact Hsf.
   under eq_bigr do rewrite qpoly_nonnegE.
   rewrite sum_poly_div.
-  apply general_Taylor.
+  under eq_bigr do rewrite -hornerZ.
+  rewrite -hornersumD.
+  apply poly_happly.
+  rewrite general_Taylor.
   - move=> a' b f' g.
     apply funext => x'.
     by apply Dq_is_linear.

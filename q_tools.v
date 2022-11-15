@@ -192,7 +192,7 @@ Proof.
 Qed. *)
 
 (* R上の　add cancel *)
-Lemma addrK' (a : R) : a - a = 0.
+Lemma addrK' {V : zmodType} (a : V) : a - a = 0.
 Proof. by rewrite -{1}(add0r a) addrK. Qed.
 
 (* Rの移項 *)
@@ -206,6 +206,13 @@ Proof. by move=> <-; rewrite addrK. Qed.
 
 Lemma Negz_transp m n l : m + Negz n = l -> m = l + n.+1.
 Proof. rewrite NegzE; apply itransposition. Qed.
+
+Lemma same_addl {V : zmodType} {a b} (c : V) : c + a = c + b -> a = b.
+Proof.
+  move=> H.
+  rewrite -(addr0 a) -(addrK' c) addrA [a + c] addrC H.
+  by rewrite [c + b] addrC -addrA addrK' addr0.
+Qed.
 
 (* 両辺にかける *)
 Lemma same_prod {a b} (c : R) : c != 0 -> a * c = b * c -> a = b.
