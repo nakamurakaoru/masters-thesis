@@ -885,31 +885,38 @@ Definition isfderiv D (P : nat -> {poly R}) := forall n,
   end.
 
 Lemma poly_basis n (P : nat -> {poly R}) (f : {poly R}) :
-  (forall m, (m <= n)%N -> size (P m) = m.+1) ->
-  size f = n.+1 ->
+  (forall m, size (P m) = m.+1) ->
+  (size f <= n.+1)%N ->
   exists (c : nat -> R), f = \sum_(0 <= i < n.+1)
           (c i *: (P i)).
 Proof.
-  elim: n => [|n IH] HP Hf //=.
-  - exists (fun n => f`_0 / (P 0%N)`_0).
-    rewrite big_nat1.
-    rewrite (@size1_polyC _ f).
-      rewrite {2}(@size1_polyC _ (P 0%N)) /=.
-        rewrite -mul_polyC.
-        admit.
-      by apply /eq_leq /HP.
-    by apply eq_leq.
-  - admit.
+  elim: n.+1 f => {n} [|n IH] f HP Hf //=.
+  - exists (fun i => 0).
+    rewrite big_nil.
+    move: Hf.
+    by rewrite leqn0 -/(nilp f) nil_poly => /eqP.
+  - set cn := f`_n / (P n)`_n.
+    set f' := f - cn *: P n.
+    destruct (IH f') as [c Hc] => //.
+      admit.
+    exists (fun i => if i == n then cn else c i).
+    rewrite big_nat_recr //=.
+    under eq_big_nat => i /andP [_].
+      rewrite ltn_neqAle => /andP [/negbTE ] -> _.
+    over.
+    by rewrite -Hc eqxx /f' subrK.
 Admitted.
 
-Lemma hornersumD n P (a : R) :
-  (\sum_(0 <= j < n.+1) P j).[a] = (\sum_(0 <= j < n.+1) (P j).[a]).
+Lemma hornersumD m n P (a : R) :
+  (\sum_(m <= j < n.+1) P j).[a] = (\sum_(m <= j < n.+1) (P j).[a]).
 Proof.
-  elim: n => [|n IH] //=.
-  - by rewrite !big_nat1.
-  - rewrite (@big_cat_nat _ _ _ n.+1) //= big_nat1.
+  have -> : (m = 0 + m)%N by [].
+  rewrite !big_addn.
+  elim: (n.+1 - m)%N => {n} [|n IH] //=.
+  - by rewrite !big_nil horner0.
+  - rewrite (@big_cat_nat _ _ _ n) //= big_nat1.
     rewrite hornerD IH.
-    by rewrite [RHS] (@big_cat_nat _ _ _ n.+1) //= big_nat1.
+    by rewrite [RHS] (@big_cat_nat _ _ _ n) //= big_nat1.
 Qed.
 
 Lemma sum0 n : \sum_(0 <= i < n.+1) (GRing.zero R) = 0.
@@ -998,13 +1005,15 @@ Theorem general_Taylor D n P (f : {poly R}) a :
   islinear D -> isfderiv D P ->
   (P 0%N).[a] = 1 ->
   (forall n, (P n.+1).[a] = 0) ->
-  (forall m, (m <= n)%N -> size (P m) = m.+1) ->
+  (forall m, size (P m) = m.+1) ->
   size f = n.+1 ->
   f = \sum_(0 <= i < n.+1)
           (((D \^ i) f).[a] *: (P i)).
 Proof.
   move=> Hl Hd HP0 HP HdP Hdf.
-  move: (poly_basis n P f HdP Hdf) => [c] Hf.
+  have Hdf' : (size f <= n.+1)%N.
+    by rewrite Hdf leqnn.
+  move: (poly_basis n P f HdP Hdf') => [c] Hf.
   have Hc0 : c 0%N = ((D \^ 0) f).[a] => /=.
     rewrite Hf.
     destruct n.
@@ -1026,11 +1035,6 @@ Proof.
       rewrite -lock.
       rewrite sum_isfderiv_0 //.
         by rewrite add0r sum_fderiv_pos.
-(*         have nthD : forall i, (D \^ j.+1) (P i) = P (i - j.+1)%N.
-          move=> i.
-          rewrite nthisfderiv_pos //.
-          admit.
-        by under eq_bigr do rewrite nthD. *)
       by apply leqW.
     by apply nth_islinear.
   have coef : forall j, (j <= n)%N -> c j = ((D \^ j) f).[a].
@@ -1041,16 +1045,22 @@ Proof.
     rewrite big_nat1.
     rewrite hornerD.
     rewrite subnn hornerZ HP0 mulr1.
-    admit.
+    rewrite hornersumD.
+    rewrite big_nat_cond.
+    under eq_bigr => i /andP [/andP [Hi Hi'] _].
+      rewrite hornerZ.
+      move: (Hi).
+      rewrite -addn1 -leq_subRL //; last by apply ltnW.
+      case: (i - j.+1)%N => // k Hk.
+      rewrite HP mulr0.
+    over.
+    by rewrite big1 ?addr0.
   rewrite {1}Hf.
-  admit.
-(* V := vectorspace of polynomials of degree not lager than n *)
-(* P 0 ... P n is basis of V *)
-
-(* Definition lfun_vectMixin := VectMixin lfun_vect_iso.
-Canonical lfun_vectType := VectType R 'Hom(aT, rT) lfun_vectMixin.
-Fact lfun_vect_iso : Vector.axiom (Vector.dim aT * Vector.dim rT) 'Hom(aT, rT). *)
-Admitted.
+  rewrite big_nat_cond.
+  rewrite [RHS] big_nat_cond.
+  apply eq_bigr => i /andP [/andP [Hi Hi'] _].
+  by rewrite coef.
+Qed.
 
 (* Lemma Dq_isfderiv n a x : x != 0 -> q_fact n != 0 ->
   isfderiv Dq n (fun i : nat => qpoly_nonneg_poly a i / (q_fact i)%:P) x.
