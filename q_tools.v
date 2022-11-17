@@ -315,4 +315,69 @@ Proof.
   - rewrite !(@big_cat_nat _ _ _ n.+1 0 n.+2) //= IH.
     by rewrite !big_nat1 hornerM polyCV hornerC mulrA.
 Qed.
+
+(* not used *)
+
+(*Lemma qpoly_ex a (n : nat) x : qpoly a (- 1) x = 1 / (x - q ^ (- 1) * a) .
+Proof.
+  move=> /=.
+  rewrite /qpoly_neg /=.
+  rewrite expr0z !mul1r.
+  rewrite (_ : Negz 1 + 1 = - 1) //.
+Qed.*)
+
+(* Lemma sum_onefderiv_pos j n c D P : islinear D -> isfderiv D P ->
+  (j <= n)%N -> 
+  \sum_(j.+1 <= i < n.+1) c i *: D (P (i - j)%N) =
+  \sum_(j.+1 <= i < n.+1) c i *: P (i - j.+1)%N.
+Proof.
+  move=> HlD Hd Hjn.
+  under eq_big_nat => i /andP [Hi HI'].
+    have -> : (i - j)%N = (i - j.+1)%N.+1.
+      by rewrite subnS prednK // subn_gt0.
+    rewrite (Hd (i - j.+1).+1).
+  over. done.
+Qed. *)
+
+(* Lemma sum_fderiv_pos j n D P c : islinear D -> isfderiv D P ->
+  (j <= n)%N ->
+  \sum_(j <= i < n.+1) c i *: (D \^ j) (P i) =
+  \sum_(j <= i < n.+1) c i *: P (i - j)%N.
+Proof.
+  move=> HlD Hd.
+  elim:j => [|j IH] Hjn.
+  - elim: n Hjn => [|n IH'] Hjn.
+    + by rewrite !big_nat1 subn0.
+    + rewrite (@big_cat_nat _ _ _ n.+1) //= big_nat1 IH' //.
+      by rewrite [RHS] (@big_cat_nat _ _ _ n.+1) //= big_nat1 subn0.
+  - have Hjn' : (j < n.+1)%N.
+      by apply leqW.
+    move: (IH (ltnW Hjn)).
+    rewrite (@big_cat_nat _ _ _ j.+1) //= big_nat1.
+    rewrite nthisfderiv_pos // subnn.
+    rewrite (@big_cat_nat _ _ _ j.+1 j) //= big_nat1 subnn.
+    move /(same_addl (c j *: P 0%N)) => IH'.
+    rewrite -linear_distr' // IH' linear_distr' //.
+    by apply sum_onefderiv_pos.
+Qed. *)
+
+(* Lemma sum_isfderiv_0 n c D (P : nat -> {poly R}) :
+  islinear D -> isfderiv D P ->
+  \sum_(0 <= i < n.+1) c i *: (D \^ n.+1) (P i) = 0.
+Proof.
+  elim: n => [/= |n IH] HlD Hd.
+  - rewrite big_nat1.
+    have -> : D (P 0%N) = 0.
+      by apply (Hd 0%N).
+    by rewrite scaler0.
+  - rewrite (@big_cat_nat _ _ _ n.+1) //.
+    rewrite big_nat1 (lock n.+1) /= -lock.
+    rewrite -linear_distr // IH //.
+    rewrite linear0 // add0r.
+    rewrite nthisfderiv_pos // subnn.
+    have -> : D (P 0%N) = 0.
+      by apply (Hd 0%N).
+    by rewrite scaler0.
+Qed. *)
+
 End q_tools.

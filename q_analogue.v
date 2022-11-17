@@ -117,21 +117,13 @@ Proof.
     by rewrite ltn_add2r.
   rewrite !q_natE.
   rewrite (@big_cat_nat _ _ _ j.+1) //=.
-  have -> : n.+1 = (j.+1 + (n.+1 - j.+1 - 1).+1)%N.
-    by rewrite addnS addnBA // subnKC // -{2}addn1 addnK.
-  rewrite (sum_shift _ j.+1).
-  have -> : (j.+1 + (n.+1 - j.+1 - 1).+1 - j.+1)%N =
-            (n.+1 - j.+1 - 1).+1.
-    by rewrite addnC addnK.
-  have H : forall m l, \sum_(0 <= i < m.+1) q ^ (i + l)%N =
-                       \sum_(0 <= i < m.+1) q ^ i * q ^ l.
-    move=> m l.
-    elim: m => [|m IH].
-    - by rewrite !big_nat1 {1}exprzD_nat.
-    - rewrite (@big_cat_nat _ _ _ m.+1) //=.
-      rewrite [RHS] (@big_cat_nat _ _ _ m.+1) //=.
-      by rewrite !big_nat1 !IH exprzD_nat.
-  by rewrite H sum_distr q_natE.
+  have {2}-> : j.+1 = (0 + j.+1)%N by [].
+  rewrite big_addn.
+  have -> : (n.+1 - j.+1)%N = (n.+1 - j.+1 - 1).+1.
+    by rewrite subn1 prednK // // subn_gt0.
+  congr (_ + _).
+  under eq_bigr do rewrite exprzD_nat.
+  by rewrite sum_distr q_natE.
 Qed.
 
 (* Lemma q_nat_ispos n : -1 < q -> q_nat n.+1 > 0.
@@ -456,14 +448,6 @@ Definition qpoly_denom a n x := match n with
 Lemma Dq_qpoly_int_to_neg a n x :
   Dq (qpoly a (Negz n)) x = Dq (qpoly_neg a (n + 1)) x.
 Proof. by rewrite /Dq /dq /= addn1. Qed.
-
-(*Lemma qpoly_ex a (n : nat) x : qpoly a (- 1) x = 1 / (x - q ^ (- 1) * a) .
-Proof.
-  move=> /=.
-  rewrite /qpoly_neg /=.
-  rewrite expr0z !mul1r.
-  rewrite (_ : Negz 1 + 1 = - 1) //.
-Qed.*)
 
 Lemma qpoly_exp_0 a m n x : m = 0 \/ n = 0 ->
   qpoly a (m + n) x = qpoly a m x * qpoly (q ^ m * a) n x.
@@ -944,13 +928,6 @@ Proof.
     by rewrite [RHS] (@big_cat_nat _ _ _ n) //= big_nat1.
 Qed.
 
-Lemma sum0 n : \sum_(0 <= i < n.+1) (GRing.zero R) = 0.
-Proof.
-  elim: n => [|n IH].
-  - by rewrite big_nat1.
-  - by rewrite (@big_cat_nat _ _ _ n.+1) //= big_nat1 IH addr0.
-Qed.
-
 Lemma nthisfderiv_pos j D P : isfderiv D P ->
   forall i, (i >= j)%N -> (D \^ j) (P i) = P (i - j)%N.
 Proof.
@@ -964,37 +941,7 @@ Proof.
     by apply ltnW.
 Qed.
 
-(* Lemma sum_onefderiv_pos j n c D P : islinear D -> isfderiv D P ->
-  (j <= n)%N -> 
-  \sum_(j.+1 <= i < n.+1) c i *: D (P (i - j)%N) =
-  \sum_(j.+1 <= i < n.+1) c i *: P (i - j.+1)%N.
-Proof.
-  move=> HlD Hd Hjn.
-Admitted. *)
-
-(* Lemma sum_fderiv_pos j n D P c : islinear D -> isfderiv D P ->
-  (j <= n)%N ->
-  \sum_(j <= i < n.+1) c i *: (D \^ j) (P i) =
-  \sum_(j <= i < n.+1) c i *: P (i - j)%N.
-Proof.
-  move=> HlD Hd.
-  elim:j => [|j IH] Hjn.
-  - elim: n Hjn => [|n IH'] Hjn.
-    + by rewrite !big_nat1 subn0.
-    + rewrite (@big_cat_nat _ _ _ n.+1) //= big_nat1 IH' //.
-      by rewrite [RHS] (@big_cat_nat _ _ _ n.+1) //= big_nat1 subn0.
-  - have Hjn' : (j < n.+1)%N.
-      by apply leqW.
-    move: (IH (ltnW Hjn)).
-    rewrite (@big_cat_nat _ _ _ j.+1) //= big_nat1.
-    rewrite nthisfderiv_pos // subnn.
-    rewrite (@big_cat_nat _ _ _ j.+1 j) //= big_nat1 subnn.
-    move /(same_addl (c j *: P 0%N)) => IH'.
-    rewrite -linear_distr' // IH' linear_distr' //.
-    by apply sum_onefderiv_pos.
-Qed. *)
-
-(* Lemma nthisfderiv_0 j D P : islinear D -> isfderiv D P ->
+Lemma nthisfderiv_0 j D P : islinear D -> isfderiv D P ->
   forall i, (i < j)%N -> (D \^ j) (P i) = 0.
 Proof.
   move=> HlD Hd i.
@@ -1003,27 +950,12 @@ Proof.
   - move: (Hij') => /eqP ->.
     rewrite nthisfderiv_pos // subnn.
     by apply (Hd 0%N).
-  - rewrite IH ?linear0 //.
-    admit.
-Admitted. *)
-
-Lemma sum_isfderiv_0 n c D (P : nat -> {poly R}) :
-  islinear D -> isfderiv D P ->
-  \sum_(0 <= i < n.+1) c i *: (D \^ n.+1) (P i) = 0.
-Proof.
-  elim: n => [/= |n IH] HlD Hd.
-  - rewrite big_nat1.
-    have -> : D (P 0%N) = 0.
-      by apply (Hd 0%N).
-    by rewrite scaler0.
-  - rewrite (@big_cat_nat _ _ _ n.+1) //.
-    rewrite big_nat1 (lock n.+1) /= -lock.
-    rewrite -linear_distr // IH //.
-    rewrite linear0 // add0r.
-    rewrite nthisfderiv_pos // subnn.
-    have -> : D (P 0%N) = 0.
-      by apply (Hd 0%N).
-    by rewrite scaler0.
+  - have Hij'' : (i < j)%N.
+      rewrite ltn_neqAle.
+      apply /andP; split.
+      + by rewrite Hij'.
+      + by rewrite -ltnS.
+    by rewrite IH // linear0.
 Qed.
 
 Theorem general_Taylor D n P (f : {poly R}) a :
@@ -1051,35 +983,28 @@ Proof.
     under eq_big_nat => i /andP [_ _].
       rewrite hornerZ addn1 HP mulr0.
     over.
-    by rewrite sum0 addr0.
+    by rewrite big1 // addr0.
   have ithD : forall j, (j.+1 <= n)%N ->
     (D \^ j.+1) f = \sum_(j.+1 <= i < n.+1) c i *: P (i - j.+1)%N.
     move=> j Hj.
     rewrite Hf linear_distr.
       rewrite {1}(lock j.+1).
       rewrite (@big_cat_nat _ _ _ j.+1) //=.
-      rewrite -lock.
-(*       under eq_big_nat => i /andP [_ Hi].
-        rewrite nthisfderiv_0 // scaler0.
-      over.
-      have -> : \sum_(0 <= i < j.+1) (fun=> 0) i = \sum_(0 <= i < j.+1) 0%R by []. *)
-
-      rewrite sum_isfderiv_0 // ?add0r.
-      by under eq_big_nat => i /andP [Hi _]
-        do rewrite nthisfderiv_pos //.
+        rewrite -lock.
+        under eq_big_nat => i /andP [_ Hi].
+          rewrite nthisfderiv_0 // scaler0.
+        over.
+        rewrite big1 // add0r.
+        by under eq_big_nat => i /andP [Hi _] do rewrite nthisfderiv_pos //.
       by apply leqW.
     by apply nth_islinear.
   have coef : forall j, (j <= n)%N -> c j = ((D \^ j) f).[a].
     move=> j Hj.
     destruct j => //.
     rewrite ithD //.
-    rewrite (@big_cat_nat _ _ _ j.+2) //=.
-    rewrite big_nat1.
-    rewrite hornerD.
-    rewrite subnn hornerZ HP0 mulr1.
-    rewrite hornersumD.
-    rewrite big_nat_cond.
-    under eq_bigr => i /andP [/andP [Hi Hi'] _].
+    rewrite (@big_cat_nat _ _ _ j.+2) //= big_nat1 hornerD.
+    rewrite subnn hornerZ HP0 mulr1 hornersumD.
+    under eq_big_nat => i /andP [Hi Hi'].
       rewrite hornerZ.
       move: (Hi).
       rewrite -addn1 -leq_subRL //; last by apply ltnW.
@@ -1087,7 +1012,7 @@ Proof.
       rewrite HP mulr0.
     over.
     move=> /=.
-    by rewrite big1 ?addr0.
+    by rewrite big1 // addr0.
   rewrite {1}Hf.
   rewrite big_nat_cond.
   rewrite [RHS] big_nat_cond.
@@ -1124,6 +1049,11 @@ Notation "D # p" := (polyderiv D p) (at level 49).
 Lemma poly_happly p p' (x : R) : p = p' -> p.[x] = p'.[x].
 Proof. by move=> ->. Qed.
 
+Lemma Dq'E p x : (Dq' p).[x] = (Dq # p) x.
+Proof.
+  rewrite /Dq' /(_ # _) /Dq /dq.
+Admitted.
+
 Theorem q_Taylor n (f : {poly R}) x a :
   x != 0 ->
   q_fact n != 0 ->
@@ -1137,8 +1067,11 @@ Proof.
   under eq_bigr do rewrite -hornerZ.
   rewrite -hornersumD.
   apply poly_happly.
-  rewrite general_Taylor.
-  - move=> a' b f' g.
+  have HDq : forall j a, ((Dq \^ j) # f) a = ((Dq' \^ j) f).[a].
+    admit.
+  under eq_bigr do rewrite HDq.
+  apply general_Taylor.
+(*   - move=> a' b f' g.
     apply funext => x'.
     by apply Dq_is_linear.
   - by apply Dq_isfderiv.
@@ -1152,8 +1085,8 @@ Proof.
     move: Hfact.
     have -> : n = (m + (n - m))%N.
       by rewrite subnKC.
-    by apply /q_fact_lenon0.
-Qed.
+    by apply /q_fact_lenon0. *)
+Admitted.
 
 Lemma Gauss_binomial x a n : q_fact n != 0 ->
   qpoly (-a) (Posz n) x =
