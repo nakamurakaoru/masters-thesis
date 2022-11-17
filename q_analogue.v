@@ -82,6 +82,8 @@ Qed.
 (* q-analogue of natural number *)
 Definition q_nat n : R := (q ^ n - 1) / (q - 1).
 
+Definition Dq' (p : {poly R}) := \poly_(i < size p) (q_nat (i.+1) * p`_i.+1).
+
 (* q_nat 0 is 0 *)
 Lemma q_nat_0 : q_nat 0 = 0.
 Proof. by rewrite /q_nat expr0z addrK' mul0r. Qed.
@@ -103,7 +105,7 @@ Proof.
 Qed.
 
 Lemma q_nat_cat {n} j : (j < n)%N ->
-  q_nat n.+1 = q_nat j.+1 + q ^ j.+1 * q_nat (n.+1 - j.+1)%N .
+  q_nat n.+1 = q_nat j.+1 + q ^ j.+1 * q_nat (n.+1 - j.+1)%N.
 Proof.
   move=> Hjn.
   have Hjn' : (j < n.+1)%N.
@@ -295,8 +297,7 @@ Lemma qpoly_size a n : size (qpoly_nonneg_poly a n) = n.+1.
 Proof.
   elim: n => [|n IH] => //=.
   - by rewrite size_poly1.
-  - Search (size _) (_ * _).
-    rewrite size_Mmonic.
+  - rewrite size_Mmonic.
         by rewrite IH size_XsubC addn2.
       by rewrite -size_poly_gt0 IH.
     by apply monicXsubC.
@@ -898,14 +899,38 @@ Proof.
   - set cn := f`_n / (P n)`_n.
     set f' := f - cn *: P n.
     destruct (IH f') as [c Hc] => //.
-      admit.
+      have Hf' : (size f' <= n.+1)%N.
+        rewrite /f' -scaleNr.
+        move: (size_add f (- cn *: P n)).
+        rewrite leq_max.
+        move /orP => [H1 | H2].
+        + by apply (leq_trans H1 Hf). Search (size _) (_ *: _).
+        + move: (size_scale_leq (- cn) (P n)).
+          move: (HP n) -> => HP'.
+          by apply (leq_trans H2 HP').
+      have Hf'n : f'`_n = 0.
+        rewrite /f' /cn coefB coefZ denomK ?addrK' //.
+        have {2}-> : n = n.+1.-1 by [].
+        move: (HP n) <-.
+        rewrite -lead_coefE.
+        case H : (lead_coef (P n) == 0) => //.
+        move: H.
+        rewrite lead_coef_eq0 -size_poly_eq0.
+        by move: (HP n) ->.
+      move /leq_sizeP in Hf'.
+      have Hf'' : forall j : nat, (n <= j)%N -> f'`_j = 0.
+        move=> j.
+        rewrite leq_eqVlt.
+        move/orP => [/eqP <-|] //.
+        by apply Hf'.
+      by apply /leq_sizeP.
     exists (fun i => if i == n then cn else c i).
     rewrite big_nat_recr //=.
     under eq_big_nat => i /andP [_].
       rewrite ltn_neqAle => /andP [/negbTE ] -> _.
     over.
     by rewrite -Hc eqxx /f' subrK.
-Admitted.
+Qed.
 
 Lemma hornersumD m n P (a : R) :
   (\sum_(m <= j < n.+1) P j).[a] = (\sum_(m <= j < n.+1) (P j).[a]).
@@ -939,15 +964,15 @@ Proof.
     by apply ltnW.
 Qed.
 
-Lemma sum_onefderiv_pos j n c D P : islinear D -> isfderiv D P ->
+(* Lemma sum_onefderiv_pos j n c D P : islinear D -> isfderiv D P ->
   (j <= n)%N -> 
   \sum_(j.+1 <= i < n.+1) c i *: D (P (i - j)%N) =
   \sum_(j.+1 <= i < n.+1) c i *: P (i - j.+1)%N.
 Proof.
   move=> HlD Hd Hjn.
-Admitted.
+Admitted. *)
 
-Lemma sum_fderiv_pos j n D P c : islinear D -> isfderiv D P ->
+(* Lemma sum_fderiv_pos j n D P c : islinear D -> isfderiv D P ->
   (j <= n)%N ->
   \sum_(j <= i < n.+1) c i *: (D \^ j) (P i) =
   \sum_(j <= i < n.+1) c i *: P (i - j)%N.
@@ -967,7 +992,7 @@ Proof.
     move /(same_addl (c j *: P 0%N)) => IH'.
     rewrite -linear_distr' // IH' linear_distr' //.
     by apply sum_onefderiv_pos.
-Qed.
+Qed. *)
 
 (* Lemma nthisfderiv_0 j D P : islinear D -> isfderiv D P ->
   forall i, (i < j)%N -> (D \^ j) (P i) = 0.
@@ -1021,10 +1046,11 @@ Proof.
     rewrite hornersumD.
     rewrite (@big_cat_nat _ _ _ 1) //= big_nat1.
     rewrite hornerZ HP0 mulr1.
-    have -> : n.+2 = (1 + n.+1)%N.
-      by rewrite addnC addnS addn0.
-    rewrite sum_shift.
-    under eq_bigr do rewrite hornerZ addn1 HP mulr0.
+    have -> : (1 = 0 + 1)%N by [].
+    rewrite big_addn subn1 /=.
+    under eq_big_nat => i /andP [_ _].
+      rewrite hornerZ addn1 HP mulr0.
+    over.
     by rewrite sum0 addr0.
   have ithD : forall j, (j.+1 <= n)%N ->
     (D \^ j.+1) f = \sum_(j.+1 <= i < n.+1) c i *: P (i - j.+1)%N.
@@ -1033,8 +1059,14 @@ Proof.
       rewrite {1}(lock j.+1).
       rewrite (@big_cat_nat _ _ _ j.+1) //=.
       rewrite -lock.
-      rewrite sum_isfderiv_0 //.
-        by rewrite add0r sum_fderiv_pos.
+(*       under eq_big_nat => i /andP [_ Hi].
+        rewrite nthisfderiv_0 // scaler0.
+      over.
+      have -> : \sum_(0 <= i < j.+1) (fun=> 0) i = \sum_(0 <= i < j.+1) 0%R by []. *)
+
+      rewrite sum_isfderiv_0 // ?add0r.
+      by under eq_big_nat => i /andP [Hi _]
+        do rewrite nthisfderiv_pos //.
       by apply leqW.
     by apply nth_islinear.
   have coef : forall j, (j <= n)%N -> c j = ((D \^ j) f).[a].
@@ -1054,6 +1086,7 @@ Proof.
       case: (i - j.+1)%N => // k Hk.
       rewrite HP mulr0.
     over.
+    move=> /=.
     by rewrite big1 ?addr0.
   rewrite {1}Hf.
   rewrite big_nat_cond.
