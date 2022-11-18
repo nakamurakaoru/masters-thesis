@@ -162,7 +162,8 @@ Proof.
   - rewrite (@big_cat_nat _ _ _ n.+1) //=.
     by rewrite big_nat1 -IH.
 Qed.*)
-Lemma lim_q_nat n : forall e : R, e > 0 ->
+
+(* Lemma lim_q_nat n : forall e : R, e > 0 ->
   exists d, `|q - 1| < d -> `|n%:R - (q_nat n)| < e.
 Proof.
   move=> e He.
@@ -170,7 +171,7 @@ Proof.
   - eexists => _.
     by rewrite q_nat_0 addrK' Num.Theory.normr0.
   - exists (e / n%:R).
-Admitted.
+Admitted. *)
 
 (* q-derivative of x ^ n *)
 Lemma qderiv_of_pow n x :
@@ -870,6 +871,14 @@ Definition isfderiv D (P : nat -> {poly R}) := forall n,
   | n.+1 => (D (P n.+1)) = P n
   end.
 
+(* Lemma poly_basis' n (P : nat -> {poly R}) (f : {poly R}) :
+  (forall m, (m <= n)%N -> size (P m) = m.+1) ->
+  (size f <= n.+1)%N ->
+  exists (c : nat -> R), f = \sum_(0 <= i < n.+1)
+          (c i *: (P i)).
+Proof.
+Admitted. *)
+
 Lemma poly_basis n (P : nat -> {poly R}) (f : {poly R}) :
   (forall m, size (P m) = m.+1) ->
   (size f <= n.+1)%N ->
@@ -889,7 +898,7 @@ Proof.
         move: (size_add f (- cn *: P n)).
         rewrite leq_max.
         move /orP => [H1 | H2].
-        + by apply (leq_trans H1 Hf). Search (size _) (_ *: _).
+        + by apply (leq_trans H1 Hf).
         + move: (size_scale_leq (- cn) (P n)).
           move: (HP n) -> => HP'.
           by apply (leq_trans H2 HP').
@@ -1050,15 +1059,41 @@ Notation "D # p" := (polyderiv D p) (at level 49).
 Lemma poly_happly p p' (x : R) : p = p' -> p.[x] = p'.[x].
 Proof. by move=> ->. Qed.
 
+(* Lemma poly_funext p p' : (forall (x : R),  p.[x] = p'.[x]) -> p = p'.
+Proof.
+Admitted. *)
+
 Lemma Dq'E p x : x != 0 -> (Dq' p).[x] = (Dq # p) x.
 Proof.
   move=> Hx.
-  rewrite /Dq' /(_ # _) /Dq /dq.
+  rewrite /Dq' /(_ # _) /Dq /dq /q_nat.
+  rewrite horner_poly.
+Admitted.
+
+Lemma hoDq'E p x n : ((Dq' \^ n) p).[x] = ((Dq \^ n) # p) x.
+Proof.
+(*   elim: n p x => [|n IH] p x //=.
+  rewrite [LHS] /= Dq'E.
+  congr Dq.
+Search ([eta _]) horner.
+  rewrite IH.
+  Locate eta.
+Check [eta horner]. *)
+Admitted.
+
+Lemma Dq'_islinear : islinear Dq'.
+Proof.
+  move=> a b p p'.
+Admitted.
+
+Lemma Dq'_isderiv a : (forall n, q_fact n != 0) ->
+  isfderiv Dq' (fun i : nat => qpoly_nonneg_poly a i / (q_fact i)%:P).
+Proof.
 Admitted.
 
 Theorem q_Taylor n (f : {poly R}) x a :
   x != 0 ->
-  q_fact n != 0 ->
+  (forall n, q_fact n != 0) ->
   size f = n.+1 ->
   f.[x] =  \sum_(0 <= i < n.+1)
              ((Dq \^ i) # f) a * qpoly_nonneg a i x / q_fact i.
@@ -1069,14 +1104,22 @@ Proof.
   under eq_bigr do rewrite -hornerZ.
   rewrite -hornersumD.
   apply poly_happly.
-  have HDq : forall j a, ((Dq \^ j) # f) a = ((Dq' \^ j) f).[a].
-    admit.
-  under eq_bigr do rewrite HDq.
-  apply general_Taylor.
-  - rewrite /islinear.
-    move=> a' b p q'.
-    rewrite /Dq'.
-  -
+  under eq_bigr do rewrite -hoDq'E.
+  apply general_Taylor => //.
+  - apply Dq'_islinear.
+  - by apply Dq'_isderiv.
+  - by rewrite invr1 mulr1 hornerC.
+  - move=> m.
+    by rewrite hornerM -qpoly_nonnegE qpolyxa mul0r.
+  - move=> m.
+    rewrite polyCV mulrC size_Cmul.
+      by rewrite qpoly_size.
+    by apply /invr_neq0.
+
+(*     move: Hfact.
+    have -> : n = (m + (n - m))%N.
+      rewrite subnKC.
+    by apply /q_fact_lenon0. *)
 (*   - move=> a' b f' g.
     apply funext => x'.
     by apply Dq_is_linear.
@@ -1092,7 +1135,7 @@ Proof.
     have -> : n = (m + (n - m))%N.
       by rewrite subnKC.
     by apply /q_fact_lenon0. *)
-Admitted.
+Qed.
 
 Lemma Gauss_binomial x a n : q_fact n != 0 ->
   qpoly (-a) (Posz n) x =
