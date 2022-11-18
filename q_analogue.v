@@ -47,6 +47,7 @@ Qed.
 
 (* q-derivative *)
 Definition Dq f := dq f // dq id.
+Check Dq.
 
 Fixpoint hoDq n f := match n with
   | 0 => f
@@ -1049,8 +1050,9 @@ Notation "D # p" := (polyderiv D p) (at level 49).
 Lemma poly_happly p p' (x : R) : p = p' -> p.[x] = p'.[x].
 Proof. by move=> ->. Qed.
 
-Lemma Dq'E p x : (Dq' p).[x] = (Dq # p) x.
+Lemma Dq'E p x : x != 0 -> (Dq' p).[x] = (Dq # p) x.
 Proof.
+  move=> Hx.
   rewrite /Dq' /(_ # _) /Dq /dq.
 Admitted.
 
@@ -1071,6 +1073,10 @@ Proof.
     admit.
   under eq_bigr do rewrite HDq.
   apply general_Taylor.
+  - rewrite /islinear.
+    move=> a' b p q'.
+    rewrite /Dq'.
+  -
 (*   - move=> a' b f' g.
     apply funext => x'.
     by apply Dq_is_linear.
