@@ -1063,27 +1063,98 @@ Proof. by move=> ->. Qed.
 Proof.
 Admitted. *)
 
+Lemma sumW n (a F : nat -> R) :
+  \sum_(i < n) (a i * F i) = \sum_(0 <= i < n) (a i * F i).
+Proof. by rewrite big_mkord. Qed.
+
 Lemma Dq'E p x : x != 0 -> (Dq' p).[x] = (Dq # p) x.
 Proof.
   move=> Hx.
-  rewrite /Dq' /(_ # _) /Dq /dq /q_nat.
-  rewrite !horner_poly.
+  rewrite /Dq' /(_ # _) /Dq /dq.
+  rewrite horner_poly !horner_coef.
+  rewrite (sumW _ (fun i => (q_nat i.+1 * p`_i.+1))) !sumW sum_sub.
+  case Hsize : (size p == 0%N).
+  - rewrite size_poly_eq0 in Hsize.
+    move/eqP : (Hsize) ->.
+    by rewrite size_poly0 !big_nil mul0r.
+  - have Hsize' : (0 < size p)%N.
+      rewrite ltn_neqAle.
+      apply /andP; split => //.
+      move: Hsize.
+      by rewrite eq_sym => ->.
+    rewrite mulrC.
+    rewrite -sum_distr.
+    rewrite [RHS](@big_cat_nat _ _ _ 1 0 (size p)) //=.
+    rewrite !big_nat1 !expr0 addrK' mul0r add0r.
+    have -> : (1 = 0 + 1)%N by [].
+    rewrite big_addn.
+    rewrite (@big_cat_nat _ _ _ (size p - 1)) //=.
+      have -> : \sum_(size p - 1 <= i < size p)
+                  q_nat i.+1 * p`_i.+1 * x ^+ i = 0.
+        under eq_big_nat => i /andP [Hi Hi'].
+          move : Hi.
+          rewrite leq_subLR addnC addn1.
+          move/leq_sizeP -> => //.
+          rewrite mulr0 mul0r.
+        over.
+        by rewrite big1.
+      rewrite addr0.
+      apply eq_big_nat => i /andP [Hi Hi'].
+      rewrite addn1 /q_nat.
+      have -> : (q * x) ^+ i.+1 = (q * x) ^ (Posz i.+1) by [].
+      have -> : x ^+ i.+1 = 1 * x ^+ i.+1.
+        by rewrite mul1r.
+      have {5}-> : x = 1 * x.
+        by rewrite mul1r.
+      rewrite expfzMl -mulrBr -!mulrBl -mulf_div -!mulrA.
+      rewrite [p`_i.+1 * x ^+ i]mulrC [RHS]mulrC !mulrA.
+      congr (_ * _).
+      rewrite [(q - 1)^-1 * (q ^ i.+1 - 1)]mulrC -!mulrA.
+      congr (_ * _).
+      congr (_ * _).
+      by rewrite exprSzr -mulrA divff // mulr1.
+    by rewrite leq_subLR.
+Qed.
+
+Lemma hoDq'_q0 (p : {poly R}) n : q = 0 ->
+  (Dq' \^ n) p = \poly_(i < size p) p`_(i + n).
+Proof.
+  move=> Hq0.
+  elim: n => [|n IH] /=.
+  - rewrite poly_def.
+    admit.
+  - rewrite IH.
+    rewrite /Dq'.
 Admitted.
 
 (* q != 0 ? *)
 Lemma hoDq'E p x n : x != 0 -> ((Dq' \^ n) p).[x] = ((Dq \^ n) # p) x.
 Proof.
+  move=> Hx.
   case Hq0 : (q == 0).
-  - elim: n p => [|n IH] p //=.
-    move/eqP : Hq0.
+  - rewrite hoDq'_q0.
+    (* elim: n p => [|n IH] p //=.
+    rewrite Dq'E // {2}/Dq /dq -!IH //. *)
     admit.
-  - move=> Hx.
-    rewrite /(_ # _).
+  - rewrite /(_ # _).
     elim: n p x Hx => [|n IH] p x Hx //=.
     rewrite Dq'E // {2}/Dq /dq -!IH //.
     apply mulf_neq0 => //.
     by rewrite Hq0.
 Admitted.
+
+Lemma Dq'_islinear_add (p p' : {poly R}) : Dq' (p + p') = Dq' p + Dq' p'.
+Proof.
+  rewrite /Dq'.
+  rewrite (polyW R (p + p') (maxn (size p) (size p'))).
+    rewrite (polyW R p (maxn (size p) (size p'))).
+      rewrite (polyW R p' (maxn (size p) (size p'))).
+        rewrite sum_add.
+        by under eq_bigr do rewrite coefD mulrDr scalerDl.
+      by apply leq_maxr.
+    by apply leq_maxl.
+  by apply size_add.
+Qed.
 
 Lemma Dq'_islinear_scale a p : Dq' (a *: p) = a *: Dq' p.
 Proof.
@@ -1096,84 +1167,6 @@ Proof.
     case : (j < size p)%N.
     + by rewrite -scalerAr coefZ.
     + by rewrite mulr0.
-Qed.
-
-Lemma Dq'_islinear_addlt (p p' : {poly R}) : (size p' < size p)%N ->
-  Dq' (p + p') = Dq' p + Dq' p'.
-Proof.
-  move=> H.
-  rewrite /Dq' poly_def.
-  transitivity
-    (\sum_(0 <= i < maxn (size p) (size p')) (q_nat i.+1 * (p + p')`_i.+1 *: 'X^i)).
-    rewrite (@big_cat_nat _ _ _ (size (p + p'))) //=.
-      rewrite big_mkord big_nat.
-      rewrite -[LHS]addr0.
-      congr (_ + _).
-      rewrite big1 // => i /andP [Hi _].
-      move/leq_sizeP : Hi -> => //.
-      by rewrite mulr0 scale0r.
-    by apply size_add.
-  apply polyP => j.
-  rewrite coefD !coef_poly coefD mulrDr.
-  have -> : size (p + p') = size p.
-    by rewrite size_addl.
-  case Hj : (j < size p')%N.
-  - have Hj' : (j < size p)%N => //.
-      by apply (ltn_trans Hj).
-    by rewrite Hj'.
-  - case Hj' : (j < size p)%N.
-    + have -> : p'`_j.+1 = 0.
-        apply /(leq_sizeP p' j) => //.
-        by rewrite leqNgt Hj.
-      by rewrite mulr0.
-    + by rewrite addr0.
-Qed.
-
-Lemma ltn_leq_trans {n m p} : (m < n)%N -> (n <= p)%N -> (m < p)%N.
-Proof. by move=> Hmn; apply: leq_trans. Qed.
-
-Lemma Dq'_islinear_addeq (p p' : {poly R}) : (size p = size p') ->
-  Dq' (p + p') = Dq' p + Dq' p'.
-Proof.
-  move=> Hsize.
-  rewrite /Dq'; apply polyP => j.
-  rewrite coefD !coef_poly coefD mulrDr Hsize.
-(*   case Hlead : (lead_coef p == -lead_coef p').
-  - have Hsize' : ((size (p + p')%R) <= (size p').-1)%N. admit.
-    case H' : (j < size (p + p')%R)%N.
-    + have -> : (j < size p')%N => //.
-      move: (size_add p p').
-      rewrite Hsize /maxn ltnn => H''.
-      by apply (ltn_leq_trans H').
-    + case H'' : (j < size p')%N.
-      - rewrite -mulrDr.
-        have -> : j.+1 = (size p).-1. admit.
-        rewrite {3}Hsize -!lead_coefE.
-        move/eqP : Hlead ->.
-        by rewrite addrC addrK' mulr0.
-      - by rewrite add0r.
-  - have Hsize' : size (p + p')%R = size p'. admit.
-    case H' : (j < size (p + p')%R)%N.
-    + have -> : (j < size p')%N => //.
-      move: (size_add p p').
-      rewrite Hsize /maxn ltnn => H''.
-      by apply (ltn_leq_trans H').
-    + have -> : (j < size p')%N = false by rewrite -Hsize'.
-      by rewrite addr0. *)
-Admitted.
-
-Lemma Dq'_islinear_add p p' : Dq' (p + p') = Dq' p + Dq' p'.
-Proof.
-  case H : (size p' < size p)%N.
-  - by rewrite Dq'_islinear_addlt.
-  - case H' : (size p == size p').
-    + rewrite Dq'_islinear_addeq //.
-      by apply /eqP.
-    + rewrite addrC Dq'_islinear_addlt.
-        by rewrite addrC.
-      rewrite ltn_neqAle; apply /andP; split.
-      - by rewrite H'.
-      - by rewrite leqNgt H.
 Qed.
 
 Lemma Dq'_islinear : islinear Dq'.

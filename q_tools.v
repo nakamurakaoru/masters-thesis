@@ -51,7 +51,7 @@ Proof.
 Qed.
 
 (* -の分配則*)
-Lemma negdistr (a b : int) : - (a + b) = - a - b.
+Lemma negdistr {V : zmodType} (a b : V) : - (a + b) = - a - b.
 Proof.
   have -> : - (a + b) = - a + a - (a + b).
     rewrite [- a + a] addrC.
@@ -78,7 +78,7 @@ Proof.
 Qed.
 
 Lemma Negz_add m n : Negz (m.+1 + n) = Negz m + Negz n.
-Proof. by rewrite !NegzE -addnS (negdistr m.+1 n.+1)%N. Qed.
+Proof. by rewrite !NegzE -addnS (negdistr (Posz m.+1) n.+1)%N. Qed.
 
 Lemma Negz_addK m n : Negz (m + n) + n = Negz m.
 Proof.
@@ -282,16 +282,37 @@ Proof.
     by rewrite leq_add2l.
 Qed.
 
-Lemma sum_distr n (F : nat -> R) a:
-  \sum_(0 <= i < n.+1) F i * a = a * \sum_(0 <= i < n.+1) F i.
+Lemma sum_add {V : zmodType} n (F G : nat -> V) :
+  \sum_(0 <= i < n) (F i) + \sum_(0 <= i < n) (G i) =
+  \sum_(0 <= i < n) (F i + G i).
 Proof.
   elim: n => [|n IH].
-  - by rewrite !big_nat1 mulrC.
-  - rewrite (@big_cat_nat R _ _ n.+1 0 n.+2) //=.
-    rewrite (@big_cat_nat R _ _ n.+1 0 n.+2) //=.
-    rewrite !big_nat1 mulrDr IH.
-    have -> : F n.+1 * a = a * F n.+1 => //.
-    by rewrite mulrC.
+  - by rewrite !big_nil addr0.
+  - rewrite !(@big_cat_nat _ _ _ n 0 n.+1) //= !big_nat1.
+    rewrite -IH -!addrA.
+    congr (_ + _).
+    by rewrite addrC -addrA [G n + F n]addrC.
+Qed.
+
+Lemma sum_sub {V : zmodType} n (F G : nat -> V) :
+  \sum_(0 <= i < n) (F i) - \sum_(0 <= i < n) (G i) =
+  \sum_(0 <= i < n) (F i - G i).
+Proof.
+  elim: n => [|n IH].
+  - by rewrite !big_nil subr0.
+  - rewrite !(@big_cat_nat _ _ _ n 0 n.+1) //= !big_nat1.
+    rewrite -IH -!addrA.
+    congr (_ + _).
+    by rewrite addrC addrA negdistr -addrA [- G n + F n]addrC addrA.
+Qed.
+
+Lemma sum_distr n (F : nat -> R) a:
+  \sum_(0 <= i < n) F i * a = a * \sum_(0 <= i < n) F i.
+Proof.
+  elim: n => [|n IH].
+  - by rewrite !big_nil mulr0.
+  - rewrite !(@big_cat_nat R _ _ n 0 n.+1) //=.
+    by rewrite !big_nat1 mulrDr IH [F n * a]mulrC.
 Qed.
 
 Lemma sum n : (2 * (\sum_(0 <= i < n.+1) Posz i) = Posz n * n.+1)%R.
@@ -314,6 +335,19 @@ Proof.
   - by rewrite !big_nat1 hornerM polyCV hornerC mulrA.
   - rewrite !(@big_cat_nat _ _ _ n.+1 0 n.+2) //= IH.
     by rewrite !big_nat1 hornerM polyCV hornerC mulrA.
+Qed.
+
+Lemma polyW (p : {poly R}) n (a : nat -> R) : ((size p) <= n)%N ->
+  \poly_(i < size p) (a i * p`_i.+1) =
+  \sum_(0 <= i < n) (a i * p`_i.+1) *: 'X^i.
+Proof.
+  move=> H.
+  rewrite poly_def.
+  rewrite (@big_cat_nat _ _ _ (size p)) //= big_mkord big_nat -[LHS]addr0.
+  congr (_ + _).
+  rewrite big1 // => i /andP [Hi _].
+  move/leq_sizeP : Hi -> => //.
+  by rewrite mulr0 scale0r.
 Qed.
 
 (* not used *)
