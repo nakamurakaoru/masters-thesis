@@ -1067,24 +1067,120 @@ Lemma Dq'E p x : x != 0 -> (Dq' p).[x] = (Dq # p) x.
 Proof.
   move=> Hx.
   rewrite /Dq' /(_ # _) /Dq /dq /q_nat.
-  rewrite horner_poly.
+  rewrite !horner_poly.
 Admitted.
 
-Lemma hoDq'E p x n : ((Dq' \^ n) p).[x] = ((Dq \^ n) # p) x.
+(* q != 0 ? *)
+Lemma hoDq'E p x n : x != 0 -> ((Dq' \^ n) p).[x] = ((Dq \^ n) # p) x.
 Proof.
-(*   elim: n p x => [|n IH] p x //=.
-  rewrite [LHS] /= Dq'E.
-  congr Dq.
-Search ([eta _]) horner.
-  rewrite IH.
-  Locate eta.
-Check [eta horner]. *)
+  case Hq0 : (q == 0).
+  - elim: n p => [|n IH] p //=.
+    move/eqP : Hq0.
+    admit.
+  - move=> Hx.
+    rewrite /(_ # _).
+    elim: n p x Hx => [|n IH] p x Hx //=.
+    rewrite Dq'E // {2}/Dq /dq -!IH //.
+    apply mulf_neq0 => //.
+    by rewrite Hq0.
 Admitted.
+
+Lemma Dq'_islinear_scale a p : Dq' (a *: p) = a *: Dq' p.
+Proof.
+  rewrite /Dq'; apply polyP => j.
+  case Ha : (a == 0).
+  - move/eqP : Ha ->; rewrite !scale0r.
+    by rewrite coef_poly size_poly0 //= coef0.
+  - have Ha' : a != 0 by rewrite Ha.
+    rewrite size_scale // coefZ !coef_poly.
+    case : (j < size p)%N.
+    + by rewrite -scalerAr coefZ.
+    + by rewrite mulr0.
+Qed.
+
+Lemma Dq'_islinear_addlt (p p' : {poly R}) : (size p' < size p)%N ->
+  Dq' (p + p') = Dq' p + Dq' p'.
+Proof.
+  move=> H.
+  rewrite /Dq' poly_def.
+  transitivity
+    (\sum_(0 <= i < maxn (size p) (size p')) (q_nat i.+1 * (p + p')`_i.+1 *: 'X^i)).
+    rewrite (@big_cat_nat _ _ _ (size (p + p'))) //=.
+      rewrite big_mkord big_nat.
+      rewrite -[LHS]addr0.
+      congr (_ + _).
+      rewrite big1 // => i /andP [Hi _].
+      move/leq_sizeP : Hi -> => //.
+      by rewrite mulr0 scale0r.
+    by apply size_add.
+  apply polyP => j.
+  rewrite coefD !coef_poly coefD mulrDr.
+  have -> : size (p + p') = size p.
+    by rewrite size_addl.
+  case Hj : (j < size p')%N.
+  - have Hj' : (j < size p)%N => //.
+      by apply (ltn_trans Hj).
+    by rewrite Hj'.
+  - case Hj' : (j < size p)%N.
+    + have -> : p'`_j.+1 = 0.
+        apply /(leq_sizeP p' j) => //.
+        by rewrite leqNgt Hj.
+      by rewrite mulr0.
+    + by rewrite addr0.
+Qed.
+
+Lemma ltn_leq_trans {n m p} : (m < n)%N -> (n <= p)%N -> (m < p)%N.
+Proof. by move=> Hmn; apply: leq_trans. Qed.
+
+Lemma Dq'_islinear_addeq (p p' : {poly R}) : (size p = size p') ->
+  Dq' (p + p') = Dq' p + Dq' p'.
+Proof.
+  move=> Hsize.
+  rewrite /Dq'; apply polyP => j.
+  rewrite coefD !coef_poly coefD mulrDr Hsize.
+(*   case Hlead : (lead_coef p == -lead_coef p').
+  - have Hsize' : ((size (p + p')%R) <= (size p').-1)%N. admit.
+    case H' : (j < size (p + p')%R)%N.
+    + have -> : (j < size p')%N => //.
+      move: (size_add p p').
+      rewrite Hsize /maxn ltnn => H''.
+      by apply (ltn_leq_trans H').
+    + case H'' : (j < size p')%N.
+      - rewrite -mulrDr.
+        have -> : j.+1 = (size p).-1. admit.
+        rewrite {3}Hsize -!lead_coefE.
+        move/eqP : Hlead ->.
+        by rewrite addrC addrK' mulr0.
+      - by rewrite add0r.
+  - have Hsize' : size (p + p')%R = size p'. admit.
+    case H' : (j < size (p + p')%R)%N.
+    + have -> : (j < size p')%N => //.
+      move: (size_add p p').
+      rewrite Hsize /maxn ltnn => H''.
+      by apply (ltn_leq_trans H').
+    + have -> : (j < size p')%N = false by rewrite -Hsize'.
+      by rewrite addr0. *)
+Admitted.
+
+Lemma Dq'_islinear_add p p' : Dq' (p + p') = Dq' p + Dq' p'.
+Proof.
+  case H : (size p' < size p)%N.
+  - by rewrite Dq'_islinear_addlt.
+  - case H' : (size p == size p').
+    + rewrite Dq'_islinear_addeq //.
+      by apply /eqP.
+    + rewrite addrC Dq'_islinear_addlt.
+        by rewrite addrC.
+      rewrite ltn_neqAle; apply /andP; split.
+      - by rewrite H'.
+      - by rewrite leqNgt H.
+Qed.
 
 Lemma Dq'_islinear : islinear Dq'.
 Proof.
   move=> a b p p'.
-Admitted.
+  by rewrite Dq'_islinear_add !Dq'_islinear_scale.
+Qed.
 
 Lemma Dq'_isderiv a : (forall n, q_fact n != 0) ->
   isfderiv Dq' (fun i : nat => qpoly_nonneg_poly a i / (q_fact i)%:P).
@@ -1104,7 +1200,7 @@ Proof.
   under eq_bigr do rewrite -hornerZ.
   rewrite -hornersumD.
   apply poly_happly.
-  under eq_bigr do rewrite -hoDq'E.
+  under eq_bigr do rewrite -hoDq'E //.
   apply general_Taylor => //.
   - apply Dq'_islinear.
   - by apply Dq'_isderiv.
