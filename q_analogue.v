@@ -1116,15 +1116,28 @@ Proof.
     by rewrite leq_subLR.
 Qed.
 
-Lemma hoDq'_q0 (p : {poly R}) n : q = 0 ->
+Lemma hoDq'_q0 n p : q = 0 ->
   (Dq' \^ n) p = \poly_(i < size p) p`_(i + n).
 Proof.
   move=> Hq0.
-  elim: n => [|n IH] /=.
-  - rewrite poly_def.
-    admit.
-  - rewrite IH.
-    rewrite /Dq'.
+  elim: n => [|n IH] //=.
+  - apply polyP => j.
+    rewrite coef_poly.
+    case Hj : (j < size p)%N.
+    + by rewrite addn0.
+    + have Hj' : (size p <= j)%N by rewrite leqNgt Hj.
+      by move/leq_sizeP : Hj' ->.
+  - rewrite IH {1}/Dq'.
+Admitted.
+
+Lemma hoDq'_q0E (p : {poly R}) x n: q = 0 -> x != 0 ->
+  ((Dq' \^ n) p).[x] = ((Dq \^ n) # p) x.
+Proof.
+  move=> Hq0 Hx.
+  rewrite hoDq'_q0 // /(_ # _).
+  elim: n => [|n IH] //=.
+  - admit.
+  - rewrite /Dq /dq -IH //=.
 Admitted.
 
 (* q != 0 ? *)
@@ -1132,16 +1145,14 @@ Lemma hoDq'E p x n : x != 0 -> ((Dq' \^ n) p).[x] = ((Dq \^ n) # p) x.
 Proof.
   move=> Hx.
   case Hq0 : (q == 0).
-  - rewrite hoDq'_q0.
-    (* elim: n p => [|n IH] p //=.
-    rewrite Dq'E // {2}/Dq /dq -!IH //. *)
-    admit.
+  - rewrite hoDq'_q0E //.
+    by apply /eqP.
   - rewrite /(_ # _).
     elim: n p x Hx => [|n IH] p x Hx //=.
     rewrite Dq'E // {2}/Dq /dq -!IH //.
     apply mulf_neq0 => //.
     by rewrite Hq0.
-Admitted.
+Qed.
 
 Lemma Dq'_islinear_add (p p' : {poly R}) : Dq' (p + p') = Dq' p + Dq' p'.
 Proof.
@@ -1180,14 +1191,25 @@ Lemma Dq'_isderiv a : (forall n, q_fact n != 0) ->
 Proof.
 Admitted.
 
+Lemma q_Taylor_a0 n (f : {poly R}) x :
+  (forall n, q_fact n != 0) ->
+  size f = n.+1 ->
+  f.[x] =  \sum_(0 <= i < n.+1)
+             ((Dq \^ i) # f) 0 * qpoly_nonneg 0 i x / q_fact i.
+Proof.
+Admitted.
+
 Theorem q_Taylor n (f : {poly R}) x a :
-  x != 0 ->
   (forall n, q_fact n != 0) ->
   size f = n.+1 ->
   f.[x] =  \sum_(0 <= i < n.+1)
              ((Dq \^ i) # f) a * qpoly_nonneg a i x / q_fact i.
 Proof.
-  move=> Hx Hfact Hsf.
+  move=> Hfact Hsf.
+  case Ha : (a == 0).
+    move/eqP : Ha ->.
+    by rewrite (q_Taylor_a0 n).
+  have Ha' : a != 0 by rewrite Ha.
   under eq_bigr do rewrite qpoly_nonnegE.
   rewrite sum_poly_div.
   under eq_bigr do rewrite -hornerZ.
@@ -1232,7 +1254,6 @@ Lemma Gauss_binomial x a n : q_fact n != 0 ->
     ((q_bicoef n i) * q ^ (Posz i * (Posz i - 1) / 2)
                     * (-a)^ i * x ^ (Posz n - Posz i)).
 Proof.
-  Search (\sum_(0 <= _ < _.+1) _).
 
   elim: n => [_ |/= n IH Hfact] //=.
   - by rewrite big_nat1 /q_bicoef !mulr1 !mul1r invr1.
