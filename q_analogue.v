@@ -1082,8 +1082,7 @@ Proof.
       apply /andP; split => //.
       move: Hsize.
       by rewrite eq_sym => ->.
-    rewrite mulrC.
-    rewrite -sum_distr.
+    rewrite mulrC -sum_distr.
     rewrite [RHS](@big_cat_nat _ _ _ 1 0 (size p)) //=.
     rewrite !big_nat1 !expr0 addrK' mul0r add0r.
     have -> : (1 = 0 + 1)%N by [].
@@ -1116,6 +1115,11 @@ Proof.
     by rewrite leq_subLR.
 Qed.
 
+(* Lemma Dq_poly_q0 p x : x != 0 -> q = 0 ->
+  (Dq # p) x = (\poly_(i < (size p)) p`_i.+1).[x].
+Proof.
+Qed. *)
+
 Lemma hoDq'_q0 n p : q = 0 ->
   (Dq' \^ n) p = \poly_(i < size p) p`_(i + n).
 Proof.
@@ -1128,6 +1132,11 @@ Proof.
     + have Hj' : (size p <= j)%N by rewrite leqNgt Hj.
       by move/leq_sizeP : Hj' ->.
   - rewrite IH {1}/Dq'.
+    rewrite (polyW _ _ (size p)).
+      have -> : \poly_(i < size p) p`_(i + n.+1) =
+                \sum_(0 <= i < size p) p`_(i + n.+1) *: 'X^i. admit.
+      under eq_big_nat => j Hj.
+        rewrite q_nat0.
 Admitted.
 
 Lemma hoDq'_q0E (p : {poly R}) x n: q = 0 -> x != 0 ->
@@ -1137,7 +1146,8 @@ Proof.
   rewrite hoDq'_q0 // /(_ # _).
   elim: n => [|n IH] //=.
   - admit.
-  - rewrite /Dq /dq -IH //=.
+  - rewrite {1}/Dq /dq -IH //=.
+    rewrite Hq0 mul0r.
 Admitted.
 
 (* q != 0 ? *)
@@ -1148,7 +1158,7 @@ Proof.
   - rewrite hoDq'_q0E //.
     by apply /eqP.
   - rewrite /(_ # _).
-    elim: n p x Hx => [|n IH] p x Hx //=.
+    elim: n x Hx => [|n IH] x Hx //=.
     rewrite Dq'E // {2}/Dq /dq -!IH //.
     apply mulf_neq0 => //.
     by rewrite Hq0.
