@@ -1136,7 +1136,7 @@ Proof.
       have -> : \poly_(i < size p) p`_(i + n.+1) =
                 \sum_(0 <= i < size p) p`_(i + n.+1) *: 'X^i. admit.
       under eq_big_nat => j Hj.
-        rewrite q_nat0.
+(*         rewrite q_nat0. *)
 Admitted.
 
 Lemma hoDq'_q0E (p : {poly R}) x n: q = 0 -> x != 0 ->
