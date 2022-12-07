@@ -1193,6 +1193,28 @@ Proof.
     by apply q_fact_nat_non0.
 Qed. *)
 
+Lemma Dq'_qpoly_poly a n :
+  Dq' (qpoly_nonneg_poly a n.+1) = (q_nat n)%:P * (qpoly_nonneg_poly a n).
+Proof.
+Admitted.
+
+Lemma Dq'_isderiv' a : (forall n, q_fact n != 0) ->
+  isfderiv Dq' (fun i : nat => qpoly_nonneg_poly a i / (q_fact i)%:P).
+Proof.
+move=> Hfact.
+rewrite /isfderiv.
+destruct n => //.
+- admit.
+- have -> : qpoly_nonneg_poly a n.+1 / (q_fact n.+1)%:P =
+            (q_fact n.+1)^-1 *: qpoly_nonneg_poly a n.+1.
+    by rewrite mulrC polyCV mul_polyC.
+  rewrite Dq'_islinear_scale -mul_polyC mulrC.
+  rewrite Dq'_qpoly_poly [(q_nat n)%:P * qpoly_nonneg_poly a n]mulrC.
+  rewrite -polyCV -mulrA.
+  f_equal.
+  rewrite polyCV mul_polyC.
+Admitted.
+
 Lemma Dq'_isderiv a : (forall n, q_fact n != 0) ->
   isfderiv Dq' (fun i : nat => qpoly_nonneg_poly a i / (q_fact i)%:P).
 Proof.
