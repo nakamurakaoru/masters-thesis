@@ -306,12 +306,12 @@ Proof.
     by rewrite addrC addrA negdistr -addrA [- G n + F n]addrC addrA.
 Qed.
 
-Lemma sum_distr n (F : nat -> R) a:
-  \sum_(0 <= i < n) F i * a = a * \sum_(0 <= i < n) F i.
+Lemma sum_distr {V : comRingType} n (F : nat -> V) (a : V) :
+  \sum_(0 <= i < n) (F i * a) = a * \sum_(0 <= i < n) F i.
 Proof.
   elim: n => [|n IH].
   - by rewrite !big_nil mulr0.
-  - rewrite !(@big_cat_nat R _ _ n 0 n.+1) //=.
+  - rewrite !(@big_cat_nat _ _ _ n 0 n.+1) //=.
     by rewrite !big_nat1 mulrDr IH [F n * a]mulrC.
 Qed.
 
