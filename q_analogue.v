@@ -1193,7 +1193,60 @@ Proof.
     by apply q_fact_nat_non0.
 Qed. *)
 
+Lemma scale_constpoly (a c : R) : a *: c%:P = (a * c)%:P.
+Proof.
+apply polyP => i.
+rewrite coefZ !coefC.
+case : (i == 0%N) => //.
+by rewrite mulr0.
+Qed.
+
+Lemma Dq'_qpoly_poly a n :
+  Dq' (qpoly_nonneg_poly a n.+1) = (q_nat n.+1) *: (qpoly_nonneg_poly a n).
+Proof.
+elim: n => [|n IH].
+- rewrite /qpoly_nonneg_poly.
+  rewrite expr0z !mul1r /Dq'.
+  rewrite poly_def.
+  have -> : size ('X - a%:P) = 2%N.
+    by rewrite size_XsubC.
+  have -> : \sum_(i < 2) (q_nat i.+1 * ('X - a%:P)`_i.+1) *: 'X^i =
+            \sum_(0 <= i < 2) (q_nat i.+1 * ('X - a%:P)`_i.+1) *: 'X^i.
+    by rewrite big_mkord.
+  rewrite (@big_cat_nat _ _ _ 1) //= !big_nat1.
+  rewrite !coefB !coefC /= !subr0.
+  by rewrite !coefX /= scale_constpoly !mulr1 mulr0 scale0r addr0 alg_polyC.
+- admit.
+Admitted.
+
 Lemma Dq'_isderiv a : (forall n, q_fact n != 0) ->
+  isfderiv Dq' (fun i : nat => qpoly_nonneg_poly a i / (q_fact i)%:P).
+Proof.
+move=> Hqnat.
+rewrite /isfderiv.
+destruct n => //.
+- have -> : (GRing.one (poly_ringType R) / 1%:P) = 1%:P.
+    by rewrite polyCV mul1r invr1.
+  rewrite /Dq' (polyW _ _ 1).
+    rewrite big_nat1.
+    by rewrite coefC /= mulr0 scale0r.
+  by apply size_polyC_leq1.
+- have -> : qpoly_nonneg_poly a n.+1 / (q_fact n.+1)%:P =
+            (q_fact n.+1)^-1 *: qpoly_nonneg_poly a n.+1.
+    by rewrite mulrC polyCV mul_polyC.
+  rewrite Dq'_islinear_scale -mul_polyC mulrC.
+  rewrite Dq'_qpoly_poly -mul_polyC.
+  rewrite [(q_nat n.+1)%:P * qpoly_nonneg_poly a n]mulrC.
+  rewrite -polyCV -mulrA.
+  f_equal.
+  rewrite polyCV mul_polyC.
+  rewrite scale_constpoly /=.
+  rewrite -{1}(mul1r (q_nat n.+1)).
+  rewrite red_frac_r ?mul1r ?polyCV //.
+  by apply q_fact_nat_non0.
+Qed.
+
+(* Lemma Dq'_isderiv' a : (forall n, q_fact n != 0) ->
   isfderiv Dq' (fun i : nat => qpoly_nonneg_poly a i / (q_fact i)%:P).
 Proof.
   move=> Hfact.
@@ -1222,7 +1275,7 @@ Proof.
         by rewrite ltnNge Hj.
       move/leq_sizeP : Hj' -> => //.
       by rewrite Hsize.
-Admitted.
+Admitted. *)
 
 (* Lemma q_Taylor_a0 n (f : {poly R}) x :
   (forall n, q_fact n != 0) ->
@@ -1248,7 +1301,7 @@ Proof.
   apply poly_happly.
   under eq_bigr do rewrite -hoDq'E //.
   apply general_Taylor => //.
-  - apply Dq'_islinear.
+  - by apply Dq'_islinear.
   - by apply Dq'_isderiv.
   - by rewrite invr1 mulr1 hornerC.
   - move=> m.
