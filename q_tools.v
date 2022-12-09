@@ -124,6 +124,13 @@ Proof.
   by rewrite mul0r.
 Qed.
 
+Lemma mulrC23 {V : comRingType} (a b c d : V) :
+  a * b * c * d = a * c * b * d.
+Proof.
+f_equal.
+by rewrite -!mulrA [b * c]mulrC.
+Qed.
+
 Lemma exp0rz' n : (GRing.zero R) ^ (Posz n.+1) = 0.
 Proof. by rewrite exprSz mul0r. Qed.
 

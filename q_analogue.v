@@ -127,6 +127,20 @@ Proof.
   by rewrite sum_distr q_natE.
 Qed.
 
+Lemma q_nat_cat1 n : q_nat n.+1 = 1 + q * q_nat n.
+Proof.
+destruct n.
+- by rewrite q_nat1 q_nat_0 mulr0 addr0.
+- by rewrite (q_nat_cat 0) ?q_nat1 ?expr1z ?subn1.
+Qed.
+
+Lemma q_nat_catn n : q_nat n.+1 = q_nat n + q ^ n.
+Proof.
+destruct n.
+- by rewrite q_nat1 q_nat_0 add0r expr0z.
+- by rewrite (q_nat_cat n) ?subSnn ?q_nat1 ?mulr1.
+Qed.
+
 (* Lemma q_nat_ispos n : -1 < q -> q_nat n.+1 > 0.
 Proof.
   move=> Hq1.
@@ -382,12 +396,7 @@ Proof.
       rewrite (_ : qpoly_nonneg a n x * (x - q ^ n * a) = qpoly_nonneg a n.+1 x) //.
       rewrite mulrA.
       rewrite -{1}(mul1r (qpoly_nonneg a n.+1 x)).
-      rewrite -mulrDl addrC.
-      rewrite -(@divff _ (q - 1)) //.
-      rewrite [q_nat n.+1] /q_nat.
-      rewrite [q * ((q ^ n.+1 - 1) / (q - 1))] mulrA.
-      rewrite (add_div _ _ (q - 1)) //.
-      by rewrite mulrBr -exprSz mulr1 subrKA.
+      by rewrite -mulrDl -q_nat_cat1.
     by apply denom_is_nonzero.
 Qed.
 
@@ -1042,8 +1051,8 @@ Proof. by move=> ->. Qed.
 Proof.
 Admitted. *)
 
-Lemma sumW n (a F : nat -> R) :
-  \sum_(i < n) (a i * F i) = \sum_(0 <= i < n) (a i * F i).
+Lemma sumW {V : zmodType} n (F : nat -> V) :
+  \sum_(i < n) F i = \sum_(0 <= i < n) F i.
 Proof. by rewrite big_mkord. Qed.
 
 Lemma Dq'E p x : x != 0 -> (Dq' p).[x] = (Dq # p) x.
@@ -1051,7 +1060,10 @@ Proof.
   move=> Hx.
   rewrite /Dq' /(_ # _) /Dq /dq.
   rewrite horner_poly !horner_coef.
-  rewrite (sumW _ (fun i => (q_nat i.+1 * p`_i.+1))) !sumW sum_sub.
+  rewrite (sumW _ (fun i => (q_nat i.+1 * p`_i.+1 * x ^+ i))).
+  rewrite (sumW _ (fun i => p`_i * (q * x) ^+ i)).
+  rewrite (sumW _ (fun i => p`_i * x ^+ i)). 
+  rewrite sum_sub.
   case Hsize : (size p == 0%N).
   - rewrite size_poly_eq0 in Hsize.
     move/eqP : (Hsize) ->.
@@ -1094,42 +1106,6 @@ Proof.
     by rewrite leq_subLR.
 Qed.
 
-(* Lemma Dq_poly_q0 p x : x != 0 -> q = 0 ->
-  (Dq # p) x = (\poly_(i < (size p)) p`_i.+1).[x].
-Proof.
-Qed. *)
-
-(* Lemma hoDq'_q0 n p : q = 0 ->
-  (Dq' \^ n) p = \poly_(i < size p) p`_(i + n).
-Proof.
-  move=> Hq0.
-  elim: n => [|n IH] //=.
-  - apply polyP => j.
-    rewrite coef_poly.
-    case Hj : (j < size p)%N.
-    + by rewrite addn0.
-    + have Hj' : (size p <= j)%N by rewrite leqNgt Hj.
-      by move/leq_sizeP : Hj' ->.
-  - rewrite IH {1}/Dq'.
-    rewrite (polyW _ _ (size p)).
-      have -> : \poly_(i < size p) p`_(i + n.+1) =
-                \sum_(0 <= i < size p) p`_(i + n.+1) *: 'X^i. admit.
-      under eq_big_nat => j Hj.
-(*         rewrite q_nat0. *)
-Admitted. *)
-
-(* Lemma hoDq'_q0E (p : {poly R}) x n: q = 0 -> x != 0 ->
-  ((Dq' \^ n) p).[x] = ((Dq \^ n) # p) x.
-Proof.
-  move=> Hq0 Hx.
-  rewrite hoDq'_q0 // /(_ # _).
-  elim: n => [|n IH] //=.
-  - admit.
-  - rewrite {1}/Dq /dq -IH //=.
-    rewrite Hq0 mul0r.
-Admitted. *)
-
-(* q != 0 ? *)
 Lemma hoDq'E p x n : q != 0 -> x != 0 ->
   ((Dq' \^ n) p).[x] = ((Dq \^ n) # p) x.
 Proof.
@@ -1172,33 +1148,77 @@ Proof.
   by rewrite Dq'_islinear_add !Dq'_islinear_scale.
 Qed.
 
-(* Lemma Dq_isfderiv n a x : x != 0 -> q_fact n != 0 ->
-  isfderiv Dq n (fun i : nat => qpoly_nonneg_poly a i / (q_fact i)%:P) x.
-Proof.
-  move=> Hx Hfact.
-  rewrite /isfderiv.
-  rewrite /deriv_to_poly.
-  destruct n => //=.
-  - by rewrite polyCV invr1 mulr1 /Dq /dq !hornerC addrK' mul0r.
-  - rewrite !polyCV /Dq /dq !hornerM !hornerXsubC !hornerC.
-    rewrite -!qpoly_nonnegE.
-    have -> : (qpoly_nonneg a n (q * x) * (q * x - q ^ n * a) /
-              (q_fact n * q_nat n.+1) -
-              qpoly_nonneg a n x * (x - q ^ n * a) /
-              (q_fact n * q_nat n.+1)) / (q * x - x) =
-              Dq (qpoly_nonneg a n.+1) x / q_fact n.+1.
-      by rewrite /Dq /dq /= -mulrBl denom_comm.
-    rewrite qderiv_qpoly_nonneg //=.
-    rewrite [q_fact n * q_nat n.+1] mulrC red_frac_l //.
-    by apply q_fact_nat_non0.
-Qed. *)
-
 Lemma scale_constpoly (a c : R) : a *: c%:P = (a * c)%:P.
 Proof.
 apply polyP => i.
 rewrite coefZ !coefC.
 case : (i == 0%N) => //.
 by rewrite mulr0.
+Qed.
+
+Definition scaleq (p : {poly R}) := \poly_(i < size p) (q ^ i * p`_i).
+
+Lemma scaleqX a : scaleq ('X - a%:P) = q *: 'X - a%:P.
+Proof.
+rewrite /scaleq poly_def size_XsubC.
+rewrite (sumW _ (fun i => (q ^ i * ('X - a%:P)`_i) *: 'X^i)).
+rewrite (@big_cat_nat _ _ _ 1) //= !big_nat1.
+rewrite addrC expr1z expr0z !coefB !coefX !coefC /=.
+by rewrite subr0 sub0r mulrN mulr1 mul1r scale_constpoly mulr1 polyCN.
+Qed.
+
+Lemma scaleqXn n : scaleq ('X ^+ n) = (q ^ n) *: 'X ^+ n.
+Proof.
+rewrite /scaleq poly_def size_polyXn.
+rewrite (sumW _ (fun i => (q ^ i * 'X^n`_i) *: 'X^i)).
+rewrite (@big_cat_nat _ _ _ n) //= big_nat1 coefXn.
+have -> : (eq_op n n) => //=.
+rewrite mulr1.
+under eq_big_nat => i /andP [] _ Hi.
+  rewrite coefXn.
+  have -> : (eq_op i n) = false => /=.
+  by apply ltn_eqF.
+  rewrite -mul_polyC mulr0 polyC0 mul0r.
+over.
+by rewrite big1 ?add0r.
+Qed.
+
+Lemma Dq'_const a : Dq' a%:P = 0.
+Proof.
+rewrite /Dq' poly_def size_polyC.
+rewrite (sumW _ (fun i => (q_nat i.+1 * a%:P`_i.+1) *: 'X^i)).
+case Ha : (a == 0) => //=.
+- by rewrite big_nil.
+- by rewrite big_nat1 coefC /= mulr0 scale0r.
+Qed.
+
+Lemma Dq'_prod' p p' :
+   Dq' (p * p') = p * Dq' p' + scaleq p' * Dq' p.
+Proof.
+(* prove in q_analogue_frac *)
+Admitted.
+
+Lemma Dq'X : Dq' 'X = 1%:P.
+Proof.
+rewrite /Dq' poly_def size_polyX.
+rewrite (sumW _ (fun i => (q_nat i.+1 * 'X`_i.+1) *: 'X^i)).
+rewrite (@big_cat_nat _ _ _ 1) //= !big_nat1.
+by rewrite !coefX /= mulr0 scale0r !q_nat1 mulr1 scale1r addr0.
+Qed.
+
+Lemma Dq'Xsub a : Dq' ('X - a%:P) = 1%:P.
+Proof.
+by rewrite Dq'_islinear_add -polyCN Dq'_const addr0 Dq'X.
+Qed.
+
+Lemma Dq'_pow n : Dq' ('X ^ n.+1) = (q_nat n.+1) *: 'X ^ n.
+Proof.
+elim: n => [|n IH].
+- by rewrite Dq'X q_nat1 scale1r.
+- rewrite exprSz Dq'_prod' IH Dq'X mulrC.
+  rewrite -mul_polyC -mulrA mul_polyC -exprSzr.
+  rewrite [scaleq ('X ^ n.+1) * 1%:P]mulrC.
+  by rewrite mul_polyC scale1r scaleqXn -scalerDl -q_nat_catn.
 Qed.
 
 Lemma Dq'_qpoly_poly a n :
@@ -1216,8 +1236,17 @@ elim: n => [|n IH].
   rewrite (@big_cat_nat _ _ _ 1) //= !big_nat1.
   rewrite !coefB !coefC /= !subr0.
   by rewrite !coefX /= scale_constpoly !mulr1 mulr0 scale0r addr0 alg_polyC.
-- admit.
-Admitted.
+- have -> : qpoly_nonneg_poly a n.+2 =
+            (qpoly_nonneg_poly a n.+1) * ('X - (q ^ n.+1 * a)%:P) by [].
+  rewrite Dq'_prod' Dq'Xsub mulr1 scaleqX IH.
+  rewrite exprSz -mulrA -scale_constpoly -scalerBr.
+  rewrite -!mul_polyC mulrA mulrC23 -mulrA.
+  rewrite [('X - (q ^ n * a)%:P) * qpoly_nonneg_poly a n]mulrC.
+  rewrite -/(qpoly_nonneg_poly a n.+1).
+  rewrite (mul_polyC q) scale_constpoly (mul_polyC (q * q_nat n.+1)).
+  rewrite -{1}(scale1r (qpoly_nonneg_poly a n.+1)) -scalerDl.
+  by rewrite mul_polyC -q_nat_cat1.
+Qed.
 
 Lemma Dq'_isderiv a : (forall n, q_fact n != 0) ->
   isfderiv Dq' (fun i : nat => qpoly_nonneg_poly a i / (q_fact i)%:P).
@@ -1246,45 +1275,6 @@ destruct n => //.
   by apply q_fact_nat_non0.
 Qed.
 
-(* Lemma Dq'_isderiv' a : (forall n, q_fact n != 0) ->
-  isfderiv Dq' (fun i : nat => qpoly_nonneg_poly a i / (q_fact i)%:P).
-Proof.
-  move=> Hfact.
-  rewrite /isfderiv /Dq'.
-  destruct n => //.
-  - have -> : (GRing.one (poly_ringType R) / 1%:P) = 1%:P.
-      by rewrite polyCV mul1r invr1.
-    rewrite (polyW _ _ 1).
-      rewrite big_nat1.
-      by rewrite coefC /= mulr0 scale0r.
-    by apply size_polyC_leq1.
-  - have Hsize : forall n, size (qpoly_nonneg_poly a n / (q_fact n)%:P) = n.+1.
-      move=> m.
-      rewrite polyCV mulrC mul_polyC size_scale.
-        by rewrite qpoly_size.
-      by rewrite invr_neq0.
-    rewrite Hsize.
-    apply polyP => j.
-    rewrite coef_poly.
-    case Hj : (j < n.+2)%N.
-    - admit.
-    - apply esym.
-      have Hj' : (n.+1 <= j)%N.
-        rewrite ltnS in Hj.
-        apply ltnW.
-        by rewrite ltnNge Hj.
-      move/leq_sizeP : Hj' -> => //.
-      by rewrite Hsize.
-Admitted. *)
-
-(* Lemma q_Taylor_a0 n (f : {poly R}) x :
-  (forall n, q_fact n != 0) ->
-  size f = n.+1 ->
-  f.[x] =  \sum_(0 <= i < n.+1)
-             ((Dq \^ i) # f) 0 * qpoly_nonneg 0 i x / q_fact i.
-Proof.
-Admitted. *)
-
 Theorem q_Taylor n (f : {poly R}) x a :
   q != 0 ->
   a != 0 ->
@@ -1310,26 +1300,6 @@ Proof.
     rewrite polyCV mulrC size_Cmul.
       by rewrite qpoly_size.
     by apply /invr_neq0.
-
-(*     move: Hfact.
-    have -> : n = (m + (n - m))%N.
-      rewrite subnKC.
-    by apply /q_fact_lenon0. *)
-(*   - move=> a' b f' g.
-    apply funext => x'.
-    by apply Dq_is_linear.
-  - by apply Dq_isfderiv.
-  - by rewrite invr1 mulr1 hornerC.
-  - move=> m.
-    by rewrite hornerM -qpoly_nonnegE qpolyxa mul0r.
-  - move=> m Hm.
-    rewrite polyCV mulrC size_Cmul.
-      by rewrite qpoly_size.
-    apply /invr_neq0.
-    move: Hfact.
-    have -> : n = (m + (n - m))%N.
-      by rewrite subnKC.
-    by apply /q_fact_lenon0. *)
 Qed.
 
 (* Lemma Gauss_binomial x a n : q_fact n != 0 ->

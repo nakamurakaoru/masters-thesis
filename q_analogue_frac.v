@@ -64,12 +64,25 @@ Notation "a */ f" := (fun x => a * (f x)) (at level 49). *)
 Notation "D # p" := (polyderiv R D p) (at level 49).
 Notation "D \^ n" := (hoD D n) (at level 49).
 
-(* q-derivative *)
-Definition dq_f (p : {poly R}) := \poly_(i < size p) (q ^ i * p`_i) - p.
+Definition scaleq (p : {poly R}):= \poly_(i < size p) (q ^ i * p`_i).
+
+Lemma scaleq_prod p p' : scaleq (p * p') = scaleq p * scaleq p'.
+Proof.
+Admitted.
+
+Definition dq_f p := scaleq p - p.
+
+Lemma dq_f_prod' p p' : dq_f (p * p') = p * dq_f p' + scaleq p' * dq_f p.
+Proof.
+rewrite /dq_f scaleq_prod !mulrBr [RHS]addrC addrA.
+f_equal.
+rewrite -addrA [- (scaleq p' * p) + p * scaleq p']addrC.
+by rewrite [p * scaleq p']mulrC addrK' addr0 mulrC.
+Qed.
 
 Lemma dq_fXE : dq_f 'X = (q - 1) *: 'X.
 Proof.
-rewrite /dq_f.
+rewrite /dq_f /scaleq.
 rewrite poly_def size_polyX.
 rewrite (sumW _ (fun i => (q ^ i * 'X`_i) *: 'X^i)).
 rewrite (@big_cat_nat _ _ _ 1) //= !big_nat1.
@@ -79,7 +92,7 @@ Qed.
 
 Lemma dq_f_dqE p x : (dq_f p).[x] = (dq R q # p) x.
 Proof.
-rewrite /dq_f /(_ # _) /dq.
+rewrite /dq_f /scaleq /(_ # _) /dq.
 rewrite hornerD hornerN.
 f_equal.
 rewrite -{3}(coefK p).
@@ -98,8 +111,18 @@ Qed.
 
 Definition Dq_f p := dq_f p %/ dq_f 'X.
 
+Lemma Dq_f_ok p : dq_f 'X %| dq_f p.
+Proof.
+Admitted.
+
 Lemma Dq_fE' p : Dq_f p = dq_f p %/ ((q - 1) *: 'X).
 Proof. by rewrite /Dq_f dq_fXE. Qed.
+
+Lemma Dq_f_prod' p p' : Dq_f (p * p') = p * Dq_f p' + scaleq p' * Dq_f p.
+Proof.
+rewrite /Dq_f !divp_mulA ?Dq_f_ok //.
+by rewrite -divpD dq_f_prod'.
+Qed.
 
 (* Lemma horner_div (p p' : {poly R}) x : (p %/ p').[x] = p.[x] / p'.[x].
 Proof.
@@ -123,7 +146,7 @@ Lemma Dq_f_const c : Dq_f c%:P = 0%:P.
 Proof.
 rewrite /Dq_f.
 have -> : dq_f c%:P = 0.
-  rewrite /dq_f poly_def size_polyC.
+  rewrite /dq_f /scaleq poly_def size_polyC.
   rewrite (sumW _ (fun i => (q ^ i * c%:P`_i) *: 'X^i)).
   case Hc : (c != 0) => /=.
   - rewrite big_nat1.
@@ -161,7 +184,7 @@ case Hsize : (size p == 0%N).
     apply /andP; split => //.
     move: Hsize.
     by rewrite eq_sym => ->.
-  rewrite Dq_fE' /dq_f /Dq' -{3}(coefK p) !poly_def.
+  rewrite Dq_fE' /dq_f /scaleq /Dq' -{3}(coefK p) !poly_def.
   rewrite (sumW _ (fun i => (q ^ i * p`_i) *: 'X^i)).
   rewrite (sumW _ (fun i => p`_i *: 'X^i)).
   rewrite (sumW _ (fun i => (q_nat R q i.+1 * p`_i.+1) *: 'X^i)).
@@ -202,7 +225,11 @@ Proof.
   by rewrite Dq_f_Dq'E IH.
 Qed.
 
-Lemma Dq_f_pow n : Dq_f ('X ^ n.+1) = (q_nat R q n.+1) *: 'X ^ n.
+Lemma Dq'_prod' p p' :
+   Dq' R q (p * p') = p * Dq' R q p' + scaleq p' * Dq' R q p.
+Proof. by rewrite -!Dq_f_Dq'E Dq_f_prod'. Qed.
+
+(* Lemma Dq_f_pow n : Dq_f ('X ^ n.+1) = (q_nat R q n.+1) *: 'X ^ n.
 Proof.
 elim: n => [|n IH] //=.
 - rewrite q_nat1 // scale1r.
