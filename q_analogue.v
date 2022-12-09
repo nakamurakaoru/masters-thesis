@@ -3,7 +3,7 @@ Import GRing.
 (*Import Numtheory.*)
 (* algebra の中の　ssrnum *)
 (* Unset Printing Notations.*)
-
+(* aaaa *)
 (* Num.Theory.nmulrn_rle0 *)
 (* apply Num.Theory.ltr_normlW. `|x| < y -> x < y*)
 Axiom funext : forall A B (f g : A -> B), f =1 g -> f = g.*)
