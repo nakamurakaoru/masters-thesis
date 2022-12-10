@@ -68,9 +68,37 @@ Definition scaleq (p : {poly R}):= \poly_(i < size p) (q ^ i * p`_i).
 
 Lemma scaleq_prod p p' : scaleq (p * p') = scaleq p * scaleq p'.
 Proof.
+rewrite -(coefK p) -(coefK p').
+rewrite /scaleq.
 Admitted.
 
 Definition dq_f p := scaleq p - p.
+
+Lemma size_N0_lt (p : {poly R}) : (size p == 0%N) = false -> (0 < size p)%N.
+Proof.
+Admitted.
+
+Lemma dq_fpXE p : dq_f p = 'X * \poly_(i < size p) ((q ^ i.+1 - 1) * p`_i.+1).
+Proof.
+rewrite /dq_f /scaleq.
+rewrite -{3}(coefK p).
+rewrite !poly_def.
+rewrite (sumW _ (fun i => (q ^ i * p`_i) *: 'X^i)).
+rewrite (sumW _ (fun i => (p`_i *: 'X^i))).
+rewrite (sumW _ (fun i => (((q ^ i.+1 - 1) * p`_i.+1) *: 'X^i))).
+rewrite sum_sub.
+case Hsize : (size p == 0%N).
+- move /eqP : Hsize ->.
+  by rewrite !big_nil mulr0.
+- rewrite (@big_cat_nat _ _ _ 1) //=; last first.
+    by apply size_N0_lt.
+  rewrite big_nat1.
+
+under eq_bigr => i _.
+  rewrite -scalerBl -{2}(mul1r p`_i) -mulrBl.
+over.
+Search (_ *: _) (_ - _).
+Admitted.
 
 Lemma dq_f_prod' p p' : dq_f (p * p') = p * dq_f p' + scaleq p' * dq_f p.
 Proof.
@@ -113,7 +141,8 @@ Definition Dq_f p := dq_f p %/ dq_f 'X.
 
 Lemma Dq_f_ok p : dq_f 'X %| dq_f p.
 Proof.
-Admitted.
+by rewrite dq_fXE dvdpZl ?dq_fpXE ?dvdp_mulIl.
+Qed.
 
 Lemma Dq_fE' p : Dq_f p = dq_f p %/ ((q - 1) *: 'X).
 Proof. by rewrite /Dq_f dq_fXE. Qed.
