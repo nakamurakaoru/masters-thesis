@@ -79,6 +79,19 @@ case Ha : (a == 0).
   + by rewrite mulr0.
 Qed.
 
+Lemma scaleqC c : scaleq c%:P = c%:P.
+Proof.
+rewrite /scaleq poly_def.
+rewrite (sumW _ (fun i => (q ^ i * c%:P`_i) *: 'X^i)) size_polyC.
+case Hc : (c == 0) => /=.
+- rewrite big_nil.
+  by move /eqP : Hc ->.
+- by rewrite big_nat1 expr0z mul1r coefC /= -mul_polyC mulr1.
+Qed.
+
+(* Lemma scaleq0 : scaleq 0 = 0.
+Proof. by rewrite -{1}(scale0r 0) scaleq_scale scale0r. Qed. *)
+
 Lemma scaleq_add p p' : scaleq (p + p') = scaleq p + scaleq p'.
 Proof.
 rewrite /scaleq.
@@ -94,12 +107,48 @@ Qed.
 
 Lemma scaleq_prodX p : scaleq ('X * p) = scaleq 'X * scaleq p.
 Proof.
-Admitted.
+case Hp : (p == 0).
+  move /eqP : Hp ->.
+  by rewrite mulr0 scaleqC mulr0.
+rewrite /scaleq !poly_def.
+rewrite (sumW _ (fun i => (q ^ i * ('X * p)`_i) *: 'X^i)).
+rewrite (sumW _ (fun i => (q ^ i * 'X`_i) *: 'X^i)).
+rewrite (sumW _ (fun i => (q ^ i * p`_i) *: 'X^i)).
+rewrite size_polyX.
+rewrite (@big_cat_nat  _ _ _ 1 _ 2) //= !big_nat1.
+rewrite !coefX /= mulr0 scale0r add0r expr1z mulr1.
+rewrite -sum_distr.
+have -> : size ('X * p) = (size p).+1.
+  by rewrite mulrC size_mulX ?Hp.
+rewrite (@big_cat_nat _ _ _ 1) //= !big_nat1.
+rewrite coefXM /= mulr0 scale0r add0r.
+have -> : (1 = 0 + 1)%N by [].
+rewrite big_addn subn1 /=.
+under eq_big_nat => i /andP [] _ Hi.
+  rewrite coefXM addn1 /= exprSzr -mulrA [q * p`_i]mulrC mulrA.
+  rewrite -scalerA exprSr scalerAr -{2}(expr1 'X) -(add0n 1%N) scalerAl.
+over.
+done.
+Qed.
 
 Lemma scaleq_prod p p' : scaleq (p * p') = scaleq p * scaleq p'.
 Proof.
-rewrite -(coefK p) -(coefK p').
-rewrite /scaleq.
+have -> : p = p - (p`_0)%:P + (p`_0)%:P by rewrite subrK.
+set p1 := 'X * (\poly_(i < (size p).-1) p`_i.+1).
+have -> : p - (p`_0)%:P = p1.
+  rewrite -{1}(coefK p) poly_def.
+  rewrite (sumW _ (fun i => p`_i *: 'X^i)).
+  rewrite (@big_cat_nat _ _ _ 1) //=; last first.
+    admit.
+  rewrite big_nat1 -mul_polyC mulr1 (addrC (p`_0)%:P) addrK.
+  have -> : (1 = 0 + 1)%N by [].
+  rewrite big_addn subn1.
+  under eq_bigr do rewrite addn1 exprSr scalerAl.
+  by rewrite sum_distr /p1 poly_def -sumW.
+rewrite mulrDl scaleq_add mul_polyC scaleq_scale.
+have -> : scaleq (p1 * p') = scaleq p1 * scaleq p'.
+  admit. (* by IH *)
+by rewrite -mul_polyC -mulrDl -{1}scaleqC -scaleq_add.
 Admitted.
 
 Definition dq_f p := scaleq p - p.

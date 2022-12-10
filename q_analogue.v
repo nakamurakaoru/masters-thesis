@@ -1248,7 +1248,7 @@ elim: n => [|n IH].
   by rewrite mul_polyC -q_nat_cat1.
 Qed.
 
-Lemma Dq'_isderiv a : (forall n, q_fact n != 0) ->
+Lemma Dq'_isfderiv a : (forall n, q_fact n != 0) ->
   isfderiv Dq' (fun i : nat => qpoly_nonneg_poly a i / (q_fact i)%:P).
 Proof.
 move=> Hqnat.
@@ -1275,6 +1275,26 @@ destruct n => //.
   by apply q_fact_nat_non0.
 Qed.
 
+Theorem q_Taylorp n (f : {poly R}) a :
+  (forall n, q_fact n != 0) ->
+  size f = n.+1 ->
+  f =
+    \sum_(0 <= i < n.+1)
+   ((Dq' \^ i) f).[a] *: (qpoly_nonneg_poly a i / (q_fact i)%:P).
+Proof.
+move=> Hfact Hsizef.
+apply general_Taylor => //.
+- by apply Dq'_islinear.
+- by apply Dq'_isfderiv.
+- by rewrite invr1 mulr1 hornerC.
+- move=> m.
+  by rewrite hornerM -qpoly_nonnegE qpolyxa mul0r.
+- move=> m.
+  rewrite polyCV mulrC size_Cmul.
+    by rewrite qpoly_size.
+  by apply /invr_neq0.
+Qed.
+
 Theorem q_Taylor n (f : {poly R}) x a :
   q != 0 ->
   a != 0 ->
@@ -1290,16 +1310,7 @@ Proof.
   rewrite -hornersumD.
   apply poly_happly.
   under eq_bigr do rewrite -hoDq'E //.
-  apply general_Taylor => //.
-  - by apply Dq'_islinear.
-  - by apply Dq'_isderiv.
-  - by rewrite invr1 mulr1 hornerC.
-  - move=> m.
-    by rewrite hornerM -qpoly_nonnegE qpolyxa mul0r.
-  - move=> m.
-    rewrite polyCV mulrC size_Cmul.
-      by rewrite qpoly_size.
-    by apply /invr_neq0.
+  by apply q_Taylorp.
 Qed.
 
 (* Lemma Gauss_binomial x a n : q_fact n != 0 ->
