@@ -1,4 +1,4 @@
-DIGEST 68a0018bf13b3afa67668a266cf3525d
+DIGEST c8f94c6a25a0daf53765574ef1b27023
 Fq_tools
 R29:41 mathcomp.ssreflect.all_ssreflect <> <> lib
 R43:48 mathcomp.algebra.ssralg <> <> lib
@@ -1596,4 +1596,85 @@ R10148:10152 mathcomp.algebra.ssralg GRing.Theory mulr0 def
 R10148:10152 mathcomp.algebra.ssralg GRing.Theory mulr0 def
 R10154:10160 mathcomp.algebra.ssralg GRing.Theory scale0r def
 R10154:10160 mathcomp.algebra.ssralg GRing.Theory scale0r def
-R12114:12120 q_tools q_tools <> sec
+prf 10175:10180 <> polyW'
+R10187:10192 mathcomp.algebra.poly <> :::'{'_'poly'_x_'}' not
+R10194:10194 mathcomp.algebra.poly <> :::'{'_'poly'_x_'}' not
+R10193:10193 q_tools <> q_tools.R var
+binder 10183:10183 <> p:145
+binder 10197:10197 <> n:146
+R10207:10210 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R10204:10206 Coq.Init.Datatypes <> nat ind
+R10211:10211 q_tools <> q_tools.R var
+binder 10200:10200 <> a:147
+R10233:10238 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R10217:10217 mathcomp.ssreflect.ssrnat <> ::nat_scope:x_'<='_x not
+R10224:10228 mathcomp.ssreflect.ssrnat <> ::nat_scope:x_'<='_x not
+R10218:10221 mathcomp.ssreflect.seq <> size def
+R10223:10223 q_tools <> p:145 var
+R10229:10229 q_tools <> n:146 var
+R10270:10274 Coq.Init.Logic <> ::type_scope:x_'='_x not
+R10239:10245 mathcomp.algebra.poly <> ::ring_scope:'\poly_'_'('_x_'<'_x_')'_x not
+R10247:10249 mathcomp.algebra.poly <> ::ring_scope:'\poly_'_'('_x_'<'_x_')'_x not
+R10256:10258 mathcomp.algebra.poly <> ::ring_scope:'\poly_'_'('_x_'<'_x_')'_x not
+R10269:10269 mathcomp.algebra.poly <> ::ring_scope:'\poly_'_'('_x_'<'_x_')'_x not
+R10250:10253 mathcomp.ssreflect.seq <> size def
+R10255:10255 q_tools <> p:145 var
+binder 10246:10246 <> i:148
+R10262:10264 mathcomp.algebra.ssralg <> ::ring_scope:x_'*'_x not
+R10259:10259 q_tools <> a:147 var
+R10261:10261 q_tools <> i:148 var
+R10266:10267 mathcomp.algebra.ssralg <> ::ring_scope:x_'`_'_x not
+R10265:10265 q_tools <> p:145 var
+R10268:10268 q_tools <> i:148 var
+R10275:10280 mathcomp.algebra.ssralg <> ::ring_scope:'\sum_'_'('_x_'<='_x_'<'_x_')'_x not
+R10282:10285 mathcomp.algebra.ssralg <> ::ring_scope:'\sum_'_'('_x_'<='_x_'<'_x_')'_x not
+R10287:10289 mathcomp.algebra.ssralg <> ::ring_scope:'\sum_'_'('_x_'<='_x_'<'_x_')'_x not
+R10291:10292 mathcomp.algebra.ssralg <> ::ring_scope:'\sum_'_'('_x_'<='_x_'<'_x_')'_x not
+R10290:10290 q_tools <> n:146 var
+binder 10286:10286 <> i:149
+binder 10286:10286 <> i:150
+binder 10286:10286 <> i:151
+R10293:10293 mathcomp.algebra.ssralg <> ::ring_scope:x_'*:'_x not
+R10304:10308 mathcomp.algebra.ssralg <> ::ring_scope:x_'*:'_x not
+R10297:10299 mathcomp.algebra.ssralg <> ::ring_scope:x_'*'_x not
+R10294:10294 q_tools <> a:147 var
+R10296:10296 q_tools <> i:149 var
+R10301:10302 mathcomp.algebra.ssralg <> ::ring_scope:x_'`_'_x not
+R10300:10300 q_tools <> p:145 var
+R10303:10303 q_tools <> i:149 var
+R10309:10311 mathcomp.algebra.poly <> ::ring_scope:'''X^'_x not
+R10312:10312 q_tools <> i:149 var
+R10344:10351 mathcomp.algebra.poly <> poly_def thm
+R10344:10351 mathcomp.algebra.poly <> poly_def thm
+R10344:10351 mathcomp.algebra.poly <> poly_def thm
+R10366:10376 mathcomp.ssreflect.bigop <> big_cat_nat thm
+R10385:10388 mathcomp.ssreflect.seq <> size def
+R10398:10406 mathcomp.ssreflect.bigop <> big_mkord thm
+R10408:10414 mathcomp.ssreflect.bigop <> big_nat thm
+R10418:10420 Coq.ssrmatching.ssrmatching SsrMatchingSyntax LHS syndef
+R10422:10426 mathcomp.algebra.ssralg GRing.Theory addr0 def
+R10366:10376 mathcomp.ssreflect.bigop <> big_cat_nat thm
+R10385:10388 mathcomp.ssreflect.seq <> size def
+R10366:10376 mathcomp.ssreflect.bigop <> big_cat_nat thm
+R10385:10388 mathcomp.ssreflect.seq <> size def
+R10398:10406 mathcomp.ssreflect.bigop <> big_mkord thm
+R10398:10406 mathcomp.ssreflect.bigop <> big_mkord thm
+R10408:10414 mathcomp.ssreflect.bigop <> big_nat thm
+R10408:10414 mathcomp.ssreflect.bigop <> big_nat thm
+R10422:10426 mathcomp.algebra.ssralg GRing.Theory addr0 def
+R10418:10420 Coq.ssrmatching.ssrmatching SsrMatchingSyntax LHS syndef
+R10422:10426 mathcomp.algebra.ssralg GRing.Theory addr0 def
+R10439:10441 mathcomp.algebra.ssralg <> ::ring_scope:x_'+'_x not
+R10439:10441 mathcomp.algebra.ssralg <> ::ring_scope:x_'+'_x not
+R10456:10459 mathcomp.ssreflect.bigop <> big1 thm
+R10456:10459 mathcomp.ssreflect.bigop <> big1 thm
+R10456:10459 mathcomp.ssreflect.bigop <> big1 thm
+R10470:10473 Coq.ssr.ssrbool <> andP thm
+R10490:10498 mathcomp.algebra.poly <> leq_sizeP thm
+R10528:10532 mathcomp.algebra.ssralg GRing.Theory mulr0 def
+R10534:10540 mathcomp.algebra.ssralg GRing.Theory scale0r def
+R10528:10532 mathcomp.algebra.ssralg GRing.Theory mulr0 def
+R10528:10532 mathcomp.algebra.ssralg GRing.Theory mulr0 def
+R10534:10540 mathcomp.algebra.ssralg GRing.Theory scale0r def
+R10534:10540 mathcomp.algebra.ssralg GRing.Theory scale0r def
+R12494:12500 q_tools q_tools <> sec

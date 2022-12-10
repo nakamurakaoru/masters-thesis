@@ -357,6 +357,19 @@ Proof.
   by rewrite mulr0 scale0r.
 Qed.
 
+Lemma polyW' (p : {poly R}) n (a : nat -> R) : ((size p) <= n)%N ->
+  \poly_(i < size p) (a i * p`_i) =
+  \sum_(0 <= i < n) (a i * p`_i) *: 'X^i.
+Proof.
+  move=> H.
+  rewrite poly_def.
+  rewrite (@big_cat_nat _ _ _ (size p)) //= big_mkord big_nat -[LHS]addr0.
+  congr (_ + _).
+  rewrite big1 // => i /andP [Hi _].
+  move/leq_sizeP : Hi -> => //.
+  by rewrite mulr0 scale0r.
+Qed.
+
 (* not used *)
 
 (*Lemma qpoly_ex a (n : nat) x : qpoly a (- 1) x = 1 / (x - q ^ (- 1) * a) .

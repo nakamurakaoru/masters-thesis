@@ -66,6 +66,36 @@ Notation "D \^ n" := (hoD D n) (at level 49).
 
 Definition scaleq (p : {poly R}):= \poly_(i < size p) (q ^ i * p`_i).
 
+Lemma scaleq_scale a p : scaleq (a *: p) = a *: scaleq p.
+Proof.
+rewrite /scaleq; apply polyP => j.
+case Ha : (a == 0).
+- move/eqP : Ha ->; rewrite !scale0r.
+  by rewrite coef_poly size_poly0 //= coef0.
+- have Ha' : a != 0 by rewrite Ha.
+  rewrite size_scale // coefZ !coef_poly.
+  case : (j < size p)%N.
+  + by rewrite -scalerAr coefZ.
+  + by rewrite mulr0.
+Qed.
+
+Lemma scaleq_add p p' : scaleq (p + p') = scaleq p + scaleq p'.
+Proof.
+rewrite /scaleq.
+  rewrite (polyW' R (p + p') (maxn (size p) (size p'))); last first.
+    by apply size_add.
+  rewrite (polyW' R p (maxn (size p) (size p'))); last first.
+    by apply leq_maxl.
+  rewrite (polyW' R p' (maxn (size p) (size p'))); last first.
+    by apply leq_maxr.
+  rewrite sum_add.
+  by under eq_bigr do rewrite coefD mulrDr scalerDl.
+Qed.
+
+Lemma scaleq_prodX p : scaleq ('X * p) = scaleq 'X * scaleq p.
+Proof.
+Admitted.
+
 Lemma scaleq_prod p p' : scaleq (p * p') = scaleq p * scaleq p'.
 Proof.
 rewrite -(coefK p) -(coefK p').
@@ -76,7 +106,12 @@ Definition dq_f p := scaleq p - p.
 
 Lemma size_N0_lt (p : {poly R}) : (size p == 0%N) = false -> (0 < size p)%N.
 Proof.
-Admitted.
+move=> Hsize.
+rewrite ltn_neqAle.
+apply /andP; split => //.
+move: Hsize.
+by rewrite eq_sym => ->.
+Qed.
 
 Lemma dq_fpXE p : dq_f p = 'X * \poly_(i < size p) ((q ^ i.+1 - 1) * p`_i.+1).
 Proof.
@@ -92,13 +127,25 @@ case Hsize : (size p == 0%N).
   by rewrite !big_nil mulr0.
 - rewrite (@big_cat_nat _ _ _ 1) //=; last first.
     by apply size_N0_lt.
+  rewrite big_nat1 expr0z mul1r addrK' add0r.
+  have -> : (1 = 0 + 1)%N by [].
+  rewrite big_addn -sum_distr.
+  rewrite [RHS](@big_cat_nat _ _ _ (size p - 1)) //=; last first.
+    by rewrite subn1 leq_pred.
+  have {4}-> : size p = ((size p) - 1).+1.
+    rewrite subn1 prednK //.
+    by apply size_N0_lt.
   rewrite big_nat1.
-
-under eq_bigr => i _.
-  rewrite -scalerBl -{2}(mul1r p`_i) -mulrBl.
-over.
-Search (_ *: _) (_ - _).
-Admitted.
+  have -> : p`_(size p - 1).+1 = 0.
+    rewrite subn1 prednK //.
+      by apply /(leq_sizeP _ (size p)) => //=.
+    by apply size_N0_lt.
+  rewrite mulr0 scale0r mul0r addr0.
+  under eq_bigr => i _.
+    rewrite -scalerBl addn1 -{2}(mul1r p`_i.+1) -mulrBl exprSr scalerAl.
+  over.
+  by move=> /=.
+Qed.
 
 Lemma dq_f_prod' p p' : dq_f (p * p') = p * dq_f p' + scaleq p' * dq_f p.
 Proof.
@@ -208,12 +255,7 @@ case Hsize : (size p == 0%N).
   rewrite /Dq' poly_def.
   rewrite (sumW _ (fun i => (q_nat R q i.+1 * 0%:P`_i.+1) *: 'X^i)).
   by rewrite size_poly0 big_nil.
-- have Hsize' : (0 < size p)%N.
-    rewrite ltn_neqAle.
-    apply /andP; split => //.
-    move: Hsize.
-    by rewrite eq_sym => ->.
-  rewrite Dq_fE' /dq_f /scaleq /Dq' -{3}(coefK p) !poly_def.
+- rewrite Dq_fE' /dq_f /scaleq /Dq' -{3}(coefK p) !poly_def.
   rewrite (sumW _ (fun i => (q ^ i * p`_i) *: 'X^i)).
   rewrite (sumW _ (fun i => p`_i *: 'X^i)).
   rewrite (sumW _ (fun i => (q_nat R q i.+1 * p`_i.+1) *: 'X^i)).
@@ -226,7 +268,8 @@ case Hsize : (size p == 0%N).
     rewrite -/(q_nat R q i).
   over.
   move=> /=.
-  rewrite (@big_cat_nat _ _ _ 1) //=.
+  rewrite (@big_cat_nat _ _ _ 1) //=; last first.
+    by apply size_N0_lt.
   rewrite big_nat1 q_nat_0 mul0r scale0r add0r.
   have -> : (1 = 0 + 1)%N by [].
   rewrite big_addn.
@@ -234,11 +277,13 @@ case Hsize : (size p == 0%N).
   rewrite (@big_cat_nat _ _ _ (size p - 1) 0 (size p)) //=; last first.
     by rewrite subn1 leq_pred.
   have {4}-> : size p = ((size p) - 1).+1.
-    by rewrite subn1 prednK.
+    rewrite subn1 prednK //.
+    by apply size_N0_lt.
   rewrite big_nat1.
   have -> : p`_(size p - 1).+1 = 0.
     rewrite subn1 prednK //.
-    by apply /(leq_sizeP _ (size p)) => //=.
+      by apply /(leq_sizeP _ (size p)) => //=.
+    by apply size_N0_lt.
   by rewrite mulr0 scale0r addr0.
 Qed.
 
