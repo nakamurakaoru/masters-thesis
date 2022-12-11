@@ -746,6 +746,12 @@ Admitted. *)
 Definition q_bicoef n j :=
   q_fact n / (q_fact j * q_fact (n - j)).
 
+Lemma q_bicoefn0 n : q_fact n != 0 -> q_bicoef n 0 = 1.
+Proof.
+move=> H.
+by rewrite /q_bicoef /= mul1r subn0 divff.
+Qed.
+
 Lemma q_bicoefnn n : q_fact n != 0 -> q_bicoef n n = 1.
 Proof.
   move=> H.
@@ -1211,13 +1217,13 @@ Proof.
 by rewrite Dq'_islinear_add -polyCN Dq'_const addr0 Dq'X.
 Qed.
 
-Lemma Dq'_pow n : Dq' ('X ^ n.+1) = (q_nat n.+1) *: 'X ^ n.
+Lemma Dq'_pow n : Dq' ('X^n.+1) = (q_nat n.+1) *: 'X^n.
 Proof.
 elim: n => [|n IH].
 - by rewrite Dq'X q_nat1 scale1r.
-- rewrite exprSz Dq'_prod' IH Dq'X mulrC.
+- rewrite exprS Dq'_prod' IH Dq'X mulrC.
   rewrite -mul_polyC -mulrA mul_polyC -exprSzr.
-  rewrite [scaleq ('X ^ n.+1) * 1%:P]mulrC.
+  rewrite [scaleq ('X^n.+1) * 1%:P]mulrC.
   by rewrite mul_polyC scale1r scaleqXn -scalerDl -q_nat_catn.
 Qed.
 
@@ -1275,12 +1281,12 @@ destruct n => //.
   by apply q_fact_nat_non0.
 Qed.
 
-Theorem q_Taylorp n (f : {poly R}) a :
+Theorem q_Taylorp n (f : {poly R}) c :
   (forall n, q_fact n != 0) ->
   size f = n.+1 ->
   f =
     \sum_(0 <= i < n.+1)
-   ((Dq' \^ i) f).[a] *: (qpoly_nonneg_poly a i / (q_fact i)%:P).
+   ((Dq' \^ i) f).[c] *: (qpoly_nonneg_poly c i / (q_fact i)%:P).
 Proof.
 move=> Hfact Hsizef.
 apply general_Taylor => //.
@@ -1295,13 +1301,13 @@ apply general_Taylor => //.
   by apply /invr_neq0.
 Qed.
 
-Theorem q_Taylor n (f : {poly R}) x a :
+Theorem q_Taylor n (f : {poly R}) x c :
   q != 0 ->
-  a != 0 ->
+  c != 0 ->
   (forall n, q_fact n != 0) ->
   size f = n.+1 ->
   f.[x] =  \sum_(0 <= i < n.+1)
-             ((Dq \^ i) # f) a * qpoly_nonneg a i x / q_fact i.
+             ((Dq \^ i) # f) c * qpoly_nonneg c i x / q_fact i.
 Proof.
   move=> Hq0 Ha Hfact Hsf.
   under eq_bigr do rewrite qpoly_nonnegE.
@@ -1313,20 +1319,81 @@ Proof.
   by apply q_Taylorp.
 Qed.
 
-(* Lemma Gauss_binomial x a n : q_fact n != 0 ->
-  qpoly (-a) (Posz n) x =
-  \sum_(0 <= i < n.+1)
-    ((q_bicoef n i) * q ^ (Posz i * (Posz i - 1) / 2)
-                    * (-a)^ i * x ^ (Posz n - Posz i)).
+Lemma hoDq'_pow n j : q_fact n != 0 -> (j <= n)%N ->
+  (Dq' \^ j) 'X^n = (q_bicoef n j * q_fact j) *: 'X^(n - j).
 Proof.
+move=> Hn.
+elim: j => [|j IH] Hj /=.
+- by rewrite q_bicoefn0 ?mul1r ?scale1r ?subn0.
+- rewrite IH; last first.
+    by apply ltnW.
+  rewrite Dq'_islinear_scale.
+  have -> : (n - j = (n - j.+1).+1)%N by rewrite subnSK.
+  rewrite Dq'_pow -mul_polyC -mul_polyC mulrA -[RHS]mul_polyC.
+  f_equal.
+  rewrite mul_polyC scale_constpoly.
+  f_equal.
+  rewrite (mulrC (q_bicoef n j)) -mulrA mulrC.
+  rewrite (mulrC (q_fact j)) [RHS]mulrA.
+  f_equal.
+  rewrite /q_bicoef.
+  rewrite -mulrA -[RHS]mulrA.
+  f_equal.
+Admitted.
 
-  elim: n => [_ |/= n IH Hfact] //=.
-  - by rewrite big_nat1 /q_bicoef !mulr1 !mul1r invr1.
-  - rewrite (@big_cat_nat R _ _ n.+1 0 n.+2) //=.
-    rewrite big_nat1 //=.
-    rewrite IH.
-      rewrite q_bicoefnn // addrN expr0z mulr1 mul1r.
-Admitted. *)
+Lemma hoDq'_pow1 n j : q_fact n != 0 -> (j <= n)%N ->
+  ((Dq' \^ j) 'X^n).[1] = (q_bicoef n j * q_fact j).
+Proof.
+move=> Hn Hj.
+by rewrite hoDq'_pow // hornerZ hornerXn expr1n mulr1.
+Qed.
+
+Lemma q_Taylorp_pow n : (forall n, q_fact n != 0) ->
+  'X^n = \sum_(0 <= i < n.+1) (q_bicoef n i *: qpoly_nonneg_poly 1 i).
+Proof.
+move=> Hfact.
+rewrite (q_Taylorp n 'X^n 1) //; last first.
+  by rewrite size_polyXn.
+under eq_big_nat => i /andP [_ Hi].
+  rewrite hoDq'_pow1 //.
+  rewrite [(qpoly_nonneg_poly 1 i / (q_fact i)%:P)]mulrC.
+  rewrite polyCV scalerAl scale_constpoly -mulrA divff //.
+  rewrite mulr1 mul_polyC.
+over.
+done.
+Qed.
+
+(* Lemma q_Taylor_pow x n : (forall n, q_fact n != 0) ->
+  x ^+ n = \sum_(0 <= i < n.+1) (q_bicoef n i * qpoly_nonneg 1 i x). *)
+
+Lemma hoDq'_qpoly n j a : q_fact n != 0 -> (j <= n)%N ->
+  (Dq' \^ j) (qpoly_nonneg_poly (- a) n) =
+  (q_bicoef n j * q_fact j) *: (qpoly_nonneg_poly (-a) (n - j)).
+Proof.
+Admitted.
+
+Theorem hoDq'_qpoly0 n j a : q_fact n != 0 -> (j <= n)%N ->
+  ((Dq' \^ j) (qpoly_nonneg_poly (- a) n)).[0] =
+  (q_bicoef n j * q_fact j) *
+   q ^+ ((n - j) * (n - j - 1) ./2) * a ^+ (n - j).
+Proof.
+Admitted.
+
+Theorem Gauss_binomial' a n : (forall n, q_fact n != 0) ->
+  qpoly_nonneg_poly (-a) n =
+  \sum_(0 <= i < n.+1)
+    (q_bicoef n i * q ^+ ((n - i) * (n - i - 1) ./2)
+                    * a ^+ (n - i)) *: 'X^i.
+Proof.
+move=> Hfact.
+rewrite (q_Taylorp n (qpoly_nonneg_poly (-a) n) 0) //; last first.
+  by rewrite qpoly_size.
+under eq_big_nat => i /andP [_ Hi].
+  rewrite hoDq'_qpoly0 //.
+(*   rewrite [(qpoly_nonneg_poly 1 i / (q_fact i)%:P)]mulrC.
+  rewrite polyCV scalerAl scale_constpoly -mulrA divff //.
+  rewrite mulr1 mul_polyC. *)
+Admitted.
 
 (* f is a function ver *)
 (* Theorem general_Taylor D n (P : nat -> {poly R}) f x a :
