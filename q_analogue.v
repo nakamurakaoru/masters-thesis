@@ -589,7 +589,7 @@ Proof.
     + rewrite qpoly_exp_pos_neg //.
       by rewrite addrC expfzDr // -mulrA.
   - case: n => n Hn.
-    + rewrite qpoly_exp_neg_pos //.
+    + by rewrite qpoly_exp_neg_pos.
     + by apply qpoly_exp_neg_neg.
 Qed.
 
