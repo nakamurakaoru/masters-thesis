@@ -61,7 +61,7 @@ Proof.
 Qed.
 
 Lemma halfdistr m n : ~ odd m ->
-  Posz (m + n)./2 = Posz m./2 + n./2.
+  ((m + n)./2 = m./2 + n./2)%N.
 Proof.
   move=> em.
   rewrite halfD.
@@ -70,7 +70,7 @@ Proof.
   by left.
 Qed.
 
-Lemma half_add n : Posz n.+1 + (n.+1 * n)./2 = (n.+2 * (n.+1))./2.
+Lemma half_add n : (n.+1 + (n.+1 * n)./2 = (n.+2 * (n.+1))./2)%N.
 Proof.
   rewrite -{1}(doubleK n.+1) -halfdistr.
     by rewrite -muln2 -mulnDr addnC addn2 mulnC.

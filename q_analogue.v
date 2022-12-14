@@ -332,34 +332,33 @@ Lemma qpolyxa a n : qpoly_nonneg a n.+1 a = 0.
 Proof. by rewrite qpoly_nonneg_head addrK' mul0r. Qed.
 
 Lemma qpolyx0 a n :
-  qpoly_nonneg (- a) n 0 = q ^ Posz ((n * (n - 1)) ./2) * a ^ n.
+  qpoly_nonneg (- a) n 0 = q ^+((n * (n - 1))./2) * a ^+ n.
 Proof.
   elim: n => [| n IH] //.
-  - by rewrite mul0n /= expr0z expr0z mulr1.
+  - by rewrite mul0n /= expr0 mulr1.
   - destruct n.
-      by rewrite /= !mul1r sub0r opp_oppE expr1z.
+      by rewrite /= !mul1r sub0r opp_oppE expr1.
     case Hq0 : (q == 0).
     + rewrite qpoly_nonneg_head.
       destruct n.
         rewrite /= expr0z.
         move: Hq0 => /eqP ->.
-        by rewrite opp_oppE add0r mul1r expr1z sub0r !mul0r mul1r oppr0 mulr0.
+        by rewrite opp_oppE add0r mul1r expr1 sub0r !mul0r mul1r oppr0 mulr0.
       rewrite qpoly_nonneg_head.
       move: Hq0 => /eqP ->.
       rewrite mul0r subr0 mulrA !mulr0 !mul0r.
       have -> : (n.+3 * (n.+3 - 1))./2 =
                 ((n.+3 * (n.+3 - 1))./2 - 1)%N.+1.
         by rewrite -[RHS]addn1 subnK.
-      by rewrite exp0rz' mul0r.
+      by rewrite expr0n mul0r.
     + rewrite /= in IH.
       rewrite [LHS] /= IH // sub0r -mulrN opp_oppE.
       rewrite [q ^ n.+1 * a] mulrC.
-      rewrite mulrA mulrC 2!mulrA -expfzDr.
-        have -> : Posz n.+1 + (n.+1 * (n.+1 - 1))./2 =
-                  (n.+2 * (n.+2 - 1))./2.
+      rewrite mulrA mulrC 2!mulrA -exprD.
+      have -> : (n.+1 + (n.+1 * (n.+1 - 1))./2 =
+                (n.+2 * (n.+2 - 1))./2)%N.
         by rewrite !subn1 /= half_add.
-    by rewrite -mulrA -(exprSzr a n.+1).
-  by move: Hq0 ->.
+      by rewrite -mulrA -(exprSzr a n.+1).
 Qed.
 
 (*Lemma prod_qpoly_nonneg a n x :
@@ -779,6 +778,37 @@ Qed. *)
   q_fact j = q_fact (n - (n - j)).
 Proof.
 Qed. *)
+
+Lemma q_bicoef_compute n j : q_fact n != 0 -> (j < n)%N ->
+  q_bicoef n j * q_fact j * q_nat (n - j.+1).+1 =
+  q_bicoef n j.+1 * (q_fact j * q_nat j.+1).
+Proof.
+move=> Hfact Hj.
+  rewrite (mulrC (q_bicoef n j)) -mulrA mulrC.
+  rewrite (mulrC (q_fact j)) [RHS]mulrA.
+  f_equal.
+  rewrite /q_bicoef.
+  rewrite -mulrA -[RHS]mulrA.
+  f_equal => /=.
+  rewrite mulrC subnSK //.
+  have -> : q_fact (n - j) = q_fact (n - j.+1) * q_nat (n - j)%N.
+    by rewrite -(subnSK Hj) /=.
+  rewrite mulrA -{1}(mul1r (q_nat (n - j)%N)) red_frac_r; last first.
+    rewrite -(subnSK Hj).
+    apply q_fact_nat_non0.
+    apply (q_fact_lenon0 _ j).
+    rewrite subnSK //.
+    rewrite subnK //.
+    by apply ltnW.
+  rewrite [RHS]mulrC.
+  rewrite [q_fact j * q_nat j.+1]mulrC.
+  rewrite -{1}(mulr1 (q_nat j.+1)).
+  rewrite -[q_nat j.+1 * q_fact j * q_fact (n - j.+1)]mulrA.
+  rewrite red_frac_l //.
+  apply q_fact_nat_non0.
+  apply (q_fact_lenon0 _ (n - j.+1)%N).
+  by rewrite subnKC.
+Qed.
 
 Lemma q_bicoefE n j : (j <= n)%N ->
   q_bicoef n (n - j) = q_bicoef n j.
@@ -1333,13 +1363,8 @@ elim: j => [|j IH] Hj /=.
   f_equal.
   rewrite mul_polyC scale_constpoly.
   f_equal.
-  rewrite (mulrC (q_bicoef n j)) -mulrA mulrC.
-  rewrite (mulrC (q_fact j)) [RHS]mulrA.
-  f_equal.
-  rewrite /q_bicoef.
-  rewrite -mulrA -[RHS]mulrA.
-  f_equal.
-Admitted.
+  by rewrite q_bicoef_compute //.
+Qed.
 
 Lemma hoDq'_pow1 n j : q_fact n != 0 -> (j <= n)%N ->
   ((Dq' \^ j) 'X^n).[1] = (q_bicoef n j * q_fact j).
@@ -1370,19 +1395,46 @@ Lemma hoDq'_qpoly n j a : q_fact n != 0 -> (j <= n)%N ->
   (Dq' \^ j) (qpoly_nonneg_poly (- a) n) =
   (q_bicoef n j * q_fact j) *: (qpoly_nonneg_poly (-a) (n - j)).
 Proof.
-Admitted.
+move=> Hfact.
+elim: j => [|j IH] Hj /=.
+- by rewrite subn0 q_bicoefn0 ?mulr1 ?scale1r.
+- rewrite IH; last first.
+    by apply ltnW.
+  rewrite Dq'_islinear_scale.
+  have -> : (n - j = (n - j.+1).+1)%N by rewrite subnSK.
+  rewrite Dq'_qpoly_poly -mul_polyC -mul_polyC mulrA -[RHS]mul_polyC.
+  f_equal.
+  rewrite mul_polyC scale_constpoly.
+  f_equal.
+  by rewrite q_bicoef_compute //.
+Qed.
 
-Theorem hoDq'_qpoly0 n j a : q_fact n != 0 -> (j <= n)%N ->
+Lemma qpoly_nonneg_qpoly0 a n :
+  (qpoly_nonneg_poly (- a) n).[0] = q ^+ (n * (n - 1))./2 * a ^+ n.
+Proof.
+by rewrite -qpoly_nonnegE qpolyx0.
+Qed.
+
+Lemma hoDq'_qpoly0 n j a : q_fact n != 0 -> (j <= n)%N ->
   ((Dq' \^ j) (qpoly_nonneg_poly (- a) n)).[0] =
   (q_bicoef n j * q_fact j) *
-   q ^+ ((n - j) * (n - j - 1) ./2) * a ^+ (n - j).
+   q ^+ ((n - j) * (n - j - 1))./2 * a ^+ (n - j).
 Proof.
-Admitted.
+move=> Hfact Hj.
+by rewrite hoDq'_qpoly // hornerZ qpoly_nonneg_qpoly0 mulrA.
+Qed.
+
+Lemma qpoly_x0 n : qpoly_nonneg_poly 0 n = 'X^n.
+Proof.
+elim: n => [|n IH] /=.
+- by rewrite expr0.
+- by rewrite IH mulr0 subr0 exprSr.
+Qed.
 
 Theorem Gauss_binomial' a n : (forall n, q_fact n != 0) ->
   qpoly_nonneg_poly (-a) n =
   \sum_(0 <= i < n.+1)
-    (q_bicoef n i * q ^+ ((n - i) * (n - i - 1) ./2)
+    (q_bicoef n i * q ^+ ((n - i) * (n - i - 1))./2
                     * a ^+ (n - i)) *: 'X^i.
 Proof.
 move=> Hfact.
@@ -1390,39 +1442,26 @@ rewrite (q_Taylorp n (qpoly_nonneg_poly (-a) n) 0) //; last first.
   by rewrite qpoly_size.
 under eq_big_nat => i /andP [_ Hi].
   rewrite hoDq'_qpoly0 //.
-(*   rewrite [(qpoly_nonneg_poly 1 i / (q_fact i)%:P)]mulrC.
-  rewrite polyCV scalerAl scale_constpoly -mulrA divff //.
-  rewrite mulr1 mul_polyC. *)
+  rewrite [(qpoly_nonneg_poly 0 i / (q_fact i)%:P)]mulrC.
+  rewrite polyCV.
+  rewrite scalerAl scale_constpoly.
+  have -> : q_bicoef n i * q_fact i * q ^+ ((n - i) * (n - i - 1))./2 *
+            a ^+ (n - i) / q_fact i =
+            q_bicoef n i * q ^+ ((n - i) * (n - i - 1))./2 * a ^+ (n - i).
+    rewrite -!mulrA; f_equal; f_equal.
+    rewrite mulrC -mulrA; f_equal.
+    by rewrite denomK.
+  rewrite mul_polyC qpoly_x0.
+over.
+done.
+Qed.
+
+Theorem Gauss_binomial a n : (forall n, q_fact n != 0) ->
+  qpoly_nonneg_poly (-a) n =
+  \sum_(0 <= i < n.+1)
+    (q_bicoef n i * q ^+ (i * (i - 1))./2 * a ^+ i) *: 'X^(n - i).
+Proof.
 Admitted.
-
-(* f is a function ver *)
-(* Theorem general_Taylor D n (P : nat -> {poly R}) f x a :
-  isleniar D -> isfderiv D n P ->
-  (P 0%N).[a] = 1 ->
-  (forall n, (P n.+1).[a] = 0) ->
-  (forall n, size (P n) = n) ->
-  f x = \sum_(0 <= i < n.+1)
-          ((hoD D n f) a * (P i).[x]).
-Proof.
-Admitted. *)
-
-(* Theorem q_Taylor' f x n c {e} :
-  (forall x, f x = \sum_(0 <= i < n.+1) e i * x^i) ->
-  f x =  \sum_(0 <= i < n.+1)
-             ((hoDq i f) c * qpoly c (Posz i ) x / q_fact i).
-Proof.
-
-(*   elim: n => [|n IH] Hf //=.
-  - rewrite !big_nat1 //=.
-    have Hf' : forall x, f x = e 0%N.
-      move=> x'.
-      by rewrite Hf big_nat1 expr0z mulr1.
-    by rewrite (Hf' x) (Hf' c) mulr1 divr1.
-  - rewrite (@big_cat_nat R _ _ n.+1 0 n.+2) //=.
-    rewrite IH.
-    rewrite big_nat1.
-    have H : forall n, *)
-Admitted. *)
 
 End q_analogue.
 
