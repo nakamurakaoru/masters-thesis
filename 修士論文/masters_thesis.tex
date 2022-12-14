@@ -1,0 +1,757 @@
+\documentclass[11pt]{jarticle}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[a4paper,margin=25mm]{geometry}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{ascmac}
+\newtheoremstyle{mystyle}% % Name
+    {}%                      % Space above
+    {}%                      % Space below
+    {\normalfont}%           % Body font
+    {}%                      % Indent amount
+    {\bfseries}%             % Theorem head font
+    {}%                      % Punctuation after theorem head
+    { }%                     % Space after theorem head, ' ', or \newline
+    {}%                      % Theorem head spec (can be left empty, meaning `normal')
+\theoremstyle{mystyle}
+\usepackage{amssymb}
+\usepackage{ascmac}
+\usepackage{txfonts}
+%\usepackage{graphics}
+\input{poster_packages.tex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newtheorem{df}{$\textrm{Definition}$}[subsubsection]
+\newtheorem{ex}[df]{$\textrm{Example}$}
+\newtheorem{prop}[df]{$\textrm{Proposition}$}
+\newtheorem{lem}[df]{$\textrm{Lemmma}$}
+\newtheorem{cor}[df]{$\textrm{Corollary}$}
+\newtheorem{rmk}[df]{$\textrm{Remark}$}
+\newtheorem{thm}[df]{$\textrm{Theorem}$}
+\newtheorem{axi}[df]{$\textrm{Axiom}$}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\bdf}{\begin{shadebox} \begin{df}}
+\newcommand{\edf}{\end{df} \end{shadebox}}
+\newcommand{\bex}{\begin{ex}}
+\newcommand{\eex}{\end{ex}}
+\newcommand{\bprop}{\begin{shadebox} \begin{prop}}
+\newcommand{\eprop}{\end{prop} \end{shadebox}}
+\newcommand{\blem}{\begin{shadebox} \begin{lem}}
+\newcommand{\elem}{\end{lem} \end{shadebox}}
+\newcommand{\bcor}{\begin{shadebox} \begin{cor}}
+\newcommand{\ecor}{\end{cor} \end{shadebox}}
+\newcommand{\brmk}{\begin{rmk}}
+\newcommand{\ermk}{\end{rmk}}
+\newcommand{\bthm}{\begin{shadebox} \begin{thm}}
+\newcommand{\ethm}{\end{thm} \end{shadebox}}
+\newcommand{\bpf}{\begin{proof}}
+\newcommand{\epf}{\end{proof}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\K}{\mathbb{K}}
+\newcommand{\D}{\mathbb{D}}
+\newcommand{\U}{\mathcal{U}}
+\newcommand{\plim}{{\displaystyle \lim_{\substack{\longleftarrow\\ n}}}}
+\newcommand{\seq}[2]{(#1_{#2})_{#2\ge1}}
+\newcommand{\Zmod}[1]{\Z/p^{#1}\Z}
+\newcommand{\Lra}{\Longrightarrow}
+\newcommand{\Llra}{\Longleftrightarrow}
+\newcommand{\lra}{\leftrightarrow}
+\newcommand{\ra}{\rightarrow}
+\newcommand{\ol}[1]{{\overline{#1}}}
+\newcommand{\ul}[1]{{\underline{#1}}}
+\newcommand{\sem}[1]{[\hspace{-2pt}[{#1}]\hspace{-2pt}]}
+\newcommand{\pros}[1]{\begin{array}{c} \ast \ast\\ \tt{#1} \end{array}}
+\newcommand{\pgm}[1]{{\tt{#1}}\text{-プログラム}}
+\newcommand{\pgms}[1]{{\tt{#1}}\text{-プログラム集合}}
+\newcommand{\dtm}[1]{{\tt{#1}}\text{-データ}}
+\newcommand{\data}[1]{{\tt{#1}}\text{-データ集合}}
+\newcommand{\rtf}[3]{time^{\tt{#1}}_{\tt{#2}}({\tt{#3}})}
+\newcommand{\id}{\textrm{id}}
+\newcommand{\refl}{\textrm{refl}}
+\newcommand{\ap}{\textrm{ap}}
+\newcommand{\apd}{\textrm{apd}}
+\newcommand{\pr}[1]{\textrm{pr}_{#1}}
+\newcommand{\tp}{\textrm{transport}}
+\newcommand{\qinv}{\textrm{qinv}}
+\newcommand{\iseq}{\textrm{isequiv}}
+\newcommand{\peq}{\textrm{pair}^=}
+\newcommand{\sig}[3]{\sum_{{#1} : {#2}} {#3}\ ({#1})}
+\newcommand{\0}{\textbf{0}}
+\newcommand{\1}{\textbf{1}}
+\newcommand{\2}{\textbf{2}}
+\newcommand{\fune}{\textrm{funext}}
+\newcommand{\happ}{\textrm{happly}}
+\newcommand{\ua}{\textrm{ua}}
+\newcommand{\ide}{\textrm{idtoequiv}}
+\newcommand{\set}[1]{\textrm{isSet({#1})}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+\title{$q$-類似のCoqによる形式化}
+\author{アドバイザー $\colon$ Jacquess Garrigue教授\\
+           学籍番号 $\colon$ 322101289\\
+           氏名 $\colon$ 中村　薫}
+\date{\today}
+\maketitle
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\tableofcontents
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{序文}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{本文}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Coq}
+Coq とは, 定理証明支援系の1つであり, 数学的な証明が正しいかどうか判定するプログラムである. 人間がチェックすることが難しい複雑な証明でも正しさが保証され, また証明付きプログラミングにも応用される. 例えば, 命題$P$, $Q$について, $P \Lra Q$かつ$P$であれば, $Q$が成り立つということは, Coq では
+\begin{lstlisting}{Coq}
+From mathcomp Require Import ssreflect.
+
+Theorem modus_ponens (P Q : Prop) : (P -> Q) /\ P -> Q.
+Proof.
+  move=> [] pq p.
+  by apply pq.
+Qed.
+\end{lstlisting}
+と表現できる. \\
+Coq による証明は, Curry-Howard 同型と呼ばれる, 
+\begin{align*}
+  \text{命題} &\leftrightarrow \text{型} \\
+  \text{証明} &\leftrightarrow \text{型に要素が存在する}
+\end{align*}
+という対応関係に基づいている. また, 論理演算子についても, 以下のような対応がある. 
+\begin{align*}
+  P \text{ならば} Q &\quad P \rightarrow Q \\
+  P \text{かつ} Q &\quad P \times Q \\
+  P \text{または} Q &\quad  P + Q
+\end{align*}
+この同型をもとに上記の証明をもう一度考えてみると, $P \ra Q$と$P$という型に要素が存在することから, $Q$という型の要素を構成すればよいということである. \\
+まず, 前提の要素それぞれに$pq$, $p$と名前をつける. これがプログラム中の{\tt move$\Rightarrow$ [] pq p}のことである. 
+ここで, $P \to Q$という型は, 入力する値の型が$P$, 出力する値の型が$Q$であるような関数の型であるため, $P$の要素$p$に$pq$を適用することで, $Q$の要素を構成することができる. この関数適用がプログラム中の{\tt apply pq}のことである. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{$q$-類似}
+$q$-類似とは, $q \to 1$とすると通常の数学に一致するような拡張のことである. 例えば, 自然数$n$の$q$-類似$[n]$は
+\[
+  [n] = 1 + q + q^2 + \cdots q ^ {n -1} 
+\]
+であり, $(x-a)^n$の$q$-類似$(x-a)^n_q$は
+\[
+  (x-a)^n_q \coloneqq \begin{cases}
+                                  1 & (n=0)\\
+                                  (x-a)(x-qa)\cdots(x-q^{n-1}a) & (n\ge1)
+                                \end{cases}
+\]
+である. 本章では, $D_q (x-a)^n_q = [n] (x-a)^{n-1}_q$(ここで, $D_q$は微分の$q$-類似)が, $n$を整数に拡張しても成り立つことの形式化を目標とする. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{形式化}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{$q$-微分の定義}
+様々な$q$-類似を考えるにあたって, まずは微分の$q$-類似から始める. 以下, $q$を$1$でない実数とする. 
+\bdf[\cite{Kac} p1 (1.1), p2 (1.5)]
+  関数$f : \R \to \R$に対して, $f(x)$の$q$差分$d_q f(x)$を, 
+  \[
+    d_q f(x) \coloneqq f (qx) - f(x)
+  \]
+  と定める. 更に, $f(x)$の$q$差分を$D_q f(x)$を, 
+  \[
+    D_q f(x) \coloneqq \frac{d_q f(x)}{d_q x} = \frac{f(qx) - f(x)}{(q - 1) x}
+  \]
+  と定める. 
+\edf
+この定義を形式化すると, 
+\begin{lstlisting}{Coq}
+From mathcomp Require Import all_ssreflect all_algebra.
+Import GRing.
+
+Section q_analogue.
+Local Open Scope ring_scope.
+Variable (R : rcfType) (q : R).
+Hypothesis Hq : q - 1 != 0.
+
+Notation "f // g" := (fun x => f x / g x) (at level 49).
+
+Definition dq (f : R -> R) x := f (q * x) - f x.
+Definition Dq f := dq f // dq id. 
+\end{lstlisting}
+となる. このコードの意味は大まかに以下のとおりである. 
+\begin{itemize}
+  \item 最初の2行で必要なライブラリの指定をしている. 
+  \item {\tt Variable}でそのセクション内で共通して使う変数を宣言している. 
+          {\tt R}がCoqにおける実数(正確には{\tt mathcomp}の{\tt algebra}の実数)の役割を
+          果たす. ここではまだ出てきていないが, {\tt nat}が$0$を含む自然数に, {\tt int}が整数に
+          対応する. 
+  \item {\tt Hypothesis}で, $q$が1でないという仮定をしている. 使いやすさのため, 
+          $q \ne 1$ではなく$q - 1 \ne 0$という形にしている. 
+  \item {\tt Notation}で関数同士の割り算の記法を定義している. 
+  \item 2つの{\tt Definition}で$q$-差分と$q$-微分をそれぞれ定義している. 
+          {\tt $\coloneqq$}以前に定義の名前と引数, 以後に具体的な定義が書いてある. 
+          例えば$q$-差分についてであれば, {\tt d\_q}が名前, {\tt f}と{\tt x}が引数, 
+          {f (q * x) - f x}が定義である. ({\tt f}の後ろの{\tt : R $\to$ R}は{\tt f}の型である. 
+          一方, もう一つの引数である{\tt x}には型を書いていない. これは, Coqには強力な
+          型推論があるため, 推論できるものであれば型を書く必要がないためである. )
+          $D_q$の定義の中の{\tt id}は恒等関数のことである. 
+\end{itemize}
+\brmk
+  $f$が微分可能であるとき, 
+  \[
+    \lim_{q\ra1} D_qf(x) = \frac{d}{dx}f(x)
+  \] 
+  が成り立つが, 本稿においては極限操作に関しての形式化は扱わない. 
+\ermk
+次に, $x ^ n$ ($n \in \Z_{\ge 0}$)を$q$-微分した際にうまく振る舞うように自然数の$q$-類似を定義する. 
+\bdf[\cite{Kac} p2 (1.9)]
+  $n \in \Z_{\ge 0}$に対して, $n$の$q$-類似$[n]$を, 
+  \[
+    [n] \coloneqq \frac{q^n - 1}{q - 1}
+  \]
+  と定義する. 
+\edf
+この$[n]$に対して, $(x^n)' = n x^{n-1}$の$q$-類似が成り立つ.
+\bprop[\cite{Kac} p2 Example (1.7)]
+  $n \in \Z_{>0}$について, 
+  \[
+    D_q x^n = [n] x ^{n - 1}
+  \]
+  が成り立つ. 
+\eprop
+\bpf
+  定義に従って計算すればよく, 
+  \[
+    D_q x ^ n = \frac{(qx) ^ n - x ^ n}{(q - 1) x}
+                 = \frac{q^n - 1}{q - 1} x ^ {n - 1}
+                 = [n] x ^ {n - 1}
+  \] 
+\epf
+この定義と補題の形式化は以下のとおりである. 
+\begin{lstlisting}{Coq}
+Definition qnat n : R := (q ^ n - 1) / (q - 1).
+
+Lemma qderiv_of_pow n x :
+  x != 0 -> Dq (fun x => x ^ n) x = qnat n * x ^ (n - 1).
+Proof.
+  move=> Hx.
+  rewrite /Dq /dq /qnat.
+  rewrite -{4}(mul1r x) -mulrBl expfzMl.
+    rewrite -add_div.
+    rewrite [in x ^ n](_ : n = (n -1) +1) //.
+      rewrite expfzDr // expr1z.
+      rewrite mulrA -mulNr !red_frac_r //.
+      rewrite add_div //.
+      rewrite -{2}[x ^ (n - 1)]mul1r.
+      rewrite -mulrBl mulrC mulrA.
+      by rewrite [in (q - 1)^-1 * (q ^ n - 1)] mulrC.
+    by rewrite subrK.
+  by apply mulf_neq0.
+Qed.
+\end{lstlisting}
+ここでも, コードについて少し説明を加える. 
+\begin{itemize}
+  \item {\tt Definition}と同様, {\tt Lemma}について, {\tt $\coloneqq$}の前に補題の名前と
+          引数が, 後に補題の主張が書いてある. 今回であれば, {\tt qderiv\_of\_pow}が補題の
+          名前で, {\tt n}と{\tt x}が引数である. 
+  \item {\tt Proof.}以下が補題の証明である. 
+  \item {\it def}が定義のとき, {\tt rewrite /{\it def}}で定義を展開している. 
+  \item {\it lem}が{\tt A = B}という形の補題のとき, {\tt rewrite {\it lem}}で結論に出現する
+          {\tt A}を{\tt B}に書き換えている. 他のコマンドの使い方については \cite{Gar}等を参照. 
+  \item {\tt red\_frac\_r}は, 
+           \begin{lstlisting}{Coq}
+red_frac_r : forall x y z : R, z != 0 -> x * z / (y * z) = x / y \end{lstlisting}
+           という補題である. この補題を使うため, もともとはなかった{\tt $x \ne 0$}という
+           前提を加えている. 実際, $D_q$の定義において分母に$x$が出現するので, 
+           $x$が$0$でないという前提は妥当である.  
+\end{itemize}
+\brmk
+  {\tt qnat}という名前であるが, 実際には{\tt n}の型は{\tt nat}ではなく{\tt R}にしている. 
+  また, {\tt qderiv\_of\_pow}の{\tt n}の型は{\tt int}であるため, より一般化した形での形式化に
+  なっている. 
+\ermk
+\cite{Kac}では証明は1行で終わっているが, 形式化する場合には何倍もかかっている. これは, 積の交換法則や指数法則などの, 通常の数学では「当たり前」なことが自動では計算されず, {\tt rewrite mulrC}や{\tt rewrite expfzDr}というように{\tt rewrite}での書き換えを明示的に行わなければならないからである. \\
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{$(x - a)^n$の$q$-類似}
+続いて$(x - a)^n$の$q$-類似を定義し, その性質を調べる.  
+\bdf[\cite{Kac} p8 Definition (3.4)]
+  $x$, $a \in \R$, $n \in \Z_{\ge 0}$に対して, $(x - a)^n$の$q$-類似$(x - a)^n_q$を, 
+  \[
+  (x - a)^n_q = \begin{cases}
+                      1 & \text{if}\ n = 0 \\
+                      (x - a) (x - qa) \cdots (x - q^{n - 1} a) & \text{if}\ n \ge 1
+                    \end{cases}
+  \]
+  と定義する. 
+\edf
+\bprop \label{q_deriv_qpoly_nonneg}
+  $n\in\Z_{>0}$に対し, 
+  \[
+    D_q(x-a)^n_q = [n](x-a)^{n-1}_q
+  \]
+  が成り立つ. 
+\eprop
+\bpf
+  $n$についての帰納法により示される. 
+\epf
+まず, $(x - a)^n_q$の定義を形式化すると, 
+\begin{lstlisting}{Coq}
+Fixpoint qpoly_nonneg a n x :=
+  match n with
+  | 0 => 1
+  | n.+1 => (qpoly_nonneg a n x) * (x - q ^ n * a)
+  end.
+\end{lstlisting}
+となる. {\tt Fixpoint}を用いて再帰的な定義をしており, {\tt match}を使って{\tt n}が{\tt 0}かどうかで場合分けしている. 補題の証明については 
+\begin{lstlisting}{Coq}
+Theorem qderiv_qpoly_nonneg a n x :
+  x != 0 -> Dq (qpoly_nonneg a n.+1) x = qnat n.+1 * qpoly_nonneg a n x.
+Proof.
+  move=> Hx.
+  elim: n => [|n IH].
+  - rewrite /Dq /dq /qpoly_nonneg /qnat.
+    rewrite !mul1r mulr1 expr1z.
+    rewrite opprB subrKA !divff //.
+    by rewrite denom_is_nonzero.
+  - rewrite (_ : Dq (qpoly_nonneg a n.+2) x =
+                 Dq ((qpoly_nonneg a n.+1) **
+                 (fun x => (x - q ^ (n.+1) * a))) x) //.
+    rewrite qderiv_prod' //.
+    rewrite [Dq (+%R^~ (- (q ^ n.+1 * a))) x] /Dq /dq.
+    rewrite opprB subrKA divff //.
+      rewrite mulr1 exprSz.
+      rewrite -[q * q ^ n * a] mulrA -(mulrBr q) IH.
+      rewrite -[q * (x - q ^ n * a) * (qnat n.+1 * qpoly_nonneg a n x)] mulrA.
+      rewrite [(x - q ^ n * a) * (qnat n.+1 * qpoly_nonneg a n x)] mulrC.
+      rewrite -[qnat n.+1 * qpoly_nonneg a n x * (x - q ^ n * a)] mulrA.
+      rewrite (_ : qpoly_nonneg a n x * (x - q ^ n * a) = qpoly_nonneg a n.+1 x) //.
+      rewrite mulrA.
+      rewrite -{1}(mul1r (qpoly_nonneg a n.+1 x)).
+      rewrite -mulrDl addrC.
+      rewrite -(@divff _ (q - 1)) //.
+      rewrite [qnat n.+1] /qnat.
+      rewrite [q * ((q ^ n.+1 - 1) / (q - 1))] mulrA.
+      rewrite (add_div _ _ (q -1)) //.
+      by rewrite mulrBr -exprSz mulr1 subrKA.
+    by apply denom_is_nonzero.
+Qed.
+\end{lstlisting}
+となる. ここで{\tt elim:\,n}は{\tt n}の帰納法に対応している. \\
+指数法則については, 一般には$(x - a)^{m + n} \neq (x - a)^m_q(x - a)^n_q$であり, 以下のようになる. 
+\bprop[\cite{Kac} p8 (3.6)] \label{q_exp_low}
+  $x,a\in\R$, $m,n\in\Z_{>0}$について, 
+  \[
+    (x-a)^{m+n}_q = (x-a)^m_q (x-q^ma)^n_q
+  \]
+  が成り立つ. 
+\eprop
+\bpf
+  \begin{align*}
+    (x-a)^{m+n}_q &= (x-a)(x-qa)\cdots(x-q^{m-1}a)
+                         \times (x-q^ma)(x-q^{m+1}a)\cdots(x-q^{m+n-1})\\
+                       &= (x-a)(x-qa)\cdots(x-q^{m-1}a)
+                         \times (x-q^ma)(x-q(q^mx))\cdots(x-q^{n-1}(q^ma))\\
+                       &= (x-a)^m_q(x-q^ma)^{n}_q
+  \end{align*}
+  より成立する.
+\epf
+この形式化は次のとおりである. 
+\begin{lstlisting}{Coq}
+Lemma qpoly_nonneg_explaw x a m n :
+  qpoly_nonneg a (m + n) x =
+    qpoly_nonneg a m x * qpoly_nonneg (q ^ m * a) n x.
+Proof.
+  elim: n.
+  - by rewrite addn0 /= mulr1.
+  - elim => [_|n _ IH].
+    + by rewrite addnS /= addn0 expr0z !mul1r.
+    + rewrite addnS [LHS]/= IH /= !mulrA.
+      by rewrite -[q ^ n.+1 * q ^ m] expfz_n0addr // addnC.
+Qed.
+\end{lstlisting}
+\cite{Kac}の証明では単に式変形しているが, {\tt qpoly\_nonneg}が再帰的に定義されているため, 形式化の証明では{\tt m}, {\tt n}に関する帰納法を用いている. \\
+この指数法則を用いて, $(x - a)^n_q$の$n$を負の数に拡張する. まず, \cite{Kac}の定義は
+\bdf[\cite{Kac} p9 (3.7)] \label{qpoly_neg}
+  $x$, $a \in \R$, $l\in\Z_{>0}$とする. このとき, 
+  \[
+    (x-a)^{-l}_q \coloneqq \frac{1}{(x-q^{-l}a)^l_q}
+  \]
+  と定める. 
+\edf
+であり, この形式化は, 
+\begin{lstlisting}{Coq}
+Definition qpoly_neg a n x := 1 / qpoly_nonneg (q ^ ((Negz n) + 1) * a) n x.
+\end{lstlisting}
+となる. ここで, {\tt Negz n}とは{\tt Negz n = - n.+1}をみたすものであって, {\tt int}は
+\begin{lstlisting}{Coq}
+Variant int : Set := Posz : nat -> int | Negz : nat -> int.
+\end{lstlisting}
+のように定義されている. よって, {\tt int}は$0$以上か負かで場合分けできるため, {\tt n :\,int}に対して, 
+\begin{lstlisting}{Coq}
+Definition qpoly a n x :=
+  match n with
+  | Posz n0 => qpoly_nonneg a n0 x
+  | Negz n0 => qpoly_neg a n0.+1 x
+  end.
+\end{lstlisting}
+と定義できる. \\
+整数に拡張した$(x - a)^n_q$についても, 指数法則とと$q$-微分はうまく振る舞う.
+まず, 指数法則について,  
+\bprop[\cite{Kac} p10 Proposition 3.2]
+  $m$, $n \in \Z$について, Proposition \ref{q_exp_low}は成り立つ. 
+\eprop
+\bpf
+  $m$, $n$の正負で場合分けして示す. $m > 0$かつ$n > 0$の場合はすでに示しており, 
+  $m = n =0$の場合は定義からすぐにわかる. その他の場合について, まず$m < 0$かつ
+  $n \ge 0$の場合, $m = -m'$とおくと
+  \begin{align*}
+    (x - a)^m_q (x - q^m)^n_q &= (x - a)^{-m'}_q (x - q^{-m'} a)^n_q\\
+                                       &= \frac{(x - q^{-m'} a)^n_q}{(x - q^{-m'} a)^{m'}_q}\\
+                                       &= \begin{cases}
+                                              (x - q^{m'} (q ^{-m'} a))^{n - m'}_q & n \ge m' \\
+                                              \frac{1}{(x - q^n (q ^{-m'} a))^{m' - n}_q} & n < m'
+                                            \end{cases}\\
+												 &= (x - a)^{n - m'}_q\\
+												 &= (x - a)^{n + m}_q
+  \end{align*}
+  というように, $n$と$m'$の大小で場合分けすることで示せる. 次に, $m \ge 0$かつ$n < 0$
+  の場合, $n = - n'$として, 
+  \begin{align*}
+    (x - a)^m_q (x - q^m)^n_q &= (x - a)^{m}_q (x - q^m a)^{-n'}_q\\
+                                       &= \begin{cases}
+                                             \frac{(x - a)^{m - n'}_q (x - q^{m - n'} a)^{n'}_q}
+                                                    {(x - q^{m - n'} a)^{n'}_q} & m \ge n' \\
+                                             \frac{(x - a)^m_q}
+                                     {(x - q^{m - n'})^{n' - m}_q (x - q^{n' - m}(q^{m - n'}a))} & m < n      
+                                           \end{cases}\\
+                                       &= \begin{cases}
+                                              (x - a)^{m - n'} & m \ge n' \\
+                                              \frac{1}{(x - q^{m - n'})^{n' - m}_q} & m < n'
+                                            \end{cases}\\
+                                       &=  (x - a)^{m - n'}_q = (x - a)^{m + n}_q
+  \end{align*}
+  となる. 最後に, $m < 0$かつ$n < 0$のとき, $m = -m'$, $n = -n'$として, 
+  \begin{align*}
+    (x - a)^m_q (x - q^m)^n_q &= (x - a)^{-m'}_q (x - q^{-m'})^{-n'}_q\\
+                                       &= \frac{1}{(x - q^{-m'} a)^{m'}_q (x - q^{-n'-m'}a)^{n'}_q}\\
+                              &= \frac{1}{(x - q^{-n'-m'}a)^{n'}_q (x - q^{n'}(q^{-m'-n'} a))^{m'}_q }\\
+                                       &= \frac{1}{(x - q^{-n'-m'} a)^{n' + m'}_q}\\
+                                       &= (x - a)^{-m'-n'}_q\\
+                                       &= (x - a)^{m' + n'}
+  \end{align*}
+  となる.
+\epf
+この補題を形式化すると, 
+\begin{lstlisting}{}
+Theorem qpoly_exp_law a m n x : q != 0 ->
+  qpoly_denom a m x != 0 ->
+  qpoly_denom (q ^ m * a) n x != 0 ->
+  qpoly a (m + n) x = qpoly a m x * qpoly (q ^ m * a) n x.
+Proof.
+  move=> Hq0.
+  case: m => m Hm.
+  - case: n => n Hn.
+    + by apply qpoly_nonneg_explaw.
+    + rewrite qpoly_exp_pos_neg //.
+      by rewrite addrC expfzDr // -mulrA.
+  - case: n => n Hn.
+    + by rewrite qpoly_exp_neg_pos.
+    + by apply qpoly_exp_neg_neg.
+Qed.
+\end{lstlisting}
+となる. 証明の構造としては, まず{\tt case:m}で{\tt m}が$0$以上か負かの場合分けを行い, 更にそれぞれの場合について{\tt case:n}で{\tt n}の場合分けを行っている. 
+ここで, 前提の{\tt qpoly\_denom}の定義は
+\begin{lstlisting}{Coq}
+Definition qpoly_denom a n x := match n with
+  | Posz n0 => 1
+  | Negz n0 => qpoly_nonneg (q ^ Negz n0 * a) n0.+1 x
+  end.
+\end{lstlisting}
+であり, 2つの前提は補題の右辺に出現する項の分母が$0$にならないということである. 
+証明中に使われている補題のうち, {\tt qpoly\_exp\_pos\_neg}, {\tt qpoly\_exp\_neg\_pos}, {\tt qpoly\_exp\_neg\_neg}はそれぞれ$m \ge 0$かつ$n < 0$, $m <0$かつ$n \ge 0$, $m < 0$かつ$n < 0$のときの証明の形式化であり, 例えば{\tt qpoly\_exp\_pos\_neg}については
+\begin{lstlisting}{Coq}
+Lemma qpoly_exp_pos_neg a (m n : nat) x : q != 0 ->
+  qpoly_nonneg (q ^ (Posz m + Negz n) * a) n.+1 x != 0 ->
+  qpoly a (Posz m + Negz n) x = qpoly a m x * qpoly (q ^ m * a) (Negz n) x.
+Proof.
+  move=> Hq0 Hqpolymn.
+  case Hmn : (Posz m + Negz n) => [l|l]  /=.
+  - rewrite /qpoly_neg mul1r.
+    rewrite (_ : qpoly_nonneg a m x = qpoly_nonneg a (l + n.+1) x).
+      rewrite qpoly_nonneg_explaw.
+      have -> : q ^ (Negz n.+1 + 1) * (q ^ m * a) = q ^ l * a.
+        by rewrite mulrA -expfzDr // -addn1 Negz_addK addrC Hmn.
+      rewrite -{2}(mul1r (qpoly_nonneg (q ^ l * a) n.+1 x)).
+      rewrite red_frac_r.
+        by rewrite divr1.
+      by rewrite -Hmn.
+    apply Negz_transp in Hmn.
+    apply (eq_int_to_nat R) in Hmn.
+    by rewrite Hmn.
+  - rewrite /qpoly_neg.
+    have Hmn' : n.+1 = (l.+1 + m)%N.
+      move /Negz_transp /esym in Hmn.
+      rewrite addrC in Hmn.
+      move /Negz_transp /(eq_int_to_nat R) in Hmn.
+      by rewrite addnC in Hmn.
+    rewrite (_ : qpoly_nonneg (q ^ (Negz n.+1 + 1) * (q ^ m * a)) n.+1 x 
+               = qpoly_nonneg (q ^ (Negz n.+1 + 1) * (q ^ m * a))
+                              (l.+1 + m) x).
+      rewrite qpoly_nonneg_explaw.
+      have -> : q ^ (Negz n.+1 + 1) * (q ^ m * a) =
+                q ^ (Negz l.+1 + 1) * a.
+        by rewrite mulrA -expfzDr // !NegzS addrC Hmn.
+      have -> : q ^ l.+1 * (q ^ (Negz l.+1 + 1) * a) = a.
+        by rewrite mulrA -expfzDr // NegzS NegzK expr0z mul1r.
+      rewrite mulrA.
+      rewrite [qpoly_nonneg (q ^ (Negz l.+1 + 1) * a) l.+1 x *
+               qpoly_nonneg a m x] mulrC.
+      rewrite red_frac_l //.
+      have -> : a = q ^ l.+1 * (q ^ (Posz m + Negz n) * a) => //.
+        by rewrite mulrA -expfzDr // Hmn NegzK expr0z mul1r.
+      apply qpoly_exp_non0r.
+      rewrite -Hmn' //.
+    by rewrite Hmn'.
+Qed.
+\end{lstlisting}
+となっている. この証明についての注目点としては, 
+\begin{itemize}
+  \item \cite{Kac}では$m$と$n'$の大小で場合分けをしていたが, 形式化では, 
+           \begin{lstlisting}{Coq}
+  case Hmn : (Posz m + Negz n) => [l|l]  /=. \end{lstlisting}
+           として, {\tt m $-$ n'}の値を{\tt l}とおき, {\tt l}が{\tt 0}以上かどうかで
+           場合分けをしている
+  \item Coqでは$A = B$という等式はどの型の上でのものなのかが区別されている. 
+           {\tt eq\_int\_to\_nat}という補題は{\tt int}上の等式を{\tt nat}上の等式に写している. 
+\end{itemize}
+などが挙げられる. 
+さらに, $q$-微分については, 
+\bprop[\cite{Kac} p10 Proposition3.3]
+  $n \in \Z$について, 
+  \[
+    D_q x^n = [n] x ^{n - 1}
+  \]
+  が成り立つ. ただし, $n$が整数の場合にも, 自然数のときと同様, $[n]$の定義は
+  \[
+    \frac{q^n - 1}{q - 1}
+  \]
+  である. 
+\eprop
+\bpf
+  $n > 0$のときは Proposition \ref{q_deriv_qpoly_nonneg} であり, $n = 0$のときは$[0] = 0$からすぐにわかる. 
+  $n < 0$のときは, Definition \ref{qpoly_neg}と, 商の微分公式の$q$-類似版である
+  \[
+    D_q \left( \frac{f(x)}{g(x)} \right) = \frac{g(x) D_q f(x) - f(x) D_q g(x)}{g(x) g(qx)} \quad
+    \text{(\cite{Kac} p3 (1.13))}
+  \]
+  及び Proposition \ref{q_deriv_qpoly_nonneg}を用いて示される. 
+\epf
+\cite{Kac}と同じ方針で証明する. まず, $n = 0$のとき, 
+\begin{lstlisting}{Coq}
+Lemma qderiv_qpoly_0 a x :
+  Dq (qpoly a 0) x = qnat 0 * qpoly a (- 1) x.
+Proof. by rewrite Dq_const qnat_0 mul0r. Qed.
+\end{lstlisting}
+である. ここで, {\tt Dq\_const}は
+\begin{lstlisting}{Coq}
+Lemma Dq_const x c : Dq (fun x => c) x = 0.
+Proof. by rewrite /Dq /dq addrK' mul0r. Qed.
+\end{lstlisting}
+という定数関数の$q$-微分は$0$であるという補題である. 次に, $n < 0$のときは
+\begin{lstlisting}{Coq}
+Lemma qderiv_qpoly_neg a n x : q != 0 -> x != 0 ->
+  (x - q ^ (Negz n) * a) != 0 ->
+  qpoly_nonneg (q ^ (Negz n + 1) * a) n x != 0 ->
+  Dq (qpoly_neg a n) x = qnat (Negz n + 1) * qpoly_neg a (n.+1) x.
+Proof.
+  move=> Hq0 Hx Hqn Hqpoly.
+  destruct n.
+  - by rewrite /Dq /dq /qpoly_neg /= addrK' qnat_0 !mul0r.
+  - rewrite qderiv_quot //.
+      rewrite Dq_const mulr0 mul1r sub0r.
+      rewrite qderiv_qpoly_nonneg // qpoly_qx // -mulNr.
+      rewrite [qpoly_nonneg (q ^ (Negz n.+1 + 1) * a) n.+1 x *
+                (q ^ n.+1 * qpoly_nonneg (q ^ (Negz n.+1 + 1 - 1) *
+                  a) n.+1 x)] mulrC.
+      rewrite -mulf_div.
+      have -> : qpoly_nonneg (q ^ (Negz n.+1 + 1) * a) n x /
+                    qpoly_nonneg (q ^ (Negz n.+1 + 1) * a) n.+1 x =
+                      1 / (x - q ^ (- 1) * a).
+        rewrite -(mulr1
+                     (qpoly_nonneg (q ^ (Negz n.+1 + 1) * a) n x)) /=.
+        rewrite red_frac_l.
+          rewrite NegzE mulrA -expfzDr // addrA -addn2.
+          rewrite (_ : Posz (n + 2)%N = Posz n + 2) //.
+          rewrite -{1}(add0r (Posz n)).
+          by rewrite addrKA.
+        by rewrite /=; apply mulnon0 in Hqpoly.
+      rewrite mulf_div.
+      rewrite -[q ^ n.+1 *
+                 qpoly_nonneg (q ^ (Negz n.+1 + 1 - 1) * a) n.+1 x *
+                   (x - q ^ (-1) * a)]mulrA.
+      have -> : qpoly_nonneg (q ^ (Negz n.+1 + 1 - 1) * a) n.+1 x *
+                (x - q ^ (-1) * a) =
+                qpoly_nonneg (q ^ (Negz (n.+1)) * a) n.+2 x => /=.
+        have -> : Negz n.+1 + 1 - 1 = Negz n.+1.
+          by rewrite addrK.
+        have -> : q ^ n.+1 * (q ^ Negz n.+1 * a) = q ^ (-1) * a => //.
+        rewrite mulrA -expfzDr // NegzE.
+        have -> : Posz n.+1 - Posz n.+2 = - 1 => //.
+        rewrite -addn1 -[(n + 1).+1]addn1.
+        rewrite (_ : Posz (n + 1)%N = Posz n + 1) //.
+        rewrite (_ : Posz (n + 1 + 1)%N = Posz n + 1 + 1) //.
+        rewrite -(add0r (Posz n + 1)).
+        by rewrite addrKA.
+      rewrite /qpoly_neg /=.
+      rewrite (_ : Negz n.+2 + 1 = Negz n.+1) //.
+      rewrite -mulf_div.
+      congr (_ * _).
+      rewrite NegzE mulrC.
+      rewrite /qnat.
+      rewrite -mulNr mulrA.
+      congr (_ / _).
+      rewrite opprB mulrBr mulr1 mulrC divff.
+        rewrite invr_expz.
+        rewrite (_ : - Posz n.+2 + 1 = - Posz n.+1) //.
+        rewrite -addn1.
+        rewrite (_ : Posz (n.+1 + 1)%N = Posz n.+1 + 1) //.
+        rewrite addrC.
+        rewrite [Posz n.+1 + 1]addrC.
+        by rewrite -{1}(add0r 1) addrKA sub0r.
+      by rewrite expnon0 //.
+    rewrite qpoly_qx // mulf_neq0 //.
+      by rewrite expnon0.
+    rewrite qpoly_nonneg_head mulf_neq0 //.
+    rewrite (_ : Negz n.+1 + 1 - 1 = Negz n.+1) //.
+      by rewrite addrK.
+    move: Hqpoly => /=.
+    move/mulnon0.
+    by rewrite addrK mulrA -{2}(expr1z q) -expfzDr.
+Qed.
+\end{lstlisting}
+と, 非常に長くなっているが積の交換則や結合則などが多く, {\tt qderiv\_quot}が商の$q$-微分公式の形式化であるため, \cite{Kac}の証明をそのまま形式化したものになっている.  また, いくつかの項が$0$でないという条件がついているが, これらの項は Definition \ref{qpoly_neg} において分母に現れるため, {\tt qderiv\_of\_pow}のときと同様妥当であると考えられる. これらをまとめて, 
+\begin{lstlisting}{Coq}
+Theorem qderiv_qpoly a n x : q != 0 -> x != 0 ->
+  x - q ^ (n - 1) * a != 0 ->
+  qpoly (q ^ n * a) (- n) x != 0 ->
+  Dq (qpoly a n) x = qnat n * qpoly a (n - 1) x.
+Proof.
+  move=> Hq0 Hx Hxqa Hqpoly.
+  case: n Hxqa Hqpoly => [|/=] n Hxqa Hqpoly.
+  - destruct n.
+    + by rewrite qderiv_qpoly_0.
+    + rewrite qderiv_qpoly_nonneg //.
+      rewrite (_ : Posz n.+1 - 1 = n) //.
+      rewrite -addn1.
+      rewrite (_ : Posz (n + 1)%N = Posz n + 1) //.
+      by rewrite addrK.
+  - rewrite Dq_qpoly_int_to_neg qderiv_qpoly_neg //.
+        rewrite NegzK.
+        rewrite (_ : (n + 1).+1 = (n + 0).+2) //.
+        by rewrite addn0 addn1.
+      rewrite (_ : Negz (n + 1) = Negz n - 1) //.
+      by apply itransposition; rewrite NegzK.
+    by rewrite NegzK addn1.
+Qed.
+\end{lstlisting}
+と形式化できる. {\tt case:\,n}で{\tt n}が$0$以上か負かで場合分けを行い, {\tt destruct n}で$0$か$1$以上かの場合分けをしており, それぞれの場合で{\tt qderiv\_qpoly\_0}, {\tt qderiv\_qpoly\_nonneg}, {\tt qderiv\_qpoly\_neg}を使っていることが見て取れる. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{$q$-Taylor展開}
+まず, 一般に以下のことが成り立つことを確認しておく. 
+\bthm
+$\K\coloneqq\R$または$\C$, $V\coloneqq\K[x]$とし, $D$を$V$上の線型作用素とする. また, 
+$\{P_n(x)\}_{n=0}\subset V$ ($n=0,1,2,\cdots$)は次の三条件をみたすとする. 
+  \begin{align*}
+    &\textrm{(i)}\,P_0 = 1,\,P_n(a)=0 \quad ({}^{\forall}n\ge1)\\
+    &\textrm{(ii)}\,\deg P_n = n \quad ({}^{\forall}n\ge0)\\
+    &\textrm{(iii)}\,DP_n(x) = P_{n-1}(x) \quad ({}^{\forall}n\ge1), \quad D(1) = 0
+  \end{align*}
+ただし, $a\in\K$である. このとき, 任意の多項式$f(x)\in V$に対し, $\deg f(x)=N$とすると, 
+  \[
+    f(x) = \sum_{n=0}^N(D^nf)(a)P_n(x)
+  \]
+が成り立つ. 
+\ethm
+\bpf
+  条件(ii)から$\{P_0(x), P_1(x), \ldots , P_n(x)\}$が$V$の基底であるため, 係数列$c_k$
+  が一意にとれて, 
+  \[
+    f(x) = \sum_{k = 0}^N c_k P_k(x)
+  \]
+  と表せる. このとき, 条件(i)から, $x = a$とすることで$c_0 = f(a)$が得られる. 更に, 条件(ii), (iii)と
+  $D$の線形性から, 両辺に$n$回($1 \le n \le N$)$D$を作用させることで, 
+  \[
+    (D^n f)(x) = \sum_{k = n}^N c_k D^n P_k (x) = \sum_{k = n}^N c_k P_{k - n}(x)
+  \]
+  となる. ここで$x = a$とすることで	条件(i)から
+  \[
+    c_n = (D^n f)(a) \quad (0 \le n \le N)
+  \]
+  が得られる. 
+\epf
+この定理を形式化すると以下のようになる. 
+\begin{lstlisting}{Coq}
+Theorem general_Taylor D n P (f : {poly R}) a :
+  islinear D -> isfderiv D P ->
+  (P 0%N).[a] = 1 ->
+  (forall n, (P n.+1).[a] = 0) ->
+  (forall m, size (P m) = m.+1) ->
+  size f = n.+1 ->
+  f = \sum_(0 <= i < n.+1)
+          (((D \^ i) f).[a] *: (P i)).
+Proof.
+  move=> Hl Hd HP0 HP HdP Hdf.
+  have Hdf' : (size f <= n.+1)%N.
+    by rewrite Hdf leqnn.
+  move: (poly_basis n P f HdP Hdf') => [c] Hf.
+  have Hc0 : c 0%N = ((D \^ 0) f).[a] => /=.
+    rewrite Hf.
+    destruct n.
+      by rewrite big_nat1 hornerZ HP0 mulr1.
+    rewrite hornersumD.
+    rewrite (@big_cat_nat _ _ _ 1) //= big_nat1.
+    rewrite hornerZ HP0 mulr1.
+    have -> : (1 = 0 + 1)%N by [].
+    rewrite big_addn subn1 /=.
+    under eq_big_nat => i /andP [_ _].
+      rewrite hornerZ addn1 HP mulr0.
+    over.
+    by rewrite big1 // addr0.
+  have ithD : forall j, (j.+1 <= n)%N ->
+    (D \^ j.+1) f = \sum_(j.+1 <= i < n.+1) c i *: P (i - j.+1)%N.
+    move=> j Hj.
+    rewrite Hf linear_distr.
+      rewrite {1}(lock j.+1).
+      rewrite (@big_cat_nat _ _ _ j.+1) //=.
+        rewrite -lock.
+        under eq_big_nat => i /andP [_ Hi].
+          rewrite nthisfderiv_0 // scaler0.
+        over.
+        rewrite big1 // add0r.
+        by under eq_big_nat => i /andP [Hi _] do rewrite nthisfderiv_pos //.
+      by apply leqW.
+    by apply nth_islinear.
+  have coef : forall j, (j <= n)%N -> c j = ((D \^ j) f).[a].
+    move=> j Hj.
+    destruct j => //.
+    rewrite ithD //.
+    rewrite (@big_cat_nat _ _ _ j.+2) //= big_nat1 hornerD.
+    rewrite subnn hornerZ HP0 mulr1 hornersumD.
+    under eq_big_nat => i /andP [Hi Hi'].
+      rewrite hornerZ.
+      move: (Hi).
+      rewrite -addn1 -leq_subRL //; last by apply ltnW.
+      case: (i - j.+1)%N => // k Hk.
+      rewrite HP mulr0.
+    over.
+    move=> /=.
+    by rewrite big1 // addr0.
+  rewrite {1}Hf.
+  rewrite big_nat_cond.
+  rewrite [RHS] big_nat_cond.
+  apply eq_bigr => i /andP [/andP [Hi Hi'] _].
+  by rewrite coef.
+Qed.
+\end{lstlisting}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{thebibliography}{9}
+  \bibitem{Kac} Victor Kac, Pokman Cheung, {\it{Quantum Calculus}}, Springer, 2001.
+  \bibitem{Gar} \url{https://www.math.nagoya-u.ac.jp/~garrigue/lecture/2021_AW/                  
+                           ssrcoq2.pdf}
+\end{thebibliography}
+\end{document}
