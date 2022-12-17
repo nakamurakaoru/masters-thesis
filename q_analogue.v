@@ -1461,7 +1461,13 @@ Theorem Gauss_binomial a n : (forall n, q_fact n != 0) ->
   \sum_(0 <= i < n.+1)
     (q_bicoef n i * q ^+ (i * (i - 1))./2 * a ^+ i) *: 'X^(n - i).
 Proof.
-Admitted.
+move=> Hfact.
+rewrite big_nat_rev //=.
+under eq_big_nat => i /andP [_ Hi].
+  rewrite add0n subSS subKn // q_bicoefE //.
+over.
+by rewrite Gauss_binomial'.
+Qed.
 
 End q_analogue.
 

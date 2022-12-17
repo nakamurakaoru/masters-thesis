@@ -131,26 +131,31 @@ over.
 done.
 Qed.
 
-Lemma scaleq_prod (p p' : {poly R}) :
+Lemma scaleq_prod (p p' : {poly R}) n : (size p <= n)%N ->
   scaleq (p * p') = scaleq p * scaleq p'.
 Proof.
-have scaleq_size_induction_step : forall n, (forall (p0 :{poly R}), size p0 = n /\ scaleq (p0 * p') = scaleq p0 * scaleq p')
-  -> (forall (p1 : {poly R}), size p1 = n.+1 -> scaleq (p1 * p') = scaleq p1 * scaleq p').
-  admit.
-(* have scaleq_size_ind (p0 : {poly R}) : 
-(forall (p0 : {poly R}), size p0 = 0%N /\ scaleq (p0 * p') = scaleq p0 * scaleq p')
-  -> (forall n, (size p0 = n /\ scaleq (p0 * p') = scaleq p0 * scaleq p')
-                 -> (forall (p1 : {poly R}), size p1 = n.+1 -> scaleq (p1 * p') = scaleq p1 * scaleq p'))
-    -> forall (p:{poly R}), scaleq (p * p') = scaleq p * scaleq p'.
-  move=>H0 IH.
-case. *)
+have Hp0 : forall (p : {poly R}), size p = 0%N ->
+  scaleq (p * p') = scaleq p * scaleq p'.
+  move=> p0.
+  move/eqP.
+  rewrite size_poly_eq0.
+  move/eqP ->.
+  by rewrite mul0r scaleqC mul0r.
+elim: n p => [|n IH] p Hsize.
+  Search (_ <= 0)%N.
+  move: Hsize.
+  rewrite leqn0 => /eqP.
+  by apply Hp0.
+case Hp : (size p == 0%N).
+  rewrite Hp0 //.
+  by apply/eqP.
 have -> : p = p - (p`_0)%:P + (p`_0)%:P by rewrite subrK.
 set p1 := (\poly_(i < (size p).-1) p`_i.+1).
 have -> : p - (p`_0)%:P = 'X * p1.
   rewrite -{1}(coefK p) poly_def.
   rewrite (sumW _ (fun i => p`_i *: 'X^i)).
   rewrite (@big_cat_nat _ _ _ 1) //=; last first.
-    admit.
+    by apply neq0_lt0n.
   rewrite big_nat1 -mul_polyC mulr1 (addrC (p`_0)%:P) addrK.
   have -> : (1 = 0 + 1)%N by [].
   rewrite big_addn subn1.
@@ -158,9 +163,16 @@ have -> : p - (p`_0)%:P = 'X * p1.
   by rewrite sum_distr /p1 poly_def -sumW.
 rewrite mulrDl [LHS]scaleq_add mul_polyC scaleq_scale -mulrA scaleq_prodX.
 have -> : scaleq (p1 * p') = scaleq p1 * scaleq p'.
-  admit. (* by IH *)
+  rewrite IH //.
+  apply (@leq_trans (size p).-1).
+    apply size_poly.
+  rewrite -(leq_add2r 1).
+  have -> : ((size p).-1 + 1 = size p)%N.
+    rewrite addn1 prednK //.
+    by apply neq0_lt0n.
+  by rewrite addn1.
 by rewrite mulrA -scaleq_prodX -mul_polyC -mulrDl -{1}scaleqC -scaleq_add.
-Admitted.
+Qed.
 
 Definition dq_f p := scaleq p - p.
 
@@ -209,7 +221,8 @@ Qed.
 
 Lemma dq_f_prod' p p' : dq_f (p * p') = p * dq_f p' + scaleq p' * dq_f p.
 Proof.
-rewrite /dq_f scaleq_prod !mulrBr [RHS]addrC addrA.
+rewrite /dq_f.
+rewrite (scaleq_prod _ _ (size p)) // !mulrBr [RHS]addrC addrA.
 f_equal.
 rewrite -addrA [- (scaleq p' * p) + p * scaleq p']addrC.
 by rewrite [p * scaleq p']mulrC addrK' addr0 mulrC.
