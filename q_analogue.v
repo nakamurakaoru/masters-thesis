@@ -41,8 +41,8 @@ Lemma dq_prod f g x :
   dq (f ** g) x = (f (q * x)) * dq g x + (g x) * dq f x.
 Proof.
   rewrite /dq !mulrBr.
-  rewrite [in g x * f (q * x)] mulrC.
-  by rewrite [in g x * f x] mulrC subrKA.
+  rewrite [g x * f (q * x)] mulrC.
+  by rewrite [g x * f x] mulrC subrKA.
 Qed.
 
 (* q-derivative *)
@@ -68,13 +68,9 @@ Proof.
     by rewrite mulr0 !addrK' !mulr0 -mulrDl addr0.
   - rewrite add_div.
       rewrite !mulrBr opprD !addrA.
-      rewrite [a * f (q * x) + b * g (q * x) - a * f x]
-              addrC.
-      rewrite [(a * f (q * x) + b * g (q * x))]
-              addrC.
-      rewrite addrA.
-      rewrite [- (a * f x) + b * g (q * x) + a * f (q * x)]
-              addrC.
+      rewrite [a * f (q * x) + b * g (q * x) - a * f x]addrC.
+      rewrite [(a * f (q * x) + b * g (q * x))]addrC addrA.
+      rewrite [- (a * f x) + b * g (q * x) + a * f (q * x)] addrC.
       by rewrite addrA.
   apply denom_is_nonzero => //.
   by rewrite Hx.
@@ -98,31 +94,23 @@ Proof.
   - by rewrite q_nat1 big_nat1 expr0z.
   - have -> : q_nat n.+2 = q_nat n.+1 + q ^ n.+1.
       apply (same_prod _ (q - 1)) => //.
-      by rewrite mulrDl !denomK // mulrBr mulr1 -exprSzr
-                [RHS] addrC subrKA.
-    rewrite IH.
-    rewrite [RHS] (@big_cat_nat _ _ _ n.+1) //=.
-    by rewrite big_nat1.
+      by rewrite mulrDl !denomK // mulrBr mulr1 -exprSzr [RHS]addrC subrKA.
+    by rewrite IH [RHS](@big_cat_nat _ _ _ n.+1) //= big_nat1.
 Qed.
 
 Lemma q_nat_cat {n} j : (j < n)%N ->
   q_nat n.+1 = q_nat j.+1 + q ^ j.+1 * q_nat (n.+1 - j.+1)%N.
 Proof.
   move=> Hjn.
-  have Hjn' : (j < n.+1)%N.
-    by apply (@ltn_trans n).
+  have Hjn' : (j < n.+1)%N by apply ltnW.
   have Hjn'' : (0 < n.+1 - j.+1)%N.
-    rewrite subn_gt0.
-    have -> : j.+1 = (j + 1)%N. by rewrite -addn1.
-    have -> : n.+1 = (n + 1)%N. by rewrite -addn1.
-    by rewrite ltn_add2r.
-  rewrite !q_natE.
-  rewrite (@big_cat_nat _ _ _ j.+1) //=.
+    by rewrite subn_gt0.
+  rewrite !q_natE (@big_cat_nat _ _ _ j.+1) //=.
   have {2}-> : j.+1 = (0 + j.+1)%N by [].
   rewrite big_addn.
   have -> : (n.+1 - j.+1)%N = (n.+1 - j.+1 - 1).+1.
     by rewrite subn1 prednK // // subn_gt0.
-  congr (_ + _).
+  f_equal.
   under eq_bigr do rewrite exprzD_nat.
   by rewrite sum_distr q_natE.
 Qed.
@@ -193,17 +181,13 @@ Lemma qderiv_of_pow n x :
 Proof.
   move=> Hx.
   rewrite /Dq /dq /q_nat.
-  rewrite -{4}(mul1r x) -mulrBl expfzMl.
-    rewrite -add_div.
-    rewrite [in x ^ n](_ : n = (n -1) +1) //.
-      rewrite expfzDr // expr1z.
-      rewrite mulrA -mulNr !red_frac_r //.
-      rewrite add_div //.
-      rewrite -{2}[x ^ (n - 1)]mul1r.
-      rewrite -mulrBl mulrC mulrA.
-      by rewrite [in (q - 1)^-1 * (q ^ n - 1)] mulrC.
+  rewrite -{4}(mul1r x) -mulrBl expfzMl -add_div; last first.
+    by apply mulf_neq0.
+  rewrite [in x ^ n](_ : n = (n -1) +1) //; last first.
     by rewrite subrK.
-  by apply mulf_neq0.
+  rewrite expfzDr ?expr1z ?mulrA -?mulNr ?red_frac_r ?add_div //.
+  rewrite -{2}[x ^ (n - 1)]mul1r -mulrBl mulrC mulrA.
+  by rewrite [in (q - 1)^-1 * (q ^ n - 1)] mulrC.
 Qed.
 
 (* q-derivative product rule *)
