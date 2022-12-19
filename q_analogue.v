@@ -1213,16 +1213,6 @@ Qed.
 
 Definition dq_f p := scaleq p - p.
 
-(* should be tools *)
-Lemma size_N0_lt (p : {poly R}) : (size p == 0%N) = false -> (0 < size p)%N.
-Proof.
-move=> Hsize.
-rewrite ltn_neqAle.
-apply /andP; split => //.
-move: Hsize.
-by rewrite eq_sym => ->.
-Qed.
-
 Lemma dq_fpXE p : dq_f p = 'X * \poly_(i < size p) ((q ^ i.+1 - 1) * p`_i.+1).
 Proof.
 rewrite /dq_f /scaleq.
@@ -1337,15 +1327,6 @@ have -> : dq_f c%:P = 0.
     move/ eqP : Hc ->.
     by rewrite polyC0 subr0.
   by rewrite div0p.
-Qed.
-
-(* should be tools *)
-Lemma divpsum n P (d : {poly R}) :
-  (\sum_(0 <= i < n) P i) %/ d = \sum_(0 <= i < n) (P i %/ d).
-Proof.
-elim: n => [|n IH].
-- by rewrite !big_nil div0p.
-- by rewrite !(@big_cat_nat _ _ _ n 0 n.+1) //= !big_nat1 divpD IH.
 Qed.
 
 Definition Dq' (p : {poly R}) := \poly_(i < size p) (q_nat (i.+1) * p`_i.+1).

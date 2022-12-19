@@ -277,7 +277,11 @@ Qed.
 Lemma denom_comm (x y z : R) : x / y / z = x / z / y.
 Proof. by rewrite -mulrA [y^-1 / z] mulrC mulrA. Qed.
 
-Lemma sum_shift m n (F : nat -> R) :
+Lemma sumW {V : zmodType} n (F : nat -> V) :
+  \sum_(i < n) F i = \sum_(0 <= i < n) F i.
+Proof. by rewrite big_mkord. Qed.
+
+(* Lemma sum_shift m n (F : nat -> R) :
   \sum_(m <= i < m + n.+1) F i = \sum_(0 <= i < n.+1) F (i + m)%N.
 Proof.
   elim: n => [|n IH].
@@ -287,7 +291,7 @@ Proof.
         by rewrite [(m + n.+2)%N] addnS IH !big_nat1 addnC.
       by apply leq_addr.
     by rewrite leq_add2l.
-Qed.
+Qed. *)
 
 Lemma sum_add {V : zmodType} n (F G : nat -> V) :
   \sum_(0 <= i < n) (F i) + \sum_(0 <= i < n) (G i) =
@@ -344,6 +348,14 @@ Proof.
     by rewrite !big_nat1 hornerM polyCV hornerC mulrA.
 Qed.
 
+Lemma divpsum n P (d : {poly R}) :
+  (\sum_(0 <= i < n) P i) %/ d = \sum_(0 <= i < n) (P i %/ d).
+Proof.
+elim: n => [|n IH].
+- by rewrite !big_nil div0p.
+- by rewrite !(@big_cat_nat _ _ _ n 0 n.+1) //= !big_nat1 divpD IH.
+Qed.
+
 Lemma polyW (p : {poly R}) n (a : nat -> R) : ((size p) <= n)%N ->
   \poly_(i < size p) (a i * p`_i.+1) =
   \sum_(0 <= i < n) (a i * p`_i.+1) *: 'X^i.
@@ -368,6 +380,15 @@ Proof.
   rewrite big1 // => i /andP [Hi _].
   move/leq_sizeP : Hi -> => //.
   by rewrite mulr0 scale0r.
+Qed.
+
+Lemma size_N0_lt (p : {poly R}) : (size p == 0%N) = false -> (0 < size p)%N.
+Proof.
+move=> Hsize.
+rewrite ltn_neqAle.
+apply /andP; split => //.
+move: Hsize.
+by rewrite eq_sym => ->.
 Qed.
 
 (* not used *)
