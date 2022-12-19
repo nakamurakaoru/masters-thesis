@@ -521,7 +521,7 @@ Qed.
 \end{itemize}
 などが挙げられる. 
 さらに, $q$-微分については, 
-\bprop[\cite{Kac} p10 Proposition3.3]
+\bprop[\cite{Kac} p10 Proposition 3.3]
   $n \in \Z$について, 
   \[
     D_q x^n = [n] x ^{n - 1}
@@ -652,8 +652,9 @@ Qed.
 と形式化できる. {\tt case:\,n}で{\tt n}が$0$以上か負かで場合分けを行い, {\tt destruct n}で$0$か$1$以上かの場合分けをしており, それぞれの場合で{\tt qderiv\_qpoly\_0}, {\tt qderiv\_qpoly\_nonneg}, {\tt qderiv\_qpoly\_neg}を使っていることが見て取れる. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{$q$-Taylor展開}
+この節では, 有限次$Taylor$展開の$q$-類似が成り立つこと, そしてその系として本論文の目的である Gauss's binomial formula が成り立つことを示し, 形式化する. 
 まず, 一般に以下のことが成り立つことを確認しておく. 
-\bthm
+\bthm[\cite{Kac} p5 Theorem 2.1] \label{general_Taylor}
 $\K\coloneqq\R$または$\C$, $V\coloneqq\K[x]$とし, $D$を$V$上の線型作用素とする. また, 
 $\{P_n(x)\}_{n=0}\subset V$ ($n=0,1,2,\cdots$)は次の三条件をみたすとする. 
   \begin{align*}
@@ -667,23 +668,23 @@ $\{P_n(x)\}_{n=0}\subset V$ ($n=0,1,2,\cdots$)は次の三条件をみたすと�
   \]
 が成り立つ. 
 \ethm
-\bpf
-  条件(ii)から$\{P_0(x), P_1(x), \ldots , P_n(x)\}$が$V$の基底であるため, 係数列$c_k$
-  が一意にとれて, 
-  \[
-    f(x) = \sum_{k = 0}^N c_k P_k(x)
-  \]
-  と表せる. このとき, 条件(i)から, $x = a$とすることで$c_0 = f(a)$が得られる. 更に, 条件(ii), (iii)と
-  $D$の線形性から, 両辺に$n$回($1 \le n \le N$)$D$を作用させることで, 
-  \[
-    (D^n f)(x) = \sum_{k = n}^N c_k D^n P_k (x) = \sum_{k = n}^N c_k P_{k - n}(x)
-  \]
-  となる. ここで$x = a$とすることで	条件(i)から
-  \[
-    c_n = (D^n f)(a) \quad (0 \le n \le N)
-  \]
-  が得られる. 
-\epf
+%\bpf
+%  条件(ii)から$\{P_0(x), P_1(x), \ldots , P_n(x)\}$が$V$の基底であるため, 係数列$c_k$
+%  が一意にとれて, 
+%  \[
+%    f(x) = \sum_{k = 0}^N c_k P_k(x)
+%  \]
+%  と表せる. このとき, 条件(i)から, $x = a$とすることで$c_0 = f(a)$が得られる. 更に, 条件(ii), (iii)と
+%  $D$の線形性から, 両辺に$n$回($1 \le n \le N$)$D$を作用させることで, 
+%  \[
+%    (D^n f)(x) = \sum_{k = n}^N c_k D^n P_k (x) = \sum_{k = n}^N c_k P_{k - n}(x)
+%  \]
+%  となる. ここで$x = a$とすることで	条件(i)から
+%  \[
+%    c_n = (D^n f)(a) \quad (0 \le n \le N)
+%  \]
+%  が得られる. 
+%\epf
 この定理を形式化すると以下のようになる. 
 \begin{lstlisting}{Coq}
 Theorem general_Taylor D n P (f : {poly R}) a :
@@ -692,62 +693,71 @@ Theorem general_Taylor D n P (f : {poly R}) a :
   (forall n, (P n.+1).[a] = 0) ->
   (forall m, size (P m) = m.+1) ->
   size f = n.+1 ->
-  f = \sum_(0 <= i < n.+1)
-          (((D \^ i) f).[a] *: (P i)).
-Proof.
-  move=> Hl Hd HP0 HP HdP Hdf.
-  have Hdf' : (size f <= n.+1)%N.
-    by rewrite Hdf leqnn.
-  move: (poly_basis n P f HdP Hdf') => [c] Hf.
-  have Hc0 : c 0%N = ((D \^ 0) f).[a] => /=.
-    rewrite Hf.
-    destruct n.
-      by rewrite big_nat1 hornerZ HP0 mulr1.
-    rewrite hornersumD.
-    rewrite (@big_cat_nat _ _ _ 1) //= big_nat1.
-    rewrite hornerZ HP0 mulr1.
-    have -> : (1 = 0 + 1)%N by [].
-    rewrite big_addn subn1 /=.
-    under eq_big_nat => i /andP [_ _].
-      rewrite hornerZ addn1 HP mulr0.
-    over.
-    by rewrite big1 // addr0.
-  have ithD : forall j, (j.+1 <= n)%N ->
-    (D \^ j.+1) f = \sum_(j.+1 <= i < n.+1) c i *: P (i - j.+1)%N.
-    move=> j Hj.
-    rewrite Hf linear_distr.
-      rewrite {1}(lock j.+1).
-      rewrite (@big_cat_nat _ _ _ j.+1) //=.
-        rewrite -lock.
-        under eq_big_nat => i /andP [_ Hi].
-          rewrite nthisfderiv_0 // scaler0.
-        over.
-        rewrite big1 // add0r.
-        by under eq_big_nat => i /andP [Hi _] do rewrite nthisfderiv_pos //.
-      by apply leqW.
-    by apply nth_islinear.
-  have coef : forall j, (j <= n)%N -> c j = ((D \^ j) f).[a].
-    move=> j Hj.
-    destruct j => //.
-    rewrite ithD //.
-    rewrite (@big_cat_nat _ _ _ j.+2) //= big_nat1 hornerD.
-    rewrite subnn hornerZ HP0 mulr1 hornersumD.
-    under eq_big_nat => i /andP [Hi Hi'].
-      rewrite hornerZ.
-      move: (Hi).
-      rewrite -addn1 -leq_subRL //; last by apply ltnW.
-      case: (i - j.+1)%N => // k Hk.
-      rewrite HP mulr0.
-    over.
-    move=> /=.
-    by rewrite big1 // addr0.
-  rewrite {1}Hf.
-  rewrite big_nat_cond.
-  rewrite [RHS] big_nat_cond.
-  apply eq_bigr => i /andP [/andP [Hi Hi'] _].
-  by rewrite coef.
-Qed.
+  f = \sum_(0 <= i < n.+1) ((D \^ i) f).[a] *: P i.
 \end{lstlisting}
+記号の意味などは以下の通りである. 
+\begin{itemize}
+  \item {\tt \{poly R\}}は{\tt R}係数多項式を表す型であり, {\tt p : {poly R}, a : R}に対して
+  {\tt p.[a]}で多項式{\tt p}の{\tt a}での値を, {\tt a *: p}でスカラー倍を表す.
+  \item {\tt islinear}, {\tt isfderiv}はそれぞれ
+    \begin{lstlisting}{Coq}
+Definition islinear (D : {poly R} -> {poly R}) :=
+  forall a b f g, D ((a *: f) + (b *: g)) = a *: D f + b *: D g.
+
+Definition isfderiv D (P : nat -> {poly R}) := forall n,
+ match n with
+  | 0 => (D (P n)) = 0
+  | n.+1 => (D (P n.+1)) = P n
+  end. \end{lstlisting}
+    という定義であり, 前者が線形作用素であること, 後者は条件(iii)を形式化したものである. 
+  \item \cite{Kac}での証明には, $\{P_0(x), P_1(x), \ldots , P_n(x)\}$が$V$の基底
+    となることを用いている. これを以下のように形式化した. 
+    \begin{lstlisting}{Coq}
+Lemma poly_basis n (P : nat -> {poly R}) (f : {poly R}) :
+  (forall m, size (P m) = m.+1) ->
+  (size f <= n.+1)%N ->
+  exists (c : nat -> R), f = \sum_(0 <= i < n.+1) c i *: P i. \end{lstlisting}
+    実際には生成系であることを示している. 
+\end{itemize}
+この定理において, 
+\[
+  D \equiv D_q, \quad P_n \equiv \frac{(x-a)^n_q}{[n]!}
+\]
+(ただし, $n\in\Z_{\ge0}$に対し, $[n]!$を
+\[
+    [n]! \coloneqq \begin{cases}
+                          1 & (n=0)\\
+                          [n]\times[n-1]\times\cdots\times[1] & (n\ge1)
+                        \end{cases}
+\]
+と定める)とすることで, 有限次Taylor展開の$q$-類似が得られる. 
+\bthm[\cite{Kac} p12 Theorem 4.1]
+$f(x)$を, $N$次の実数係数多項式とする. 任意の$c\in\R$に対し, 
+  \[
+    f(x) = \sum_{j=0}^N (D_q^jf)(c)\frac{(x-c)^j_q}{[j]!}
+  \]
+が成り立つ. 
+\ethm
+\bpf
+$\frac{(x-a)^n_q}{[n]!}$が, $a$, $D_q$に対してTheorem \ref{general_Taylor}の三条件をみたすことを確かめればよい. (i), (ii)は$(x-a)^n_q$の定義から, (iii)はProposition\ref{q_deriv_qpoly_nonneg}から分かる. 
+\epf
+この定理を形式化したいが, 型が合わないという問題が発生する. 実際, {\tt general\_Taylor}の型を調べてみると, 
+\begin{lstlisting}{Coq}
+general_Taylor
+     : forall (D : {poly R} -> {poly R}) (n : nat) (P : nat -> {poly R}) (f : {poly R}) (a : R), ...\end{lstlisting}
+となっているが, ${\tt D}_{\tt q}$, {\tt q\_binom}の型は
+\begin{lstlisting}{Coq}
+Dq : (R -> R) -> R -> R
+
+q_binom_pos : R -> nat -> R -> R \end{lstlisting}
+であり, 型が合わず代入できない. そこで, この問題を回避するため, 多項式に対しての$q$-微分と
+多項式としての$(x - a)^n_q$を改めて定義する. まず, $q$-微分について, 
+\begin{lstlisting}{Coq}
+Definition scaleq (p : {poly R}):= \poly_(i < size p) (q ^ i * p`_i).
+Definition dq_f p := scaleq p - p.
+Definition Dqp p := dq_f p %/ dq_f 'X.
+\end{lstlisting}
+と定義する. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{thebibliography}{9}
   \bibitem{Kac} Victor Kac, Pokman Cheung, {\it{Quantum Calculus}}, Springer, 2001.
