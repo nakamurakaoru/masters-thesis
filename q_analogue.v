@@ -909,7 +909,7 @@ Lemma poly_basis n (P : nat -> {poly R}) (f : {poly R}) :
   (forall m, size (P m) = m.+1) ->
   (size f <= n.+1)%N ->
   exists (c : nat -> R), f = \sum_(0 <= i < n.+1)
-          (c i *: (P i)).
+          c i *: P i.
 Proof.
   elim: n.+1 f => {n} [|n IH] f HP Hf //=.
   - exists (fun i => 0).
@@ -1285,19 +1285,19 @@ over.
 done.
 Qed.
 
-Definition Dq_f p := dq_f p %/ dq_f 'X.
+Definition Dqp p := dq_f p %/ dq_f 'X.
 
-Lemma Dq_f_ok p : dq_f 'X %| dq_f p.
+Lemma Dqp_ok p : dq_f 'X %| dq_f p.
 Proof.
 by rewrite dq_fXE dvdpZl ?dq_fpXE ?dvdp_mulIl.
 Qed.
 
-Lemma Dq_fE' p : Dq_f p = dq_f p %/ ((q - 1) *: 'X).
-Proof. by rewrite /Dq_f dq_fXE. Qed.
+Lemma DqpE' p : Dqp p = dq_f p %/ ((q - 1) *: 'X).
+Proof. by rewrite /Dqp dq_fXE. Qed.
 
-Lemma Dq_f_prod' p p' : Dq_f (p * p') = p * Dq_f p' + scaleq p' * Dq_f p.
+Lemma Dqp_prod' p p' : Dqp (p * p') = p * Dqp p' + scaleq p' * Dqp p.
 Proof.
-rewrite /Dq_f !divp_mulA ?Dq_f_ok //.
+rewrite /Dqp !divp_mulA ?Dqp_ok //.
 by rewrite -divpD dq_f_prod'.
 Qed.
 
@@ -1309,9 +1309,9 @@ move=> Hd.
 by rewrite divpZl divpZr // scalerA.
 Qed.
 
-Lemma Dq_f_const c : Dq_f c%:P = 0%:P.
+Lemma Dqp_const c : Dqp c%:P = 0%:P.
 Proof.
-rewrite /Dq_f.
+rewrite /Dqp.
 have -> : dq_f c%:P = 0.
   rewrite /dq_f /scaleq poly_def size_polyC.
   rewrite (sumW _ (fun i => (q ^ i * c%:P`_i) *: 'X^i)).
@@ -1329,18 +1329,18 @@ have -> : dq_f c%:P = 0.
   by rewrite div0p.
 Qed.
 
-Definition Dq' (p : {poly R}) := \poly_(i < size p) (q_nat (i.+1) * p`_i.+1).
+Definition Dqp' (p : {poly R}) := \poly_(i < size p) (q_nat (i.+1) * p`_i.+1).
 
-Lemma Dq_f_Dq'E p : Dq_f p = Dq' p.
+Lemma Dqp_Dqp'E p : Dqp p = Dqp' p.
 Proof.
 case Hsize : (size p == 0%N).
 - move: Hsize.
   rewrite size_poly_eq0 => /eqP ->.
-  rewrite Dq_f_const.
-  rewrite /Dq' poly_def.
+  rewrite Dqp_const.
+  rewrite /Dqp' poly_def.
   rewrite (sumW _ (fun i => (q_nat i.+1 * 0%:P`_i.+1) *: 'X^i)).
   by rewrite size_poly0 big_nil.
-- rewrite Dq_fE' /dq_f /scaleq /Dq' -{3}(coefK p) !poly_def.
+- rewrite DqpE' /dq_f /scaleq /Dqp' -{3}(coefK p) !poly_def.
   rewrite (sumW _ (fun i => (q ^ i * p`_i) *: 'X^i)).
   rewrite (sumW _ (fun i => p`_i *: 'X^i)).
   rewrite (sumW _ (fun i => (q_nat i.+1 * p`_i.+1) *: 'X^i)).
@@ -1372,26 +1372,26 @@ case Hsize : (size p == 0%N).
   by rewrite mulr0 scale0r addr0.
 Qed.
 
-(* Lemma Dq'_DqE p x : (Dq' R q p).[x] = (Dq R q # p) x.
+(* Lemma Dqp'_DqE p x : (Dqp' R q p).[x] = (Dq R q # p) x.
 Proof.
-by rewrite -Dq_fE -Dq_f_DqE.
+by rewrite -DqpE -Dqp_DqE.
 Qed. *)
 
-Lemma hoDq_f_Dq'E n p :
-  (Dq_f \^ n) p = ((Dq' \^ n) p).
+Lemma hoDqp_Dqp'E n p :
+  (Dqp \^ n) p = ((Dqp' \^ n) p).
 Proof.
   elim: n => [|n IH] //=.
-  by rewrite Dq_f_Dq'E IH.
+  by rewrite Dqp_Dqp'E IH.
 Qed.
 
-Lemma Dq'_prod' p p' :
-   Dq' (p * p') = p * Dq' p' + scaleq p' * Dq' p.
-Proof. by rewrite -!Dq_f_Dq'E Dq_f_prod'. Qed.
+Lemma Dqp'_prod' p p' :
+   Dqp' (p * p') = p * Dqp' p' + scaleq p' * Dqp' p.
+Proof. by rewrite -!Dqp_Dqp'E Dqp_prod'. Qed.
 
-Lemma Dq'_DqE p x : x != 0 -> (Dq' p).[x] = (Dq # p) x.
+Lemma Dqp'_DqE p x : x != 0 -> (Dqp' p).[x] = (Dq # p) x.
 Proof.
   move=> Hx.
-  rewrite /Dq' /(_ # _) /Dq /dq.
+  rewrite /Dqp' /(_ # _) /Dq /dq.
   rewrite horner_poly !horner_coef.
   rewrite (sumW _ (fun i => (q_nat i.+1 * p`_i.+1 * x ^+ i))).
   rewrite (sumW _ (fun i => p`_i * (q * x) ^+ i)).
@@ -1439,19 +1439,19 @@ Proof.
     by rewrite leq_subLR.
 Qed.
 
-Lemma hoDq'_DqE p x n : q != 0 -> x != 0 ->
-  ((Dq' \^ n) p).[x] = ((Dq \^ n) # p) x.
+Lemma hoDqp'_DqE p x n : q != 0 -> x != 0 ->
+  ((Dqp' \^ n) p).[x] = ((Dq \^ n) # p) x.
 Proof.
   move=> Hq0 Hx.
   rewrite /(_ # _).
   elim: n x Hx => [|n IH] x Hx //=.
-  rewrite Dq'_DqE // {2}/Dq /dq -!IH //.
+  rewrite Dqp'_DqE // {2}/Dq /dq -!IH //.
   by apply mulf_neq0 => //.
 Qed.
 
-Lemma Dq'_islinear_add (p p' : {poly R}) : Dq' (p + p') = Dq' p + Dq' p'.
+Lemma Dqp'_islinear_add (p p' : {poly R}) : Dqp' (p + p') = Dqp' p + Dqp' p'.
 Proof.
-  rewrite /Dq'.
+  rewrite /Dqp'.
   rewrite (polyW R (p + p') (maxn (size p) (size p'))); last first.
     by apply size_add.
   rewrite (polyW R p (maxn (size p) (size p'))); last first.
@@ -1462,9 +1462,9 @@ Proof.
   by under eq_bigr do rewrite coefD mulrDr scalerDl.
 Qed.
 
-Lemma Dq'_islinear_scale a p : Dq' (a *: p) = a *: Dq' p.
+Lemma Dqp'_islinear_scale a p : Dqp' (a *: p) = a *: Dqp' p.
 Proof.
-  rewrite /Dq'; apply polyP => j.
+  rewrite /Dqp'; apply polyP => j.
   case Ha : (a == 0).
   - move/eqP : Ha ->; rewrite !scale0r.
     by rewrite coef_poly size_poly0 //= coef0.
@@ -1475,44 +1475,44 @@ Proof.
     + by rewrite mulr0.
 Qed.
 
-Lemma Dq'_islinear : islinear Dq'.
+Lemma Dqp'_islinear : islinear Dqp'.
 Proof.
   move=> a b p p'.
-  by rewrite Dq'_islinear_add !Dq'_islinear_scale.
+  by rewrite Dqp'_islinear_add !Dqp'_islinear_scale.
 Qed.
 
-Lemma Dq'_const a : Dq' a%:P = 0.
-Proof. by rewrite -Dq_f_Dq'E Dq_f_const. Qed.
+Lemma Dqp'_const a : Dqp' a%:P = 0.
+Proof. by rewrite -Dqp_Dqp'E Dqp_const. Qed.
 
-Lemma Dq'X : Dq' 'X = 1%:P.
+Lemma Dqp'X : Dqp' 'X = 1%:P.
 Proof.
-rewrite /Dq' poly_def size_polyX.
+rewrite /Dqp' poly_def size_polyX.
 rewrite (sumW _ (fun i => (q_nat i.+1 * 'X`_i.+1) *: 'X^i)).
 rewrite (@big_cat_nat _ _ _ 1) //= !big_nat1.
 by rewrite !coefX /= mulr0 scale0r !q_nat1 mulr1 scale1r addr0.
 Qed.
 
-Lemma Dq'Xsub a : Dq' ('X - a%:P) = 1%:P.
+Lemma Dqp'Xsub a : Dqp' ('X - a%:P) = 1%:P.
 Proof.
-by rewrite Dq'_islinear_add -polyCN Dq'_const addr0 Dq'X.
+by rewrite Dqp'_islinear_add -polyCN Dqp'_const addr0 Dqp'X.
 Qed.
 
-Lemma Dq'_pow n : Dq' ('X^n.+1) = (q_nat n.+1) *: 'X^n.
+Lemma Dqp'_pow n : Dqp' ('X^n.+1) = (q_nat n.+1) *: 'X^n.
 Proof.
 elim: n => [|n IH].
-- by rewrite Dq'X q_nat1 scale1r.
-- rewrite exprS Dq'_prod' IH Dq'X mulrC.
+- by rewrite Dqp'X q_nat1 scale1r.
+- rewrite exprS Dqp'_prod' IH Dqp'X mulrC.
   rewrite -mul_polyC -mulrA mul_polyC -exprSzr.
   rewrite [scaleq ('X^n.+1) * 1%:P]mulrC.
   by rewrite mul_polyC scale1r scaleqXn -scalerDl -q_nat_catn.
 Qed.
 
-Lemma Dq'_q_binom_poly a n :
-  Dq' (q_binom_pos_poly a n.+1) = (q_nat n.+1) *: (q_binom_pos_poly a n).
+Lemma Dqp'_q_binom_poly a n :
+  Dqp' (q_binom_pos_poly a n.+1) = (q_nat n.+1) *: (q_binom_pos_poly a n).
 Proof.
 elim: n => [|n IH].
 - rewrite /q_binom_pos_poly.
-  rewrite expr0z !mul1r /Dq'.
+  rewrite expr0z !mul1r /Dqp'.
   rewrite poly_def.
   have -> : size ('X - a%:P) = 2%N.
     by rewrite size_XsubC.
@@ -1524,7 +1524,7 @@ elim: n => [|n IH].
   by rewrite !coefX /= scale_constpoly !mulr1 mulr0 scale0r addr0 alg_polyC.
 - have -> : q_binom_pos_poly a n.+2 =
             (q_binom_pos_poly a n.+1) * ('X - (q ^ n.+1 * a)%:P) by [].
-  rewrite Dq'_prod' Dq'Xsub mulr1 scaleqX IH.
+  rewrite Dqp'_prod' Dqp'Xsub mulr1 scaleqX IH.
   rewrite exprSz -mulrA -scale_constpoly -scalerBr.
   rewrite -!mul_polyC mulrA mulrC23 -mulrA.
   rewrite [('X - (q ^ n * a)%:P) * q_binom_pos_poly a n]mulrC.
@@ -1534,23 +1534,23 @@ elim: n => [|n IH].
   by rewrite mul_polyC -q_nat_cat1.
 Qed.
 
-Lemma Dq'_isfderiv a : (forall n, q_fact n != 0) ->
-  isfderiv Dq' (fun i : nat => q_binom_pos_poly a i / (q_fact i)%:P).
+Lemma Dqp'_isfderiv a : (forall n, q_fact n != 0) ->
+  isfderiv Dqp' (fun i : nat => q_binom_pos_poly a i / (q_fact i)%:P).
 Proof.
 move=> Hqnat.
 rewrite /isfderiv.
 destruct n => //.
 - have -> : (GRing.one (poly_ringType R) / 1%:P) = 1%:P.
     by rewrite polyCV mul1r invr1.
-  rewrite /Dq' (polyW _ _ 1).
+  rewrite /Dqp' (polyW _ _ 1).
     rewrite big_nat1.
     by rewrite coefC /= mulr0 scale0r.
   by apply size_polyC_leq1.
 - have -> : q_binom_pos_poly a n.+1 / (q_fact n.+1)%:P =
             (q_fact n.+1)^-1 *: q_binom_pos_poly a n.+1.
     by rewrite mulrC polyCV mul_polyC.
-  rewrite Dq'_islinear_scale -mul_polyC mulrC.
-  rewrite Dq'_q_binom_poly -mul_polyC.
+  rewrite Dqp'_islinear_scale -mul_polyC mulrC.
+  rewrite Dqp'_q_binom_poly -mul_polyC.
   rewrite [(q_nat n.+1)%:P * q_binom_pos_poly a n]mulrC.
   rewrite -polyCV -mulrA.
   f_equal.
@@ -1566,12 +1566,12 @@ Theorem q_Taylorp n (f : {poly R}) c :
   size f = n.+1 ->
   f =
     \sum_(0 <= i < n.+1)
-   ((Dq' \^ i) f).[c] *: (q_binom_pos_poly c i / (q_fact i)%:P).
+   ((Dqp' \^ i) f).[c] *: (q_binom_pos_poly c i / (q_fact i)%:P).
 Proof.
 move=> Hfact Hsizef.
 apply general_Taylor => //.
-- by apply Dq'_islinear.
-- by apply Dq'_isfderiv.
+- by apply Dqp'_islinear.
+- by apply Dqp'_isfderiv.
 - by rewrite invr1 mulr1 hornerC.
 - move=> m.
   by rewrite hornerM -q_binom_posE q_binomxa mul0r.
@@ -1595,32 +1595,32 @@ Proof.
   under eq_bigr do rewrite -hornerZ.
   rewrite -hornersumD.
   apply poly_happly.
-  under eq_bigr do rewrite -hoDq'_DqE //.
+  under eq_bigr do rewrite -hoDqp'_DqE //.
   by apply q_Taylorp.
 Qed.
 
-Lemma hoDq'_pow n j : q_fact n != 0 -> (j <= n)%N ->
-  (Dq' \^ j) 'X^n = (q_bicoef n j * q_fact j) *: 'X^(n - j).
+Lemma hoDqp'_pow n j : q_fact n != 0 -> (j <= n)%N ->
+  (Dqp' \^ j) 'X^n = (q_bicoef n j * q_fact j) *: 'X^(n - j).
 Proof.
 move=> Hn.
 elim: j => [|j IH] Hj /=.
 - by rewrite q_bicoefn0 ?mul1r ?scale1r ?subn0.
 - rewrite IH; last first.
     by apply ltnW.
-  rewrite Dq'_islinear_scale.
+  rewrite Dqp'_islinear_scale.
   have -> : (n - j = (n - j.+1).+1)%N by rewrite subnSK.
-  rewrite Dq'_pow -mul_polyC -mul_polyC mulrA -[RHS]mul_polyC.
+  rewrite Dqp'_pow -mul_polyC -mul_polyC mulrA -[RHS]mul_polyC.
   f_equal.
   rewrite mul_polyC scale_constpoly.
   f_equal.
   by rewrite q_bicoef_compute //.
 Qed.
 
-Lemma hoDq'_pow1 n j : q_fact n != 0 -> (j <= n)%N ->
-  ((Dq' \^ j) 'X^n).[1] = (q_bicoef n j * q_fact j).
+Lemma hoDqp'_pow1 n j : q_fact n != 0 -> (j <= n)%N ->
+  ((Dqp' \^ j) 'X^n).[1] = (q_bicoef n j * q_fact j).
 Proof.
 move=> Hn Hj.
-by rewrite hoDq'_pow // hornerZ hornerXn expr1n mulr1.
+by rewrite hoDqp'_pow // hornerZ hornerXn expr1n mulr1.
 Qed.
 
 Lemma q_Taylorp_pow n : (forall n, q_fact n != 0) ->
@@ -1630,7 +1630,7 @@ move=> Hfact.
 rewrite (q_Taylorp n 'X^n 1) //; last first.
   by rewrite size_polyXn.
 under eq_big_nat => i /andP [_ Hi].
-  rewrite hoDq'_pow1 //.
+  rewrite hoDqp'_pow1 //.
   rewrite [(q_binom_pos_poly 1 i / (q_fact i)%:P)]mulrC.
   rewrite polyCV scalerAl scale_constpoly -mulrA divff //.
   rewrite mulr1 mul_polyC.
@@ -1641,8 +1641,8 @@ Qed.
 (* Lemma q_Taylor_pow x n : (forall n, q_fact n != 0) ->
   x ^+ n = \sum_(0 <= i < n.+1) (q_bicoef n i * q_binom_pos 1 i x). *)
 
-Lemma hoDq'_q_binom n j a : q_fact n != 0 -> (j <= n)%N ->
-  (Dq' \^ j) (q_binom_pos_poly (- a) n) =
+Lemma hoDqp'_q_binom n j a : q_fact n != 0 -> (j <= n)%N ->
+  (Dqp' \^ j) (q_binom_pos_poly (- a) n) =
   (q_bicoef n j * q_fact j) *: (q_binom_pos_poly (-a) (n - j)).
 Proof.
 move=> Hfact.
@@ -1650,9 +1650,9 @@ elim: j => [|j IH] Hj /=.
 - by rewrite subn0 q_bicoefn0 ?mulr1 ?scale1r.
 - rewrite IH; last first.
     by apply ltnW.
-  rewrite Dq'_islinear_scale.
+  rewrite Dqp'_islinear_scale.
   have -> : (n - j = (n - j.+1).+1)%N by rewrite subnSK.
-  rewrite Dq'_q_binom_poly -mul_polyC -mul_polyC mulrA -[RHS]mul_polyC.
+  rewrite Dqp'_q_binom_poly -mul_polyC -mul_polyC mulrA -[RHS]mul_polyC.
   f_equal.
   rewrite mul_polyC scale_constpoly.
   f_equal.
@@ -1665,13 +1665,13 @@ Proof.
 by rewrite -q_binom_posE q_binomx0.
 Qed.
 
-Lemma hoDq'_q_binom0 n j a : q_fact n != 0 -> (j <= n)%N ->
-  ((Dq' \^ j) (q_binom_pos_poly (- a) n)).[0] =
+Lemma hoDqp'_q_binom0 n j a : q_fact n != 0 -> (j <= n)%N ->
+  ((Dqp' \^ j) (q_binom_pos_poly (- a) n)).[0] =
   (q_bicoef n j * q_fact j) *
    q ^+ ((n - j) * (n - j - 1))./2 * a ^+ (n - j).
 Proof.
 move=> Hfact Hj.
-by rewrite hoDq'_q_binom // hornerZ q_binom_pos_q_binom0 mulrA.
+by rewrite hoDqp'_q_binom // hornerZ q_binom_pos_q_binom0 mulrA.
 Qed.
 
 Lemma q_binom_x0 n : q_binom_pos_poly 0 n = 'X^n.
@@ -1691,7 +1691,7 @@ move=> Hfact.
 rewrite (q_Taylorp n (q_binom_pos_poly (-a) n) 0) //; last first.
   by rewrite q_binom_size.
 under eq_big_nat => i /andP [_ Hi].
-  rewrite hoDq'_q_binom0 //.
+  rewrite hoDqp'_q_binom0 //.
   rewrite [(q_binom_pos_poly 0 i / (q_fact i)%:P)]mulrC.
   rewrite polyCV.
   rewrite scalerAl scale_constpoly.
