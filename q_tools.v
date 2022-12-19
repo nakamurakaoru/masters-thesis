@@ -326,16 +326,16 @@ Proof.
     by rewrite !big_nat1 mulrDr IH [F n * a]mulrC.
 Qed.
 
-Lemma sum n : (2 * (\sum_(0 <= i < n.+1) Posz i) = Posz n * n.+1)%R.
+Lemma hornersumD m n P (a : R) :
+  (\sum_(m <= j < n.+1) P j).[a] = (\sum_(m <= j < n.+1) (P j).[a]).
 Proof.
-  elim:n => [|n IH].
-  - by rewrite big_nat1 mulr0 mul0r.
-  - rewrite !(@big_cat_nat _ _ _ n.+1 0 n.+2) //= mulrDr IH.
-    rewrite big_nat1.
-    rewrite -(mulrDl _ _ (Posz n.+1)) mulrC.
-    have -> : Posz n + 2 = n.+2 => //.
-    apply eq_nat_to_int.
-    by rewrite addn2.
+  have -> : (m = 0 + m)%N by [].
+  rewrite !big_addn.
+  elim: (n.+1 - m)%N => {n} [|n IH] //=.
+  - by rewrite !big_nil horner0.
+  - rewrite (@big_cat_nat _ _ _ n) //= big_nat1.
+    rewrite hornerD IH.
+    by rewrite [RHS] (@big_cat_nat _ _ _ n) //= big_nat1.
 Qed.
 
 Lemma sum_poly_div n F (P : nat -> {poly R}) C x :
@@ -382,6 +382,9 @@ Proof.
   by rewrite mulr0 scale0r.
 Qed.
 
+Lemma poly_happly p p' (x : R) : p = p' -> p.[x] = p'.[x].
+Proof. by move=> ->. Qed.
+
 Lemma size_N0_lt (p : {poly R}) : (size p == 0%N) = false -> (0 < size p)%N.
 Proof.
 move=> Hsize.
@@ -389,6 +392,18 @@ rewrite ltn_neqAle.
 apply /andP; split => //.
 move: Hsize.
 by rewrite eq_sym => ->.
+Qed.
+
+Lemma polyX_div n : (polyX R) ^ n.+1 %/ (polyX R) = (polyX R) ^ n.
+Proof.
+by rewrite exprSzr mulpK ?polyX_eq0.
+Qed.
+
+Lemma scale_div c d (p p' : {poly R}) : d != 0 ->
+  (c *: p) %/ (d *: p') = (c / d) *: (p %/ p').
+Proof.
+move=> Hd.
+by rewrite divpZl divpZr // scalerA.
 Qed.
 
 (* not used *)
