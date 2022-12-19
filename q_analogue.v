@@ -1001,7 +1001,7 @@ Theorem general_Taylor D n P (f : {poly R}) a :
   (forall m, size (P m) = m.+1) ->
   size f = n.+1 ->
   f = \sum_(0 <= i < n.+1)
-          (((D \^ i) f).[a] *: (P i)).
+          ((D \^ i) f).[a] *: P i.
 Proof.
   move=> Hl Hd HP0 HP HdP Hdf.
   have Hdf' : (size f <= n.+1)%N.
