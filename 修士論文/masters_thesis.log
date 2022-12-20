@@ -1,4 +1,4 @@
-This is e-pTeX, Version 3.14159265-p3.8.1-180518-2.6 (utf8.sjis) (TeX Live 2018/W32TeX) (preloaded format=platex 2018.7.29)  13 DEC 2022 19:31
+This is e-pTeX, Version 3.14159265-p3.8.1-180518-2.6 (utf8.sjis) (TeX Live 2018/W32TeX) (preloaded format=platex 2018.7.29)  20 DEC 2022 00:05
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -503,18 +503,35 @@ LaTeX Font Warning: Font shape `JT1/mc/m/it' undefined
 LaTeX Font Warning: Font shape `JY1/mc/m/it' undefined
 (Font)              using `JY1/mc/m/n' instead on input line 218.
 
-[3] [4] [5] [6] [7] [8] [9] [10] [11] [12] [13] (./masters_thesis.aux)
+[3] [4] [5] [6] [7] [8] [9] [10] [11]
+LaTeX Font Info:    Try loading font information for OMS+txtt on input line 700
+.
+LaTeX Font Info:    No file OMStxtt.fd. on input line 700.
+
+
+LaTeX Font Warning: Font shape `OMS/txtt/m/n' undefined
+(Font)              using `OMS/txsy/m/n' instead
+(Font)              for symbol `textbraceleft' on input line 700.
+
+[12]
+Overfull \hbox (42.40448pt too wide) in paragraph at lines 747--747
+[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
+][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]
+[][][][][][][][][][][][][][][][][][][][][][][][][][] 
+ []
+
+[13] (./masters_thesis.aux)
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
  ) 
 Here is how much of TeX's memory you used:
- 5712 strings out of 493249
- 70930 string characters out of 6146370
+ 5651 strings out of 493249
+ 70302 string characters out of 6146370
  218614 words of memory out of 5000000
- 9556 multiletter control sequences out of 15000+600000
- 43940 words of font info for 147 fonts, out of 8000000 for 9000
+ 9494 multiletter control sequences out of 15000+600000
+ 45044 words of font info for 151 fonts, out of 8000000 for 9000
  929 hyphenation exceptions out of 8191
  35i,16n,58p,403b,1734s stack positions out of 5000i,500n,10000p,500000b,80000s
 
-Output written on masters_thesis.dvi (13 pages, 111548 bytes).
+Output written on masters_thesis.dvi (13 pages, 109260 bytes).
