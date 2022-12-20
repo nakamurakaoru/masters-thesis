@@ -756,14 +756,59 @@ q_binom_pos : R -> nat -> R -> R \end{lstlisting}
 \begin{lstlisting}{Coq}
 Definition scaleq (p : {poly R}):= \poly_(i < size p) (q ^ i * p`_i).
 Definition dqp p := scaleq p - p.
-Definition Dqp p := dq_f p %/ dq_f 'X.
+Definition Dqp p := dqp p %/ dqp 'X.
 \end{lstlisting}
 と定義する. 
 \begin{itemize}
   \item {\tt p`\_i}は多項式{\tt p}の{\tt i}次の係数を表すため, {\tt scaleq}は多項式{\tt p}
     を受け取り, $i$次の係数を$q^i$倍した多項式を返す操作である.
-  \item もとの$d_q$の定義は$f(qx) - f(x)$であるが, 多項式を入力して
+  \item もとの$d_q$の定義は$f(qx) - f(x)$であるが, 多項式を入力して多項式を返す型で定義
+    したいため, 値を入力することができないので, この形で定義した. 多項式に対しては$d_q$と同じ
+    結果になることが確認できる(正確には, {\tt dqp}を適用した多項式での{\tt x}での値と, 
+    ${\tt x} \mapsto {\tt p.[x]}$という関数に${\tt d}_{\tt q}$を適用した関数の{\tt x}での値が
+    等しいということである). 
+    \begin{lstlisting}{Coq}
+Definition polyderiv (D : (R -> R) -> (R -> R)) (p : {poly R}) :=
+  D (fun (x : R) => p.[x]).
+Notation "D # p" := (polyderiv D p) (at level 49).
+Lemma dqp_dqE p x : (dqp p).[x] = (dq # p) x.
+    \end{lstlisting}
+  \item {\tt Dqp}の定義について, {\tt p \%/ p'}は多項式{\tt p}を多項式{\tt p'}で割った商を
+    表しており, {\tt 'X}は$x$のみからなる単項式である. 実際に多項式に対して{\tt Dqp}を計算
+    すると, {\tt dqp}の定義から, {\tt dqp p}は定数項が打ち消しあい, また{\tt dqp 'X}は
+    {\tt (q - 1) * 'X}となるので割り切れるはずである. 実際, 
+    \begin{lstlisting}{Coq}
+Lemma Dqp_ok p : dqp 'X %| dqp p.
+    \end{lstlisting}
+    が示せる({\tt p' \%| p}で{\tt p}が{\tt p'}で割り切れることを表す). 
 \end{itemize}
+今後は扱いやすさのため, {\tt `X}で約分した形
+\begin{lstlisting}{Coq}
+Definition Dqp' (p : {poly R}) := \poly_(i < size p) (qnat (i.+1) * p`_i.+1).
+\end{lstlisting}
+を用いる. このとき, {\tt Dqp}と{\tt Dqp'}が等しいことも示せる. 
+\begin{lstlisting}{Coq}
+Lemma Dqp_Dqp'E p : Dqp p = Dqp' p.
+\end{lstlisting}
+この{\tt Lemma}で注意すべき点は, {\tt X \%/ 'X = 1\%:P}という計算をする際に特に条件が必要ないことである. Coqで約分の計算を行う際には分母が$0$でないという条件が必要だが, {\tt 'X}は単項式であるため, ゼロ多項式とは異なる. よって自動的に条件がみたされることになる. 
+一方, {\tt Dqp}と{\tt Dq}が等しいことを示そうとすると, 
+\begin{lstlisting}{Coq}
+Lemma Dqp'_DqE p x : x != 0 -> (Dqp' p).[x] = (Dq # p) x.
+\end{lstlisting}
+というように{\tt x != 0}という条件が必要になる. これは多項式の割り算ではなく実数の値の割り算での約分を計算する必要があるからである. \\
+次に, $(x - a)^n_q$を多項式として以下のように定義しなおす. 
+\begin{lstlisting}{Coq}
+Fixpoint qbinom_pos_poly a n :=
+  match n with
+  | 0 => 1
+  | n.+1 => (qbinom_pos_poly a n) * ('X - (q ^ n * a)%:P)
+  end.
+\end{lstlisting}
+この多項式の{\tt x}での値は元の定義の{\tt qbinom\_pos}と等しくなる. 
+\begin{lstlisting}{Coq}
+Lemma qbinom_posE a n x :
+  qbinom_pos a n x = (qbinom_pos_poly a n).[x].
+\end{lstlisting}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{thebibliography}{9}
   \bibitem{Kac} Victor Kac, Pokman Cheung, {\it{Quantum Calculus}}, Springer, 2001.

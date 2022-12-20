@@ -1,4 +1,4 @@
-This is e-pTeX, Version 3.14159265-p3.8.1-180518-2.6 (utf8.sjis) (TeX Live 2018/W32TeX) (preloaded format=platex 2018.7.29)  20 DEC 2022 18:05
+This is e-pTeX, Version 3.14159265-p3.8.1-180518-2.6 (utf8.sjis) (TeX Live 2018/W32TeX) (preloaded format=platex 2018.7.29)  21 DEC 2022 01:29
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -455,7 +455,12 @@ LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <14.4> not available
 (Font)              Font shape `JT1/gt/m/n' tried instead on input line 99.
 LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <14.4> not available
 (Font)              Font shape `JY1/gt/m/n' tried instead on input line 99.
- (./masters_thesis.toc)
+ (./masters_thesis.toc
+LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <10.95> not available
+(Font)              Font shape `JT1/gt/m/n' tried instead on input line 1.
+LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <10.95> not available
+(Font)              Font shape `JY1/gt/m/n' tried instead on input line 1.
+)
 \tf@toc=\write3
 \openout3 = `masters_thesis.toc'.
 
@@ -472,10 +477,6 @@ File: ot1txtt.fd 2000/12/15 v3.1
 ) [1
 
 ]
-LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <10.95> not available
-(Font)              Font shape `JT1/gt/m/n' tried instead on input line 148.
-LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <10.95> not available
-(Font)              Font shape `JY1/gt/m/n' tried instead on input line 148.
 LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <8> not available
 (Font)              Font shape `JT1/gt/m/n' tried instead on input line 150.
 LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <8> not available
@@ -484,23 +485,15 @@ LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <6> not available
 (Font)              Font shape `JT1/gt/m/n' tried instead on input line 150.
 LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <6> not available
 (Font)              Font shape `JY1/gt/m/n' tried instead on input line 150.
-
-
-LaTeX Warning: Citation `Kac' on page 2 undefined on input line 150.
-
+ [2]
 LaTeX Font Info:    Try loading font information for OMS+txr on input line 178.
+
 
 (c:/w32tex/share/texmf-dist/tex/latex/txr/omstxr.fd
 File: omstxr.fd 2000/12/15 v3.1
 )
 LaTeX Font Info:    Font shape `OMS/txr/m/n' in size <10.95> not available
 (Font)              Font shape `OMS/txsy/m/n' tried instead on input line 178.
- [2]
-
-LaTeX Warning: Citation `Kac' on page 3 undefined on input line 202.
-
-
-LaTeX Warning: Citation `Kac' on page 3 undefined on input line 210.
 
 
 LaTeX Font Warning: Font shape `JT1/mc/m/it' undefined
@@ -510,55 +503,7 @@ LaTeX Font Warning: Font shape `JT1/mc/m/it' undefined
 LaTeX Font Warning: Font shape `JY1/mc/m/it' undefined
 (Font)              using `JY1/mc/m/n' instead on input line 218.
 
-[3]
-
-LaTeX Warning: Citation `Gar' on page 4 undefined on input line 255.
-
-
-LaTeX Warning: Citation `Kac' on page 4 undefined on input line 268.
-
-
-LaTeX Warning: Citation `Kac' on page 4 undefined on input line 272.
-
-[4]
-
-LaTeX Warning: Citation `Kac' on page 5 undefined on input line 336.
-
-[5]
-
-LaTeX Warning: Citation `Kac' on page 6 undefined on input line 367.
-
-
-LaTeX Warning: Citation `Kac' on page 6 undefined on input line 368.
-
-
-LaTeX Warning: Citation `Kac' on page 6 undefined on input line 369.
-
-
-LaTeX Warning: Citation `Kac' on page 6 undefined on input line 395.
-
-[6] [7] [8]
-
-LaTeX Warning: Citation `Kac' on page 9 undefined on input line 514.
-
-
-LaTeX Warning: Citation `Kac' on page 9 undefined on input line 524.
-
-
-LaTeX Warning: Citation `Kac' on page 9 undefined on input line 540.
-
-
-LaTeX Warning: Citation `Kac' on page 9 undefined on input line 544.
-
-[9]
-
-LaTeX Warning: Citation `Kac' on page 10 undefined on input line 627.
-
-[10]
-
-LaTeX Warning: Citation `Kac' on page 11 undefined on input line 657.
-
-[11]
+[3] [4] [5] [6] [7] [8] [9] [10] [11]
 LaTeX Font Info:    Try loading font information for OMS+txtt on input line 700
 .
 LaTeX Font Info:    No file OMStxtt.fd. on input line 700.
@@ -568,37 +513,25 @@ LaTeX Font Warning: Font shape `OMS/txtt/m/n' undefined
 (Font)              using `OMS/txsy/m/n' instead
 (Font)              for symbol `textbraceleft' on input line 700.
 
-
-LaTeX Warning: Citation `Kac' on page 12 undefined on input line 714.
-
-
-LaTeX Warning: Citation `Kac' on page 12 undefined on input line 735.
-
-
+[12]
 Overfull \hbox (42.40448pt too wide) in paragraph at lines 748--748
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
-[12] [13] (./masters_thesis.aux)
+[13] [14] (./masters_thesis.aux)
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
-
-LaTeX Warning: There were undefined references.
-
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
  ) 
 Here is how much of TeX's memory you used:
- 5653 strings out of 493249
- 70318 string characters out of 6146370
- 215614 words of memory out of 5000000
- 9496 multiletter control sequences out of 15000+600000
+ 5669 strings out of 493249
+ 70530 string characters out of 6146370
+ 218614 words of memory out of 5000000
+ 9512 multiletter control sequences out of 15000+600000
  45044 words of font info for 151 fonts, out of 8000000 for 9000
  929 hyphenation exceptions out of 8191
  35i,16n,58p,403b,1734s stack positions out of 5000i,500n,10000p,500000b,80000s
 
-Output written on masters_thesis.dvi (13 pages, 107492 bytes).
+Output written on masters_thesis.dvi (14 pages, 118300 bytes).
