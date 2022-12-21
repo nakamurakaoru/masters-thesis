@@ -732,7 +732,7 @@ Lemma poly_basis n (P : nat -> {poly R}) (f : {poly R}) :
                         \end{cases}
 \]
 と定める)とすることで, 有限次Taylor展開の$q$-類似が得られる. 
-\bthm[\cite{Kac} p12 Theorem 4.1]
+\bthm[\cite{Kac} p12 Theorem 4.1] \label{q_Taylor}
 $f(x)$を, $N$次の実数係数多項式とする. 任意の$c\in\R$に対し, 
   \[
     f(x) = \sum_{j=0}^N (D_q^jf)(c)\frac{(x-c)^j_q}{[j]!}
@@ -790,12 +790,14 @@ Definition Dqp' (p : {poly R}) := \poly_(i < size p) (qnat (i.+1) * p`_i.+1).
 \begin{lstlisting}{Coq}
 Lemma Dqp_Dqp'E p : Dqp p = Dqp' p.
 \end{lstlisting}
+\brmk
 この{\tt Lemma}で注意すべき点は, {\tt X \%/ 'X = 1\%:P}という計算をする際に特に条件が必要ないことである. Coqで約分の計算を行う際には分母が$0$でないという条件が必要だが, {\tt 'X}は単項式であるため, ゼロ多項式とは異なる. よって自動的に条件がみたされることになる. 
 一方, {\tt Dqp}と{\tt Dq}が等しいことを示そうとすると, 
 \begin{lstlisting}{Coq}
 Lemma Dqp'_DqE p x : x != 0 -> (Dqp' p).[x] = (Dq # p) x.
 \end{lstlisting}
-というように{\tt x != 0}という条件が必要になる. これは多項式の割り算ではなく実数の値の割り算での約分を計算する必要があるからである. \\
+というように{\tt x != 0}という条件が必要になる. これは多項式の割り算ではなく実数の値の割り算での約分を計算する必要があるからである.
+\ermk
 次に, $(x - a)^n_q$を多項式として以下のように定義しなおす. 
 \begin{lstlisting}{Coq}
 Fixpoint qbinom_pos_poly a n :=
@@ -809,6 +811,76 @@ Fixpoint qbinom_pos_poly a n :=
 Lemma qbinom_posE a n x :
   qbinom_pos a n x = (qbinom_pos_poly a n).[x].
 \end{lstlisting}
+この{\tt Dqp}と{\tt qbinom\_pos\_poly}に対してもProposition \ref{q_deriv_qpoly_nonneg}と同じことが成り立つ. 
+\begin{lstlisting}{Coq}
+Lemma Dqp'_qbinom_poly a n :
+  Dqp' (qbinom_pos_poly a n.+1) = (qnat n.+1) *: (qbinom_pos_poly a n).
+\end{lstlisting}
+\brmk
+  基本的な証明の方針は\cite{Kac}と同じだが, {\tt Dq\_prod'}に対応する補題の証明のため, 
+  {\tt scaleq}が積について分解できること, つまり
+  \begin{lstlisting}{Coq}
+Lemma scaleq_prod (p p' : {poly R}) n : (size p <= n)%N ->
+  scaleq (p * p') = scaleq p * scaleq p'. \end{lstlisting}
+  を示しているが, 多項式の{\tt size}に関する帰納法を使いたいため, {\tt (size p <= n)\%N}
+  という仮定を加えている. 実際にこの補題を使う際には, {\tt n}として{\tt size p}をとれば常に
+  {\tt (size p <= size p)\%N}が成り立つので問題ない. 
+\ermk
+これで準備が整ったため, Theorem \ref{q_Taylor}を形式化する. 
+\begin{lstlisting}{Coq}
+Theorem q_Taylorp n (f : {poly R}) c :
+  (forall n, q_fact n != 0) ->
+  size f = n.+1 ->
+  f = \sum_(0 <= i < n.+1) ((Dqp' \^ i) f).[c] *: (qbinom_pos_poly c i / (q_fact i)%:P).
+\end{lstlisting}
+{\tt Dqp}, {\tt qbinom\_pos\_poly}をもとの定義に戻したものについては, 
+\begin{lstlisting}{Coq}
+Theorem q_Taylor n (f : {poly R}) x c :
+  q != 0 ->
+  c != 0 ->
+  (forall n, q_fact n != 0) ->
+  size f = n.+1 ->
+  f.[x] =  \sum_(0 <= i < n.+1)
+             ((Dq \^ i) # f) c * qbinom_pos c i x / q_fact i.
+\end{lstlisting}
+というように形式化できる. 
+\brmk
+  {\tt c != 0}という条件は約分のためのものであるが, {\tt q != 0}はなぜ必要なのであろうか. 
+  これは, 高階{\tt Dqp'}と{\tt Dq}を一致させる補題
+  \begin{lstlisting}{Coq}
+Lemma hoDqp'_DqE p x n : q != 0 -> x != 0 ->
+  ((Dqp' \^ n) p).[x] = ((Dq \^ n) # p) x.
+Proof.
+  move=> Hq0 Hx.
+  rewrite /(_ # _).
+  elim: n x Hx => [|n IH] x Hx //=.
+  rewrite Dqp'_DqE // {2}/Dq /dq -!IH //.
+  by apply mulf_neq0 => //.
+Qed. \end{lstlisting}
+  の証明において, {\tt IH}を使う際に{\tt q * x != 0}という条件が必要だからである. 
+  さらに, 高階{\tt Dq}が定義できないという点からも{\tt q != 0}という条件は妥当である.
+  実際, $q = 0$のとき, 
+  \begin{align*}
+    (D_q ^2 f) (x) = (D_0 ^2 f) (x) &= (D_0 (D_0 f)) (x) \\
+                      &= D_0 \left( \lambda x.\ \frac{f (0 x) - f(x)}{(0 - 1)x} \right) (x) \\
+                      &= D_0 \left( \lambda x.\ \frac{f(x) - f(0)}{x} \right) (x) \\
+                      &= (D_0 F) (x)
+                        \quad (\text{ここで}F \coloneqq \lambda x.\ \frac{f(x) - f(0)}{x}
+                                  \text{とおいた})\\
+                      &= \lambda x.\ \frac{F(x) - F(0)}{x} (x) \\
+                      &= \frac{F(x) - F(0)}{x}
+  \end{align*}
+  となるが, 
+  \[
+    F(0) = \frac{f(0) - f(0)}{0} = \frac{0}{0}
+  \]
+  となってしまう
+  (Coq では{\tt 0 / 0}は{\tt 0}と計算されるが, これでも正しい計算結果とはならない).
+  この問題が起きるのは{\tt dq}を値の代入を用いて定義しているからであり, 
+  係数を変化させることで定義している{\tt dqp}では{\tt q = 0}でも問題が起きない. 
+  よってこの{\tt dqp}を用いている{\tt Dqp}および{\tt Dqp'}については{\tt q = 0}かどうかに
+  かかわらず高階の操作を定義できる. 
+\ermk
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{thebibliography}{9}
   \bibitem{Kac} Victor Kac, Pokman Cheung, {\it{Quantum Calculus}}, Springer, 2001.
