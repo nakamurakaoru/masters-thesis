@@ -4,5 +4,5 @@
 \contentsline {subsection}{\numberline {2.2}$q$-類似}{2}
 \contentsline {subsection}{\numberline {2.3}形式化}{2}
 \contentsline {subsubsection}{\numberline {2.3.1}$q$-微分の定義}{2}
-\contentsline {subsubsection}{\numberline {2.3.2}$(x - a)^n$の$q$-類似}{4}
-\contentsline {subsubsection}{\numberline {2.3.3}$q$-Taylor展開}{11}
+\contentsline {subsubsection}{\numberline {2.3.2}$(x - a)^n$の$q$-類似}{5}
+\contentsline {subsubsection}{\numberline {2.3.3}$q$-Taylor展開}{12}
