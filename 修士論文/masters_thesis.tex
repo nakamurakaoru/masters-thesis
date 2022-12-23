@@ -53,6 +53,7 @@
 \newcommand{\K}{\mathbb{K}}
 \newcommand{\D}{\mathbb{D}}
 \newcommand{\U}{\mathcal{U}}
+\newcommand{\qcoe}[2]{\left[\begin{array}{ccc}#1\\#2\end{array}\right]}
 \newcommand{\plim}{{\displaystyle \lim_{\substack{\longleftarrow\\ n}}}}
 \newcommand{\seq}[2]{(#1_{#2})_{#2\ge1}}
 \newcommand{\Zmod}[1]{\Z/p^{#1}\Z}
@@ -828,6 +829,11 @@ Lemma scaleq_prod (p p' : {poly R}) n : (size p <= n)%N ->
 \ermk
 これで準備が整ったため, Theorem \ref{q_Taylor}を形式化する. 
 \begin{lstlisting}{Coq}
+Fixpoint q_fact n := match n with
+  | 0 => 1
+  | n.+1 => q_fact n * qnat n.+1
+  end.
+
 Theorem q_Taylorp n (f : {poly R}) c :
   (forall n, q_fact n != 0) ->
   size f = n.+1 ->
@@ -880,6 +886,100 @@ Qed. \end{lstlisting}
   係数を変化させることで定義している{\tt dqp}では{\tt q = 0}でも問題が起きない. 
   よってこの{\tt dqp}を用いている{\tt Dqp}および{\tt Dqp'}については{\tt q = 0}かどうかに
   かかわらず高階の操作を定義できる. 
+\ermk
+本論文の最後に, $x ^ n$と$(x - a)^n_q$にこのTaylor展開の$q$-類似を適用する. 
+\blem[\cite{Kac} p12 Example (4.4)]
+  $n \in \Z_{>0}$について, 
+  \[
+    x ^ n = \sum_{j = 0}^n \qcoe{n}{j} (x - 1)^j_q \quad
+      \left( \text{ここで, }\qcoe{n}{j} \coloneqq \frac{[n]!}{[j]![n - j]!} \right)
+  \]
+  が成り立つ. 
+\elem
+\bpf
+  Theorem \ref{q_Taylor}において, $f(x) = x^n$, $c = 1$とする. 
+  任意の正整数$j <= n$に対して, $D_q x^n = [n] x ^{n -1}$より, 
+  \[
+    (D_q^j f) (x) = [n] [n - 1] \cdots [n - j +1] x^{n - j}
+  \]
+  となるので, 
+  \[
+    (D_q^j f)(1) = [n] [n - 1] \cdots [n - j +1]
+  \]
+  が得られる.   
+\epf
+\blem[\cite{Kac} p15 Example (5.5)]
+  $n \in \Z_{>0}$について, 
+  \[
+    (x - a)^n_q = \sum_{j = 0}^n \qcoe{n}{j} q^{j (j - 1)/2} a^j x^{n - j}
+  \]
+  が成り立つ. この式は Gauss's binomial formula と呼ばれる. 
+\elem
+\bpf
+  $f = (x + a)^n_q$とすると, 任意の正整数$j <= n$に対して, 
+  \[
+    (D_q ^j f) (x) = [n] [n - 1] [n - j + 1] (x + a)^{n - j}_q
+  \]
+  であり, また
+  \[
+    (x + a)^m_q = (x + a) (x + qa) \cdots (x + q^{m - 1} a)
+  \]
+  から, $(0 + a)^m_q = a \cdot qa \cdots q^{m - 1}a = q^{m (m - 1)/2}a^m$となるので, 
+  \[
+    (D_q^j f) (0) = [n] [n - 1] \cdots [n - j +1]q^{(n - j) (n - j - 1)/2} a^{n - j}
+  \]
+  が成り立つ. よって, Theorem \ref{q_Taylor} において, $f = (x + a)^n_q$, $c = 0$として, 
+  \[
+    (x + a)^n_q = \sum_{j = 0}^n \qcoe{n}{j} q^{(n - j) (n - j - 1)/2} a^{n - j} x^j
+  \]
+  が得られる. この式の右辺において$j$を$n - j$に置き換えることで, 
+  \[
+    \qcoe{n}{n - j} = \frac{[n]!}{[n - j]![n - (n - j)]!} = \frac{[n]!}{[j]![n - j]!} = \qcoe{n}{j}
+  \]
+  に注意すれば, 
+  \[
+    (x - a)^n_q = \sum_{j = 0}^n \qcoe{n}{j} q^{j (j - 1)/2} a^j x^{n - j}
+  \]
+  が成り立つ. 
+\epf
+この二つの等式の形式化はそれぞれ
+\begin{lstlisting}{Coq}
+Lemma q_Taylorp_pow n : (forall n, q_fact n != 0) ->
+  'X^n = \sum_(0 <= i < n.+1) (q_bicoef n i *: qbinom_pos_poly 1 i).
+
+Definition q_bicoef n j := q_fact n / (q_fact j * q_fact (n - j)).
+Theorem Gauss_binomial' a n : (forall n, q_fact n != 0) ->
+  qbinom_pos_poly (-a) n =
+  \sum_(0 <= i < n.+1) (q_bicoef n i * q ^+ ((n - i) * (n - i - 1))./2 * a ^+ (n - i)) *: 'X^i.
+Theorem Gauss_binomial a n : (forall n, q_fact n != 0) ->
+  qbinom_pos_poly (-a) n =
+  \sum_(0 <= i < n.+1) (q_bicoef n i * q ^+ (i * (i - 1))./2 * a ^+ i) *: 'X^(n - i).
+Qed. \end{lstlisting}
+となる. 
+\brmk
+{\tt Gauss\_binomial'}の証明は
+\begin{lstlisting}{Coq}
+Proof.
+move=> Hfact.
+rewrite (q_Taylorp n (qbinom_pos_poly (-a) n) 0) //; last first.
+  by rewrite qbinom_size.
+under eq_big_nat => i /andP [_ Hi].
+  rewrite hoDqp'_qbinom0 //.
+  rewrite [(qbinom_pos_poly 0 i / (q_fact i)%:P)]mulrC.
+  rewrite polyCV.
+  rewrite scalerAl scale_constpoly.
+  have -> : q_bicoef n i * q_fact i * q ^+ ((n - i) * (n - i - 1))./2 *
+            a ^+ (n - i) / q_fact i =
+            q_bicoef n i * q ^+ ((n - i) * (n - i - 1))./2 * a ^+ (n - i).
+    rewrite -!mulrA; f_equal; f_equal.
+    rewrite mulrC -mulrA; f_equal.
+    by rewrite denomK.
+  rewrite mul_polyC qbinom_x0.
+over.
+done.
+Qed. \end{lstlisting}
+となっており, {\tt q\_Taylor}ではなく{\tt q\_Taylorp}において{\tt c = 0}として証明している. 
+{\tt q\_Taylor}には{\tt c != 0}という前提があるため, この証明には使えない. 
 \ermk
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{thebibliography}{9}
