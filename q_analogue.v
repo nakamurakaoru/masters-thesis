@@ -1,36 +1,17 @@
-(* From mathcomp Require Import all_ssreflect all_algebra.
+From mathcomp Require Import all_ssreflect all_algebra.
 Import GRing.
-(*Import Numtheory.*)
-(* algebra の中の　ssrnum *)
-(* Unset Printing Notations.*)
-(* Num.Theory.nmulrn_rle0 *)
-(* apply Num.Theory.ltr_normlW. `|x| < y -> x < y*)
-Axiom funext : forall A B (f g : A -> B), f =1 g -> f = g.*)
-(* rename scale_var *)
-From mathcomp Require Import all_ssreflect ssralg ssrint ssrnum matrix.
-From mathcomp Require Import interval rat.
-From mathcomp Require Import boolp classical_sets.
-From mathcomp Require Import functions set_interval mathcomp_extra.
-From mathcomp Require Import reals ereal signed topology normedtype landau.
-From mathcomp Require Import sequences.
-From mathcomp Require Import all_algebra.
 Require Import q_tools.
 
-(* Unset Strict Implicit. *)
-Unset Printing Implicit Defensive.
-Import Order.TTheory GRing.Theory Num.Def Num.Theory.
-Import numFieldNormedType.Exports.
-
-Local Open Scope classical_set_scope.
 Local Open Scope ring_scope.
 
 Section q_analogue.
-Variable (R : realType) (q : R).
+Variable (R : rcfType) (q : R).
 Hypothesis Hq : q - 1 != 0.
+Axiom funext : forall A B (f g : A -> B), f =1 g -> f = g.
 
-Notation "f ** g" := (fun x => f x * g x) (at level 49).
-Notation "f // g" := (fun x => f x / g x) (at level 49).
-Notation "a */ f" := (fun x => a * (f x)) (at level 49).
+Notation "f ** g" := (fun x => f x * g x) (at level 40).
+Notation "f // g" := (fun x => f x / g x) (at level 40).
+Notation "a */ f" := (fun x => a * (f x)) (at level 40).
 
 (* q-differential *)
 Definition dq (f : R -> R) x := f (q * x) - f x.
@@ -383,9 +364,7 @@ Definition qbinom_neg a n x := 1 / qbinom_pos (q ^ ((Negz n) + 1) * a) n x.
 
 (* q-poly_nat 0 = q-poly_neg 0 *)
 Lemma qbinom_0 a x : qbinom_neg a 0 x = qbinom_pos a 0 x.
-Proof.
-  by rewrite /qbinom_neg /= -[RHS] (@divff _ 1) //.
-Qed.
+Proof. by rewrite /qbinom_neg /= -[RHS] (@divff _ 1) ?oner_neq0. Qed.
 
 Theorem qbinom_neg_inv a n x :
   qbinom_pos (q ^ (Negz n + 1) * a) n x != 0 ->
@@ -993,9 +972,9 @@ Proof.
     by rewrite coef_poly size_poly0 //= coef0.
   - have Ha' : a != 0 by rewrite Ha.
     rewrite size_scale // coefZ !coef_poly.
-    case : (j < size p)%N.
-    + by rewrite -scalerAr coefZ.
-    + by rewrite mulr0.
+    case : (j < size p)%N; last first.
+      by rewrite mulr0.
+    by rewrite scalerAr'.
 Qed.
 
 Lemma scale_varC c : scale_var c%:P = c%:P.
@@ -1007,9 +986,6 @@ Proof.
     by move /eqP : Hc ->.
   - by rewrite big_nat1 expr0z mul1r coefC /= -mul_polyC mulr1.
 Qed.
-
-(* Lemma scale_var0 : scale_var 0 = 0.
-Proof. by rewrite -{1}(scale0r 0) scale_var_scale scale0r. Qed. *)
 
 Lemma scale_var_add p p' : scale_var (p + p') = scale_var p + scale_var p'.
 Proof.
@@ -1279,11 +1255,6 @@ Proof.
     by rewrite mulr0 scale0r addr0.
 Qed.
 
-(* Lemma Dqp'_DqE p x : (Dqp' R q p).[x] = (Dq R q # p) x.
-Proof.
-by rewrite -DqpE -Dqp_DqE.
-Qed. *)
-
 Lemma hoDqp_Dqp'E n p :
   (Dqp \^ n) p = ((Dqp' \^ n) p).
 Proof.
@@ -1378,7 +1349,7 @@ Proof.
   - have Ha' : a != 0 by rewrite Ha.
     rewrite size_scale // coefZ !coef_poly.
     case : (j < size p)%N.
-    + by rewrite -scalerAr coefZ.
+    + by rewrite scalerAr'.
     + by rewrite mulr0.
 Qed.
 
@@ -1650,7 +1621,7 @@ End q_analogue.
 
 Section q_chain_rule.
 Local Open Scope ring_scope.
-Variable (R : realType).
+Variable (R : rcfType).
 
 Lemma qchain q u f a b x : dq R q u x != 0 -> u = (fun x => a * x ^ b) ->
   Dq R q (f \o u) x = (Dq R (q^b) f (u x)) * (Dq R q u x).
