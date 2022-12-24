@@ -100,13 +100,58 @@
 \tableofcontents
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{序文}
-本論文は, $q$-類似の基礎的な結果をCoqによって形式化するものである. 具体的には\cite{Kac}の5章前半, (5.5)式の形式化までを扱う. 
+本論文は, $q$-類似の初等的な結果をCoqによって形式化するものである. 具体的には\cite{Kac}の5章前半, (5.5)式
+\begin{screen}
+  \[
+    (x + a)^n_q = \sum_{j = 0}^n \qcoe{n}{j} q^{j (j - 1)/2} a^j x^{n - j}
+  \]
+\end{screen}
+(ここで,   $x$, $q \in \R$, $n \in \Z_{>0}$であり, $(x + a)^n_q$, $\qcoe{n}{j}$はそれぞれ$(x + a)^n_j$, 二項係数の$q$-類似である)の形式化までを扱う. 
+本論文での$q$-類似に関する定義や定理, 証明は\cite{Kac}によるものだが, その形式化を行ったという点において独自性がある
 基本的には, \cite{Kac}での定義, 定理を述べた後, その形式化を与え, 必要であれば形式化をするにあたっての注意点を述べることを繰り返すという流れで構成していく. 
+証明の方針等は基本的に\cite{Kac}の通りであるが, \ref{sssec q_Taylor}では一部\cite{Kac}から離れ, 多項式として$q$-微分や$q$-二公式を定義しなおして形式化を行っている. これらの新たな定義が多項式に対してのもとの定義を適用したものと一致していることの証明も行っている.  
+
+$q$-類似の概要
+実数パラメータ$q$を'極限で$1$に近づけると通常の数学に一致するような一般化
+自然数ならば
+$1$, $1 + q$, $1 + q + q^2$が$1$, $2$, $3$, $\ldots$に対応する. 
+$e^x$, $sin x$などの初等関数や積分の$q$-類似も考えられる　微分積分学の基本定理も成り立つ. ただしこれらは無限和が必要なので形式化はできていない. 
+また, あえてパラメータを増やす$q$-類似を考える利点の一つとしては, 証明が複雑な定理に対してより簡単な別証明を与えられることである. 例えば, ヤコビの三重積(\cite{Kac} p35 Theorem 11.1)
+\begin{screen}
+$z$, $q \in \R$, $|q| < 1$として, 
+\[
+  \sum_{n = -\infty}^{\infty} q^{n^2} z^n =
+  \prod_{n = 1}^{\infty} (1 - q^{2n})(1 + q^{2n - 1}z)(1 + q^{2n - 1}z^{-1})
+\]
+が成り立つ. 
+\end{screen}
+はその一例である. 楕円関数論の文脈で登場する恒等式であるが(楕円関数論の教科書引用予定), $q$-類似で得られる式
+\begin{align*}
+  (1 + x)^{\infty}_q &=
+    \sum_{j = 0}^{\infty} q^{j(j - 1)/2} \frac{x^j}{(1 - q) (1 - q^2) \cdots (1 - q^j)}
+     \quad(\text{\cite{Kac} p30 (9.3)式}) \\
+  \frac{1}{(1 - x)^{\infty}_q} &=
+    \sum_{j = 0}^{\infty} \frac{x^j}{(1 - q) (1 - q^2) \cdots (1 - q^j)}
+      \quad(\text{\cite{Kac} p30 (9.4)式})
+\end{align*}
+を用いることで簡単に証明できる. 
+
+Coqの概要
+Coqとは, 定理証明支援系の1つであり, 数学的な証明が正しいかどうか判定するプログラムである.
+人間がチェックすることが難しい複雑な証明でも正しさが保証され, また証明付きプログラミングにも応用される. 実際にCoqが用いられた有名な例として, 四色定理やフェイト・トンプソンの定理(奇数位数定理)などがある. 今回の証明に関しては, Coqの標準ライブラリ(\cite{coq sl})に加えて, 数学の証明のために整備されたライブラリである mathcomp(\cite{coq mc}) も用いている. Coq や mathcompの使い方については, \cite{Hag}等を参照のこと. 
+
+%研究に至った背景
+%修士1年次後半で学習した型付き$\lambda$計算の応用としてCoqによる形式化に挑戦したい
+%学部4年次の卒業研究で扱った$q$-類似がその題材に適していると考えた
+%  特に初等的な部分に関しては代数的に操作でき, 極限操作に関する議論が必要ない
+%  (-> 極限には開発中のライブラリである mathcomp analysis が必要
+%  代数的な部分は mathcomp で足りる)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{本文}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Coq}
-Coq とは, 定理証明支援系の1つであり, 数学的な証明が正しいかどうか判定するプログラムである. 人間がチェックすることが難しい複雑な証明でも正しさが保証され, また証明付きプログラミングにも応用される. 例えば, 命題$P$, $Q$について, $P \Lra Q$かつ$P$であれば, $Q$が成り立つということは, Coq では
+%Coq とは, 定理証明支援系の1つであり, 数学的な証明が正しいかどうか判定するプログラムである. 人間がチェックすることが難しい複雑な証明でも正しさが保証され, また証明付きプログラミングにも応用される. 例えば, 
+命題$P$, $Q$について, $P \Lra Q$かつ$P$であれば, $Q$が成り立つということは, Coq では
 \begin{lstlisting}{Coq}
 From mathcomp Require Import ssreflect.
 
@@ -636,7 +681,7 @@ Qed.
 \end{lstlisting}
 と形式化できる. {\tt case:\,n}で{\tt n}が$0$以上か負かで場合分けを行い, {\tt destruct n}で$0$か$1$以上かの場合分けをしており, それぞれの場合で{\tt Dq\_qbinom\_0}, {\tt Dq\_qbinom\_nonneg}, {\tt Dq\_qbinom\_neg}を使っていることが見て取れる. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsubsection{$q$-Taylor展開}
+\subsubsection{$q$-Taylor展開} \label{sssec q_Taylor}
 この節では, 有限次Taylor展開の$q$-類似が成り立つこと, そしてその系として本論文の目的である Gauss's binomial formula が成り立つことを示し, 形式化する. 
 まず, 一般に以下のことが成り立つことを確認しておく. 
 \bthm[\cite{Kac} p5 Theorem 2.1] \label{general_Taylor}
@@ -909,7 +954,7 @@ Qed. \end{lstlisting}
 \blem[\cite{Kac} p15 Example (5.5)]
   $n \in \Z_{>0}$について, 
   \[
-    (x - a)^n_q = \sum_{j = 0}^n \qcoe{n}{j} q^{j (j - 1)/2} a^j x^{n - j}
+    (x + a)^n_q = \sum_{j = 0}^n \qcoe{n}{j} q^{j (j - 1)/2} a^j x^{n - j}
   \]
   が成り立つ. この式は Gauss's binomial formula と呼ばれる. 
 \elem
@@ -983,5 +1028,9 @@ Qed. \end{lstlisting}
   \bibitem{Kac} Victor Kac, Pokman Cheung, {\it{Quantum Calculus}}, Springer, 2001.
   \bibitem{Gar} \url{https://www.math.nagoya-u.ac.jp/~garrigue/lecture/2021_AW/                  
                            ssrcoq2.pdf}
+  \bibitem{Hag} 萩原 学/アフェルト・レナルド, {\it Coq/SSReflect/Mathcomp}, 森北出版, 
+    2018
+  \bibitem{coq sl} \url{https://coq.inria.fr/distrib/current/stdlib/}
+  \bibitem{coq mc} \url{https://github.com/math-comp/math-comp}
 \end{thebibliography}
 \end{document}
