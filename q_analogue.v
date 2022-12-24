@@ -505,7 +505,7 @@ Proof.
             qbinom_pos (q ^ (Negz m.+1 + 1) * a) m.+1 x] mulrC.
 Qed.
 
-Theorem qbinom_exp_law a m n x : q != 0 ->
+Theorem qbinom_explaw a m n x : q != 0 ->
   qbinom_denom a m x != 0 ->
   qbinom_denom (q ^ m * a) n x != 0 ->
   qbinom a (m + n) x = qbinom a m x * qbinom (q ^ m * a) n x.
@@ -632,18 +632,18 @@ Proof.
     by rewrite Negz_addK addn1.
 Qed.
 
-Fixpoint q_fact n := match n with
+Fixpoint qfact n := match n with
   | 0 => 1
-  | n.+1 => q_fact n * qnat n.+1
+  | n.+1 => qfact n * qnat n.+1
   end.
 
-Lemma q_fact_nat_non0 n : q_fact n.+1 != 0 -> qnat n.+1 != 0.
+Lemma qfact_nat_non0 n : qfact n.+1 != 0 -> qnat n.+1 != 0.
 Proof.
   rewrite /= mulrC.
   by apply mulnon0.
 Qed.
 
-Lemma q_fact_lenon0 m n : q_fact (m + n) != 0 -> q_fact m != 0.
+Lemma qfact_lenon0 m n : qfact (m + n) != 0 -> qfact m != 0.
 Proof.
   elim: n => [|n IH].
   - by rewrite addn0.
@@ -652,7 +652,7 @@ Proof.
     apply IH.
 Qed.
 
-(* Lemma q_fact_non0 n : q_fact n != 0.
+(* Lemma qfact_non0 n : qfact n != 0.
 Proof.
   elim: n => [|n IH] //=.
   - by apply oner_neq0.
@@ -660,23 +660,23 @@ Proof.
     apply mulf_neq0 => //.
 Admitted. *)
 
-Definition q_bicoef n j :=
-  q_fact n / (q_fact j * q_fact (n - j)).
+Definition qbicoef n j :=
+  qfact n / (qfact j * qfact (n - j)).
 
-Lemma q_bicoefn0 n : q_fact n != 0 -> q_bicoef n 0 = 1.
+Lemma qbicoefn0 n : qfact n != 0 -> qbicoef n 0 = 1.
 Proof.
 move=> H.
-by rewrite /q_bicoef /= mul1r subn0 divff.
+by rewrite /qbicoef /= mul1r subn0 divff.
 Qed.
 
-Lemma q_bicoefnn n : q_fact n != 0 -> q_bicoef n n = 1.
+Lemma qbicoefnn n : qfact n != 0 -> qbicoef n n = 1.
 Proof.
   move=> H.
-  rewrite /q_bicoef.
+  rewrite /qbicoef.
   by rewrite -{3}(addn0 n) addKn /= mulr1 divff.
 Qed.
 
-(* Lemma q_fact1 n : (n <= 0)%N -> q_fact n = 1.
+(* Lemma qfact1 n : (n <= 0)%N -> qfact n = 1.
 Proof.
   move=> Hn.
   have -> : (n = 0)%N => //.
@@ -684,74 +684,74 @@ Proof.
   by rewrite -(subn0 n) subn_eq0 //. 
 Qed. *)
 
-(*Lemma q_bicoef_jn n j : (n - j <= 0)%N ->
-  q_coef n j = q_fact n / q_fact j.
+(*Lemma qbicoef_jn n j : (n - j <= 0)%N ->
+  q_coef n j = qfact n / qfact j.
 Proof.
   move=> Hjn.
   rewrite /q_coef.
-  by rewrite (q_fact1 (n - j)%N) // mulr1.
+  by rewrite (qfact1 (n - j)%N) // mulr1.
 Qed. *)
 
-(* Lemma q_fact_jn n j : (n - j <= 0)%N ->
-  q_fact j = q_fact (n - (n - j)).
+(* Lemma qfact_jn n j : (n - j <= 0)%N ->
+  qfact j = qfact (n - (n - j)).
 Proof.
 Qed. *)
 
-Lemma q_bicoef_compute n j : q_fact n != 0 -> (j < n)%N ->
-  q_bicoef n j * q_fact j * qnat (n - j.+1).+1 =
-  q_bicoef n j.+1 * (q_fact j * qnat j.+1).
+Lemma qbicoef_compute n j : qfact n != 0 -> (j < n)%N ->
+  qbicoef n j * qfact j * qnat (n - j.+1).+1 =
+  qbicoef n j.+1 * (qfact j * qnat j.+1).
 Proof.
 move=> Hfact Hj.
-  rewrite (mulrC (q_bicoef n j)) -mulrA mulrC (mulrC (q_fact j)) [RHS]mulrA.
+  rewrite (mulrC (qbicoef n j)) -mulrA mulrC (mulrC (qfact j)) [RHS]mulrA.
   f_equal.
-  rewrite /q_bicoef -mulrA -[RHS]mulrA.
+  rewrite /qbicoef -mulrA -[RHS]mulrA.
   f_equal => /=.
   rewrite mulrC subnSK //.
-  have -> : q_fact (n - j) = q_fact (n - j.+1) * qnat (n - j)%N.
+  have -> : qfact (n - j) = qfact (n - j.+1) * qnat (n - j)%N.
     by rewrite -(subnSK Hj) /=.
   rewrite mulrA -{1}(mul1r (qnat (n - j)%N)) red_frac_r; last first.
     rewrite -(subnSK Hj).
-    apply q_fact_nat_non0.
-    apply (q_fact_lenon0 _ j).
+    apply qfact_nat_non0.
+    apply (qfact_lenon0 _ j).
     rewrite subnSK ?subnK //.
     by apply ltnW.
-  rewrite [RHS]mulrC [q_fact j * qnat j.+1]mulrC -{1}(mulr1 (qnat j.+1)).
-  rewrite -[qnat j.+1 * q_fact j * q_fact (n - j.+1)]mulrA red_frac_l //.
-  apply q_fact_nat_non0.
-  apply (q_fact_lenon0 _ (n - j.+1)%N).
+  rewrite [RHS]mulrC [qfact j * qnat j.+1]mulrC -{1}(mulr1 (qnat j.+1)).
+  rewrite -[qnat j.+1 * qfact j * qfact (n - j.+1)]mulrA red_frac_l //.
+  apply qfact_nat_non0.
+  apply (qfact_lenon0 _ (n - j.+1)%N).
   by rewrite subnKC.
 Qed.
 
-Lemma q_bicoefE n j : (j <= n)%N ->
-  q_bicoef n (n - j) = q_bicoef n j.
+Lemma qbicoefE n j : (j <= n)%N ->
+  qbicoef n (n - j) = qbicoef n j.
 Proof.
   move=> Hjn.
-  rewrite /q_bicoef.
+  rewrite /qbicoef.
   rewrite subKn //.
-  by rewrite [q_fact (n - j) * q_fact j] mulrC.
+  by rewrite [qfact (n - j) * qfact j] mulrC.
 Qed.
 
 Lemma q_pascal n j : (j < n)%N ->
-  q_fact j.+1 != 0 ->
-  q_fact (n - j) != 0 ->
-  q_bicoef n.+1 j.+1 = q_bicoef n j +
-                 q ^ j.+1 * q_bicoef n j.+1.
+  qfact j.+1 != 0 ->
+  qfact (n - j) != 0 ->
+  qbicoef n.+1 j.+1 = qbicoef n j +
+                 q ^ j.+1 * qbicoef n j.+1.
 Proof.
   move=> Hjn Hj0 Hnj0.
-  rewrite [LHS] /q_bicoef [q_fact n.+1] /= (qnat_cat j) // mulrDr -add_div.
-    have -> : q_fact n * qnat j.+1 / (q_fact j.+1 * q_fact (n.+1 - j.+1)) =
-              q_bicoef n j.
+  rewrite [LHS] /qbicoef [qfact n.+1] /= (qnat_cat j) // mulrDr -add_div.
+    have -> : qfact n * qnat j.+1 / (qfact j.+1 * qfact (n.+1 - j.+1)) =
+              qbicoef n j.
       rewrite -mulrA -(mul1r (qnat j.+1)).
-      rewrite [q_fact j.+1 * q_fact (n.+1 - j.+1)] mulrC /=.
-      rewrite [q_fact (n.+1 - j.+1) * (q_fact j * qnat j.+1)] mulrA.
+      rewrite [qfact j.+1 * qfact (n.+1 - j.+1)] mulrC /=.
+      rewrite [qfact (n.+1 - j.+1) * (qfact j * qnat j.+1)] mulrA.
       rewrite red_frac_r //.
         rewrite mul1r subSS.
-        by rewrite [q_fact (n - j) * q_fact j] mulrC.
-      by apply q_fact_nat_non0.
-    rewrite mulrA [q_fact n * q ^ j.+1]mulrC subSS -subnSK //.
-    rewrite [q_fact (n - j.+1).+1] /= mulrA red_frac_r.
+        by rewrite [qfact (n - j) * qfact j] mulrC.
+      by apply qfact_nat_non0.
+    rewrite mulrA [qfact n * q ^ j.+1]mulrC subSS -subnSK //.
+    rewrite [qfact (n - j.+1).+1] /= mulrA red_frac_r.
       by rewrite mulrA.
-    apply q_fact_nat_non0.
+    apply qfact_nat_non0.
     rewrite subnSK //.
   by apply mulf_neq0.
 Qed.
@@ -1434,8 +1434,8 @@ Proof.
     by rewrite mul_polyC -qnat_cat1.
 Qed.
 
-Lemma Dqp'_isfderiv a : (forall n, q_fact n != 0) ->
-  isfderiv Dqp' (fun i : nat => qbinom_pos_poly a i / (q_fact i)%:P).
+Lemma Dqp'_isfderiv a : (forall n, qfact n != 0) ->
+  isfderiv Dqp' (fun i : nat => qbinom_pos_poly a i / (qfact i)%:P).
 Proof.
   move=> Hqnat.
   rewrite /isfderiv.
@@ -1446,8 +1446,8 @@ Proof.
       rewrite big_nat1.
       by rewrite coefC /= mulr0 scale0r.
     by apply size_polyC_leq1.
-  - have -> : qbinom_pos_poly a n.+1 / (q_fact n.+1)%:P =
-              (q_fact n.+1)^-1 *: qbinom_pos_poly a n.+1.
+  - have -> : qbinom_pos_poly a n.+1 / (qfact n.+1)%:P =
+              (qfact n.+1)^-1 *: qbinom_pos_poly a n.+1.
       by rewrite mulrC polyCV mul_polyC.
     rewrite Dqp'_islinear_scale -mul_polyC mulrC.
     rewrite Dqp'_qbinom_poly -mul_polyC.
@@ -1458,15 +1458,15 @@ Proof.
     rewrite scale_constpoly /=.
     rewrite -{1}(mul1r (qnat n.+1)).
     rewrite red_frac_r ?mul1r ?polyCV //.
-    by apply q_fact_nat_non0.
+    by apply qfact_nat_non0.
 Qed.
 
 Theorem q_Taylorp n (f : {poly R}) c :
-  (forall n, q_fact n != 0) ->
+  (forall n, qfact n != 0) ->
   size f = n.+1 ->
   f =
     \sum_(0 <= i < n.+1)
-   ((Dqp' \^ i) f).[c] *: (qbinom_pos_poly c i / (q_fact i)%:P).
+   ((Dqp' \^ i) f).[c] *: (qbinom_pos_poly c i / (qfact i)%:P).
 Proof.
   move=> Hfact Hsizef.
   apply general_Taylor => //.
@@ -1484,10 +1484,10 @@ Qed.
 Theorem q_Taylor n (f : {poly R}) x c :
   q != 0 ->
   c != 0 ->
-  (forall n, q_fact n != 0) ->
+  (forall n, qfact n != 0) ->
   size f = n.+1 ->
   f.[x] =  \sum_(0 <= i < n.+1)
-             ((Dq \^ i) # f) c * qbinom_pos c i x / q_fact i.
+             ((Dq \^ i) # f) c * qbinom_pos c i x / qfact i.
 Proof.
   move=> Hq0 Ha Hfact Hsf.
   under eq_bigr do rewrite qbinom_posE.
@@ -1499,12 +1499,12 @@ Proof.
   by apply q_Taylorp.
 Qed.
 
-Lemma hoDqp'_pow n j : q_fact n != 0 -> (j <= n)%N ->
-  (Dqp' \^ j) 'X^n = (q_bicoef n j * q_fact j) *: 'X^(n - j).
+Lemma hoDqp'_pow n j : qfact n != 0 -> (j <= n)%N ->
+  (Dqp' \^ j) 'X^n = (qbicoef n j * qfact j) *: 'X^(n - j).
 Proof.
   move=> Hn.
   elim: j => [|j IH] Hj /=.
-  - by rewrite q_bicoefn0 ?mul1r ?scale1r ?subn0.
+  - by rewrite qbicoefn0 ?mul1r ?scale1r ?subn0.
   - rewrite IH; last first.
       by apply ltnW.
     rewrite Dqp'_islinear_scale.
@@ -1513,41 +1513,41 @@ Proof.
     f_equal.
     rewrite mul_polyC scale_constpoly.
     f_equal.
-    by rewrite q_bicoef_compute //.
+    by rewrite qbicoef_compute //.
 Qed.
 
-Lemma hoDqp'_pow1 n j : q_fact n != 0 -> (j <= n)%N ->
-  ((Dqp' \^ j) 'X^n).[1] = (q_bicoef n j * q_fact j).
+Lemma hoDqp'_pow1 n j : qfact n != 0 -> (j <= n)%N ->
+  ((Dqp' \^ j) 'X^n).[1] = (qbicoef n j * qfact j).
 Proof.
   move=> Hn Hj.
   by rewrite hoDqp'_pow // hornerZ hornerXn expr1n mulr1.
 Qed.
 
-Lemma q_Taylorp_pow n : (forall n, q_fact n != 0) ->
-  'X^n = \sum_(0 <= i < n.+1) (q_bicoef n i *: qbinom_pos_poly 1 i).
+Lemma q_Taylorp_pow n : (forall n, qfact n != 0) ->
+  'X^n = \sum_(0 <= i < n.+1) (qbicoef n i *: qbinom_pos_poly 1 i).
 Proof.
   move=> Hfact.
   rewrite (q_Taylorp n 'X^n 1) //; last first.
     by rewrite size_polyXn.
   under eq_big_nat => i /andP [_ Hi].
     rewrite hoDqp'_pow1 //.
-    rewrite [(qbinom_pos_poly 1 i / (q_fact i)%:P)]mulrC.
+    rewrite [(qbinom_pos_poly 1 i / (qfact i)%:P)]mulrC.
     rewrite polyCV scalerAl scale_constpoly -mulrA divff //.
     rewrite mulr1 mul_polyC.
   over.
   done.
 Qed.
 
-(* Lemma q_Taylor_pow x n : (forall n, q_fact n != 0) ->
-  x ^+ n = \sum_(0 <= i < n.+1) (q_bicoef n i * qbinom_pos 1 i x). *)
+(* Lemma q_Taylor_pow x n : (forall n, qfact n != 0) ->
+  x ^+ n = \sum_(0 <= i < n.+1) (qbicoef n i * qbinom_pos 1 i x). *)
 
-Lemma hoDqp'_qbinom n j a : q_fact n != 0 -> (j <= n)%N ->
+Lemma hoDqp'_qbinom n j a : qfact n != 0 -> (j <= n)%N ->
   (Dqp' \^ j) (qbinom_pos_poly (- a) n) =
-  (q_bicoef n j * q_fact j) *: (qbinom_pos_poly (-a) (n - j)).
+  (qbicoef n j * qfact j) *: (qbinom_pos_poly (-a) (n - j)).
 Proof.
   move=> Hfact.
   elim: j => [|j IH] Hj /=.
-  - by rewrite subn0 q_bicoefn0 ?mulr1 ?scale1r.
+  - by rewrite subn0 qbicoefn0 ?mulr1 ?scale1r.
   - rewrite IH; last first.
       by apply ltnW.
     rewrite Dqp'_islinear_scale.
@@ -1556,16 +1556,16 @@ Proof.
     f_equal.
     rewrite mul_polyC scale_constpoly.
     f_equal.
-    by rewrite q_bicoef_compute //.
+    by rewrite qbicoef_compute //.
 Qed.
 
 Lemma qbinom_pos_qbinom0 a n :
   (qbinom_pos_poly (- a) n).[0] = q ^+ (n * (n - 1))./2 * a ^+ n.
 Proof. by rewrite -qbinom_posE qbinomx0. Qed.
 
-Lemma hoDqp'_qbinom0 n j a : q_fact n != 0 -> (j <= n)%N ->
+Lemma hoDqp'_qbinom0 n j a : qfact n != 0 -> (j <= n)%N ->
   ((Dqp' \^ j) (qbinom_pos_poly (- a) n)).[0] =
-  (q_bicoef n j * q_fact j) *
+  (qbicoef n j * qfact j) *
    q ^+ ((n - j) * (n - j - 1))./2 * a ^+ (n - j).
 Proof.
   move=> Hfact Hj.
@@ -1579,10 +1579,10 @@ Proof.
   - by rewrite IH mulr0 subr0 exprSr.
 Qed.
 
-Theorem Gauss_binomial' a n : (forall n, q_fact n != 0) ->
+Theorem Gauss_binomial' a n : (forall n, qfact n != 0) ->
   qbinom_pos_poly (-a) n =
   \sum_(0 <= i < n.+1)
-    (q_bicoef n i * q ^+ ((n - i) * (n - i - 1))./2
+    (qbicoef n i * q ^+ ((n - i) * (n - i - 1))./2
                     * a ^+ (n - i)) *: 'X^i.
 Proof.
   move=> Hfact.
@@ -1590,12 +1590,12 @@ Proof.
     by rewrite qbinom_size.
   under eq_big_nat => i /andP [_ Hi].
     rewrite hoDqp'_qbinom0 //.
-    rewrite [(qbinom_pos_poly 0 i / (q_fact i)%:P)]mulrC.
+    rewrite [(qbinom_pos_poly 0 i / (qfact i)%:P)]mulrC.
     rewrite polyCV.
     rewrite scalerAl scale_constpoly.
-    have -> : q_bicoef n i * q_fact i * q ^+ ((n - i) * (n - i - 1))./2 *
-              a ^+ (n - i) / q_fact i =
-              q_bicoef n i * q ^+ ((n - i) * (n - i - 1))./2 * a ^+ (n - i).
+    have -> : qbicoef n i * qfact i * q ^+ ((n - i) * (n - i - 1))./2 *
+              a ^+ (n - i) / qfact i =
+              qbicoef n i * q ^+ ((n - i) * (n - i - 1))./2 * a ^+ (n - i).
       rewrite -!mulrA; f_equal; f_equal.
       rewrite mulrC -mulrA; f_equal.
       by rewrite denomK.
@@ -1604,15 +1604,15 @@ Proof.
   done.
 Qed.
 
-Theorem Gauss_binomial a n : (forall n, q_fact n != 0) ->
+Theorem Gauss_binomial a n : (forall n, qfact n != 0) ->
   qbinom_pos_poly (-a) n =
   \sum_(0 <= i < n.+1)
-    (q_bicoef n i * q ^+ (i * (i - 1))./2 * a ^+ i) *: 'X^(n - i).
+    (qbicoef n i * q ^+ (i * (i - 1))./2 * a ^+ i) *: 'X^(n - i).
 Proof.
   move=> Hfact.
   rewrite big_nat_rev //=.
   under eq_big_nat => i /andP [_ Hi].
-    rewrite add0n subSS subKn // q_bicoefE //.
+    rewrite add0n subSS subKn // qbicoefE //.
   over.
   by rewrite Gauss_binomial'.
 Qed.
