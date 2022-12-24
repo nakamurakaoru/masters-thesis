@@ -91,7 +91,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
 \title{$q$-類似のCoqによる形式化}
-\author{アドバイザー $\colon$ Jacquess Garrigue教授\\
+\author{アドバイザー $\colon$ Jacques Garrigue教授\\
            学籍番号 $\colon$ 322101289\\
            氏名 $\colon$ 中村　薫}
 \date{\today}
@@ -175,7 +175,7 @@ Local Open Scope ring_scope.
 Variable (R : rcfType) (q : R).
 Hypothesis Hq : q - 1 != 0.
 
-Notation "f // g" := (fun x => f x / g x) (at level 49).
+Notation "f // g" := (fun x => f x / g x) (at level 40).
 
 Definition dq (f : R -> R) x := f (q * x) - f x.
 Definition Dq f := dq f // dq id. 
@@ -233,28 +233,24 @@ Definition Dq f := dq f // dq id.
 \begin{lstlisting}{Coq}
 Definition qnat n : R := (q ^ n - 1) / (q - 1).
 
-Lemma qderiv_of_pow n x :
+Lemma Dq_pow n x :
   x != 0 -> Dq (fun x => x ^ n) x = qnat n * x ^ (n - 1).
 Proof.
   move=> Hx.
   rewrite /Dq /dq /qnat.
-  rewrite -{4}(mul1r x) -mulrBl expfzMl.
-    rewrite -add_div.
-    rewrite [in x ^ n](_ : n = (n -1) +1) //.
-      rewrite expfzDr // expr1z.
-      rewrite mulrA -mulNr !red_frac_r //.
-      rewrite add_div //.
-      rewrite -{2}[x ^ (n - 1)]mul1r.
-      rewrite -mulrBl mulrC mulrA.
-      by rewrite [in (q - 1)^-1 * (q ^ n - 1)] mulrC.
+  rewrite -{4}(mul1r x) -mulrBl expfzMl -add_div; last first.
+    by apply mulf_neq0.
+  rewrite [in x ^ n](_ : n = (n -1) +1) //; last first.
     by rewrite subrK.
-  by apply mulf_neq0.
+  rewrite expfzDr ?expr1z ?mulrA -?mulNr ?red_frac_r ?add_div //.
+  rewrite -{2}[x ^ (n - 1)]mul1r -mulrBl mulrC mulrA.
+  by rewrite [in (q - 1)^-1 * (q ^ n - 1)] mulrC.
 Qed.
 \end{lstlisting}
 ここでも, コードについて少し説明を加える. 
 \begin{itemize}
   \item {\tt Definition}と同様, {\tt Lemma}について, {\tt $\coloneqq$}の前に補題の名前と
-          引数が, 後に補題の主張が書いてある. 今回であれば, {\tt qderiv\_of\_pow}が補題の
+          引数が, 後に補題の主張が書いてある. 今回であれば, {\tt Dq\_of\_pow}が補題の
           名前で, {\tt n}と{\tt x}が引数である. 
   \item {\tt Proof.}以下が補題の証明である. 
   \item {\it def}が定義のとき, {\tt rewrite /{\it def}}で定義を展開している. 
@@ -269,7 +265,7 @@ red_frac_r : forall x y z : R, z != 0 -> x * z / (y * z) = x / y \end{lstlisting
 \end{itemize}
 \brmk
   {\tt qnat}という名前であるが, 実際には{\tt n}の型は{\tt nat}ではなく{\tt R}にしている. 
-  また, {\tt qderiv\_of\_pow}の{\tt n}の型は{\tt int}であるため, より一般化した形での形式化に
+  また, {\tt Dq\_of\_pow}の{\tt n}の型は{\tt int}であるため, より一般化した形での形式化に
   なっている. 
 \ermk
 \cite{Kac}では証明は1行で終わっているが, 形式化する場合には何倍もかかっている. これは, 積の交換法則や指数法則などの, 通常の数学では「当たり前」なことが自動では計算されず, {\tt rewrite mulrC}や{\tt rewrite expfzDr}というように{\tt rewrite}での書き換えを明示的に行わなければならないからである. \\
@@ -286,7 +282,7 @@ red_frac_r : forall x y z : R, z != 0 -> x * z / (y * z) = x / y \end{lstlisting
   \]
   と定義する. 
 \edf
-\bprop \label{q_deriv_qpoly_nonneg}
+\bprop \label{Dq_qbinom_nonneg}
   $n\in\Z_{>0}$に対し, 
   \[
     D_q(x-a)^n_q = [n](x-a)^{n-1}_q
@@ -298,44 +294,39 @@ red_frac_r : forall x y z : R, z != 0 -> x * z / (y * z) = x / y \end{lstlisting
 \epf
 まず, $(x - a)^n_q$の定義を形式化すると, 
 \begin{lstlisting}{Coq}
-Fixpoint qpoly_nonneg a n x :=
+Fixpoint qbinom_pos a n x :=
   match n with
   | 0 => 1
-  | n.+1 => (qpoly_nonneg a n x) * (x - q ^ n * a)
+  | n.+1 => (qbinom_pos a n x) * (x - q ^ n * a)
   end.
 \end{lstlisting}
 となる. {\tt Fixpoint}を用いて再帰的な定義をしており, {\tt match}を使って{\tt n}が{\tt 0}かどうかで場合分けしている. 補題の証明については 
 \begin{lstlisting}{Coq}
-Theorem qderiv_qpoly_nonneg a n x :
-  x != 0 -> Dq (qpoly_nonneg a n.+1) x = qnat n.+1 * qpoly_nonneg a n x.
+Theorem Dq_qbinom_pos a n x : x != 0 ->
+  Dq (qbinom_pos a n.+1) x =
+  qnat n.+1 * qbinom_pos a n x.
 Proof.
   move=> Hx.
   elim: n => [|n IH].
-  - rewrite /Dq /dq /qpoly_nonneg /qnat.
+  - rewrite /Dq /dq /qbinom_pos /qnat.
     rewrite !mul1r mulr1 expr1z.
     rewrite opprB subrKA !divff //.
     by rewrite denom_is_nonzero.
-  - rewrite (_ : Dq (qpoly_nonneg a n.+2) x =
-                 Dq ((qpoly_nonneg a n.+1) **
+  - rewrite (_ : Dq (qbinom_pos a n.+2) x =
+                 Dq ((qbinom_pos a n.+1) **
                  (fun x => (x - q ^ (n.+1) * a))) x) //.
-    rewrite qderiv_prod' //.
-    rewrite [Dq (+%R^~ (- (q ^ n.+1 * a))) x] /Dq /dq.
-    rewrite opprB subrKA divff //.
-      rewrite mulr1 exprSz.
-      rewrite -[q * q ^ n * a] mulrA -(mulrBr q) IH.
-      rewrite -[q * (x - q ^ n * a) * (qnat n.+1 * qpoly_nonneg a n x)] mulrA.
-      rewrite [(x - q ^ n * a) * (qnat n.+1 * qpoly_nonneg a n x)] mulrC.
-      rewrite -[qnat n.+1 * qpoly_nonneg a n x * (x - q ^ n * a)] mulrA.
-      rewrite (_ : qpoly_nonneg a n x * (x - q ^ n * a) = qpoly_nonneg a n.+1 x) //.
-      rewrite mulrA.
-      rewrite -{1}(mul1r (qpoly_nonneg a n.+1 x)).
-      rewrite -mulrDl addrC.
-      rewrite -(@divff _ (q - 1)) //.
-      rewrite [qnat n.+1] /qnat.
-      rewrite [q * ((q ^ n.+1 - 1) / (q - 1))] mulrA.
-      rewrite (add_div _ _ (q -1)) //.
-      by rewrite mulrBr -exprSz mulr1 subrKA.
-    by apply denom_is_nonzero.
+    rewrite Dq_prod' //.
+    rewrite [Dq (+%R^~ (- (q ^ n.+1 * a))) x]/Dq /dq.
+    rewrite opprB subrKA divff //; last first.
+      by apply denom_is_nonzero.
+    rewrite mulr1 exprSz.
+    rewrite -[q * q ^ n * a]mulrA -(mulrBr q) IH.
+    rewrite -[q * (x - q ^ n * a) * (qnat n.+1 * qbinom_pos a n x)]mulrA.
+    rewrite [(x - q ^ n * a) * (qnat n.+1 * qbinom_pos a n x)]mulrC.
+    rewrite -[qnat n.+1 * qbinom_pos a n x * (x - q ^ n * a)]mulrA.
+    rewrite (_ : qbinom_pos a n x * (x - q ^ n * a) = qbinom_pos a n.+1 x) //.
+    rewrite mulrA -{1}(mul1r (qbinom_pos a n.+1 x)).
+    by rewrite -mulrDl -qnat_cat1.
 Qed.
 \end{lstlisting}
 となる. ここで{\tt elim:\,n}は{\tt n}の帰納法に対応している. \\
@@ -359,9 +350,9 @@ Qed.
 \epf
 この形式化は次のとおりである. 
 \begin{lstlisting}{Coq}
-Lemma qpoly_nonneg_explaw x a m n :
-  qpoly_nonneg a (m + n) x =
-    qpoly_nonneg a m x * qpoly_nonneg (q ^ m * a) n x.
+Lemma qbinom_pos_explaw x a m n :
+  qbinom_pos a (m + n) x =
+    qbinom_pos a m x * qbinom_pos (q ^ m * a) n x.
 Proof.
   elim: n.
   - by rewrite addn0 /= mulr1.
@@ -371,9 +362,9 @@ Proof.
       by rewrite -[q ^ n.+1 * q ^ m] expfz_n0addr // addnC.
 Qed.
 \end{lstlisting}
-\cite{Kac}の証明では単に式変形しているが, {\tt qpoly\_nonneg}が再帰的に定義されているため, 形式化の証明では{\tt m}, {\tt n}に関する帰納法を用いている. \\
+\cite{Kac}の証明では単に式変形しているが, {\tt qbinom\_nonneg}が再帰的に定義されているため, 形式化の証明では{\tt m}, {\tt n}に関する帰納法を用いている. \\
 この指数法則を用いて, $(x - a)^n_q$の$n$を負の数に拡張する. まず, \cite{Kac}の定義は
-\bdf[\cite{Kac} p9 (3.7)] \label{qpoly_neg}
+\bdf[\cite{Kac} p9 (3.7)] \label{qbinom_neg}
   $x$, $a \in \R$, $l\in\Z_{>0}$とする. このとき, 
   \[
     (x-a)^{-l}_q \coloneqq \frac{1}{(x-q^{-l}a)^l_q}
@@ -382,7 +373,7 @@ Qed.
 \edf
 であり, この形式化は, 
 \begin{lstlisting}{Coq}
-Definition qpoly_neg a n x := 1 / qpoly_nonneg (q ^ ((Negz n) + 1) * a) n x.
+Definition qbinom_neg a n x := 1 / qbinom_nonneg (q ^ ((Negz n) + 1) * a) n x.
 \end{lstlisting}
 となる. ここで, {\tt Negz n}とは{\tt Negz n = - n.+1}をみたすものであって, {\tt int}は
 \begin{lstlisting}{Coq}
@@ -390,10 +381,10 @@ Variant int : Set := Posz : nat -> int | Negz : nat -> int.
 \end{lstlisting}
 のように定義されている. よって, {\tt int}は$0$以上か負かで場合分けできるため, {\tt n :\,int}に対して, 
 \begin{lstlisting}{Coq}
-Definition qpoly a n x :=
+Definition qbinom a n x :=
   match n with
-  | Posz n0 => qpoly_nonneg a n0 x
-  | Negz n0 => qpoly_neg a n0.+1 x
+  | Posz n0 => qbinom_pos a n0 x
+  | Negz n0 => qbinom_neg a n0.+1 x
   end.
 \end{lstlisting}
 と定義できる. \\
@@ -444,74 +435,73 @@ Definition qpoly a n x :=
   となる.
 \epf
 この補題を形式化すると, 
-\begin{lstlisting}{}
-Theorem qpoly_exp_law a m n x : q != 0 ->
-  qpoly_denom a m x != 0 ->
-  qpoly_denom (q ^ m * a) n x != 0 ->
-  qpoly a (m + n) x = qpoly a m x * qpoly (q ^ m * a) n x.
+\begin{lstlisting}{Coq}
+Theorem qbinom_explaw a m n x : q != 0 ->
+  qbinom_denom a m x != 0 ->
+  qbinom_denom (q ^ m * a) n x != 0 ->
+  qbinom a (m + n) x = qbinom a m x * qbinom (q ^ m * a) n x.
 Proof.
   move=> Hq0.
   case: m => m Hm.
   - case: n => n Hn.
-    + by apply qpoly_nonneg_explaw.
-    + rewrite qpoly_exp_pos_neg //.
+    + by apply qbinom_pos_explaw.
+    + rewrite qbinom_exp_pos_neg //.
       by rewrite addrC expfzDr // -mulrA.
   - case: n => n Hn.
-    + by rewrite qpoly_exp_neg_pos.
-    + by apply qpoly_exp_neg_neg.
+    + by rewrite qbinom_exp_neg_pos.
+    + by apply qbinom_exp_neg_neg.
 Qed.
 \end{lstlisting}
 となる. 証明の構造としては, まず{\tt case:m}で{\tt m}が$0$以上か負かの場合分けを行い, 更にそれぞれの場合について{\tt case:n}で{\tt n}の場合分けを行っている. 
-ここで, 前提の{\tt qpoly\_denom}の定義は
+ここで, 前提の{\tt qbinom\_denom}の定義は
 \begin{lstlisting}{Coq}
-Definition qpoly_denom a n x := match n with
+Definition qbinom_denom a n x := match n with
   | Posz n0 => 1
-  | Negz n0 => qpoly_nonneg (q ^ Negz n0 * a) n0.+1 x
+  | Negz n0 => qbinom_pos (q ^ Negz n0 * a) n0.+1 x
   end.
 \end{lstlisting}
 であり, 2つの前提は補題の右辺に出現する項の分母が$0$にならないということである. 
-証明中に使われている補題のうち, {\tt qpoly\_exp\_pos\_neg}, {\tt qpoly\_exp\_neg\_pos}, {\tt qpoly\_exp\_neg\_neg}はそれぞれ$m \ge 0$かつ$n < 0$, $m <0$かつ$n \ge 0$, $m < 0$かつ$n < 0$のときの証明の形式化であり, 例えば{\tt qpoly\_exp\_pos\_neg}については
+証明中に使われている補題のうち, {\tt qbinom\_exp\_pos\_neg}, {\tt qbinom\_exp\_neg\_pos}, {\tt qbinom\_exp\_neg\_neg}はそれぞれ$m \ge 0$かつ$n < 0$, $m <0$かつ$n \ge 0$, $m < 0$かつ$n < 0$のときの証明の形式化であり, 例えば{\tt qbinom\_exp\_pos\_neg}については
 \begin{lstlisting}{Coq}
-Lemma qpoly_exp_pos_neg a (m n : nat) x : q != 0 ->
-  qpoly_nonneg (q ^ (Posz m + Negz n) * a) n.+1 x != 0 ->
-  qpoly a (Posz m + Negz n) x = qpoly a m x * qpoly (q ^ m * a) (Negz n) x.
+Lemma qbinom_exp_pos_neg a (m n : nat) x : q != 0 ->
+  qbinom_pos (q ^ (Posz m + Negz n) * a) n.+1 x != 0 ->
+  qbinom a (Posz m + Negz n) x = qbinom a m x * qbinom (q ^ m * a) (Negz n) x.
 Proof.
-  move=> Hq0 Hqpolymn.
+  move=> Hq0 Hqbinommn.
   case Hmn : (Posz m + Negz n) => [l|l]  /=.
-  - rewrite /qpoly_neg mul1r.
-    rewrite (_ : qpoly_nonneg a m x = qpoly_nonneg a (l + n.+1) x).
-      rewrite qpoly_nonneg_explaw.
+  - rewrite /qbinom_neg mul1r.
+    rewrite (_ : qbinom_pos a m x = qbinom_pos a (l + n.+1) x).
+      rewrite qbinom_pos_explaw.
       have -> : q ^ (Negz n.+1 + 1) * (q ^ m * a) = q ^ l * a.
         by rewrite mulrA -expfzDr // -addn1 Negz_addK addrC Hmn.
-      rewrite -{2}(mul1r (qpoly_nonneg (q ^ l * a) n.+1 x)).
-      rewrite red_frac_r.
+      rewrite -{2}(mul1r (qbinom_pos (q ^ l * a) n.+1 x)) red_frac_r.
         by rewrite divr1.
       by rewrite -Hmn.
     apply Negz_transp in Hmn.
     apply (eq_int_to_nat R) in Hmn.
     by rewrite Hmn.
-  - rewrite /qpoly_neg.
+  - rewrite /qbinom_neg.
     have Hmn' : n.+1 = (l.+1 + m)%N.
       move /Negz_transp /esym in Hmn.
       rewrite addrC in Hmn.
       move /Negz_transp /(eq_int_to_nat R) in Hmn.
       by rewrite addnC in Hmn.
-    rewrite (_ : qpoly_nonneg (q ^ (Negz n.+1 + 1) * (q ^ m * a)) n.+1 x 
-               = qpoly_nonneg (q ^ (Negz n.+1 + 1) * (q ^ m * a))
+    rewrite (_ : qbinom_pos (q ^ (Negz n.+1 + 1) * (q ^ m * a)) n.+1 x 
+               = qbinom_pos (q ^ (Negz n.+1 + 1) * (q ^ m * a))
                               (l.+1 + m) x).
-      rewrite qpoly_nonneg_explaw.
+      rewrite qbinom_pos_explaw.
       have -> : q ^ (Negz n.+1 + 1) * (q ^ m * a) =
                 q ^ (Negz l.+1 + 1) * a.
         by rewrite mulrA -expfzDr // !NegzS addrC Hmn.
       have -> : q ^ l.+1 * (q ^ (Negz l.+1 + 1) * a) = a.
         by rewrite mulrA -expfzDr // NegzS NegzK expr0z mul1r.
       rewrite mulrA.
-      rewrite [qpoly_nonneg (q ^ (Negz l.+1 + 1) * a) l.+1 x *
-               qpoly_nonneg a m x] mulrC.
+      rewrite [qbinom_pos (q ^ (Negz l.+1 + 1) * a) l.+1 x *
+               qbinom_pos a m x]mulrC.
       rewrite red_frac_l //.
       have -> : a = q ^ l.+1 * (q ^ (Posz m + Negz n) * a) => //.
         by rewrite mulrA -expfzDr // Hmn NegzK expr0z mul1r.
-      apply qpoly_exp_non0r.
+      apply qbinom_exp_non0r.
       rewrite -Hmn' //.
     by rewrite Hmn'.
 Qed.
@@ -540,19 +530,19 @@ Qed.
   である. 
 \eprop
 \bpf
-  $n > 0$のときは Proposition \ref{q_deriv_qpoly_nonneg} であり, $n = 0$のときは$[0] = 0$からすぐにわかる. 
-  $n < 0$のときは, Definition \ref{qpoly_neg}と, 商の微分公式の$q$-類似版である
+  $n > 0$のときは Proposition \ref{Dq_qbinom_nonneg} であり, $n = 0$のときは$[0] = 0$からすぐにわかる. 
+  $n < 0$のときは, Definition \ref{qbinom_neg}と, 商の微分公式の$q$-類似版である
   \[
     D_q \left( \frac{f(x)}{g(x)} \right) = \frac{g(x) D_q f(x) - f(x) D_q g(x)}{g(x) g(qx)} \quad
     \text{(\cite{Kac} p3 (1.13))}
   \]
-  及び Proposition \ref{q_deriv_qpoly_nonneg}を用いて示される. 
+  及び Proposition \ref{Dq_qbinom_nonneg}を用いて示される. 
 \epf
 \cite{Kac}と同じ方針で証明する. まず, $n = 0$のとき, 
 \begin{lstlisting}{Coq}
-Lemma qderiv_qpoly_0 a x :
-  Dq (qpoly a 0) x = qnat 0 * qpoly a (- 1) x.
-Proof. by rewrite Dq_const qnat_0 mul0r. Qed.
+Lemma Dq_qbinomn0 a x :
+  Dq (qbinom a 0) x = qnat 0 * qbinom a (- 1) x.
+Proof. by rewrite Dq_const qnat0 mul0r. Qed.
 \end{lstlisting}
 である. ここで, {\tt Dq\_const}は
 \begin{lstlisting}{Coq}
@@ -561,39 +551,37 @@ Proof. by rewrite /Dq /dq addrK' mul0r. Qed.
 \end{lstlisting}
 という定数関数の$q$-微分は$0$であるという補題である. 次に, $n < 0$のときは
 \begin{lstlisting}{Coq}
-Lemma qderiv_qpoly_neg a n x : q != 0 -> x != 0 ->
+Theorem Dq_qbinom_neg a n x : q != 0 -> x != 0 ->
   (x - q ^ (Negz n) * a) != 0 ->
-  qpoly_nonneg (q ^ (Negz n + 1) * a) n x != 0 ->
-  Dq (qpoly_neg a n) x = qnat (Negz n + 1) * qpoly_neg a (n.+1) x.
+  qbinom_pos (q ^ (Negz n + 1) * a) n x != 0 ->
+  Dq (qbinom_neg a n) x = qnat (Negz n + 1) * qbinom_neg a (n.+1) x.
 Proof.
-  move=> Hq0 Hx Hqn Hqpoly.
+  move=> Hq0 Hx Hqn Hqbinom.
   destruct n.
-  - by rewrite /Dq /dq /qpoly_neg /= addrK' qnat_0 !mul0r.
-  - rewrite qderiv_quot //.
+  - by rewrite /Dq /dq /qbinom_neg /= addrK' qnat0 !mul0r.
+  - rewrite Dq_quot //.
       rewrite Dq_const mulr0 mul1r sub0r.
-      rewrite qderiv_qpoly_nonneg // qpoly_qx // -mulNr.
-      rewrite [qpoly_nonneg (q ^ (Negz n.+1 + 1) * a) n.+1 x *
-                (q ^ n.+1 * qpoly_nonneg (q ^ (Negz n.+1 + 1 - 1) *
+      rewrite Dq_qbinom_pos // qbinom_qx // -mulNr.
+      rewrite [qbinom_pos (q ^ (Negz n.+1 + 1) * a) n.+1 x *
+                (q ^ n.+1 * qbinom_pos (q ^ (Negz n.+1 + 1 - 1) *
                   a) n.+1 x)] mulrC.
       rewrite -mulf_div.
-      have -> : qpoly_nonneg (q ^ (Negz n.+1 + 1) * a) n x /
-                    qpoly_nonneg (q ^ (Negz n.+1 + 1) * a) n.+1 x =
+      have -> : qbinom_pos (q ^ (Negz n.+1 + 1) * a) n x /
+                    qbinom_pos (q ^ (Negz n.+1 + 1) * a) n.+1 x =
                       1 / (x - q ^ (- 1) * a).
-        rewrite -(mulr1
-                     (qpoly_nonneg (q ^ (Negz n.+1 + 1) * a) n x)) /=.
+        rewrite -(mulr1 (qbinom_pos (q ^ (Negz n.+1 + 1) * a) n x)) /=.
         rewrite red_frac_l.
           rewrite NegzE mulrA -expfzDr // addrA -addn2.
           rewrite (_ : Posz (n + 2)%N = Posz n + 2) //.
-          rewrite -{1}(add0r (Posz n)).
-          by rewrite addrKA.
-        by rewrite /=; apply mulnon0 in Hqpoly.
+          by rewrite -{1}(add0r (Posz n)) addrKA.
+        by rewrite /=; apply mulnon0 in Hqbinom.
       rewrite mulf_div.
       rewrite -[q ^ n.+1 *
-                 qpoly_nonneg (q ^ (Negz n.+1 + 1 - 1) * a) n.+1 x *
+                 qbinom_pos (q ^ (Negz n.+1 + 1 - 1) * a) n.+1 x *
                    (x - q ^ (-1) * a)]mulrA.
-      have -> : qpoly_nonneg (q ^ (Negz n.+1 + 1 - 1) * a) n.+1 x *
+      have -> : qbinom_pos (q ^ (Negz n.+1 + 1 - 1) * a) n.+1 x *
                 (x - q ^ (-1) * a) =
-                qpoly_nonneg (q ^ (Negz (n.+1)) * a) n.+2 x => /=.
+                qbinom_pos (q ^ (Negz (n.+1)) * a) n.+2 x => /=.
         have -> : Negz n.+1 + 1 - 1 = Negz n.+1.
           by rewrite addrK.
         have -> : q ^ n.+1 * (q ^ Negz n.+1 * a) = q ^ (-1) * a => //.
@@ -604,59 +592,49 @@ Proof.
         rewrite (_ : Posz (n + 1 + 1)%N = Posz n + 1 + 1) //.
         rewrite -(add0r (Posz n + 1)).
         by rewrite addrKA.
-      rewrite /qpoly_neg /=.
-      rewrite (_ : Negz n.+2 + 1 = Negz n.+1) //.
-      rewrite -mulf_div.
+      rewrite /qbinom_neg /=.
+      rewrite (_ : Negz n.+2 + 1 = Negz n.+1) // -mulf_div.
       congr (_ * _).
-      rewrite NegzE mulrC.
-      rewrite /qnat.
-      rewrite -mulNr mulrA.
+      rewrite NegzE mulrC /qnat -mulNr mulrA.
       congr (_ / _).
-      rewrite opprB mulrBr mulr1 mulrC divff.
-        rewrite invr_expz.
-        rewrite (_ : - Posz n.+2 + 1 = - Posz n.+1) //.
-        rewrite -addn1.
-        rewrite (_ : Posz (n.+1 + 1)%N = Posz n.+1 + 1) //.
-        rewrite addrC.
-        rewrite [Posz n.+1 + 1]addrC.
-        by rewrite -{1}(add0r 1) addrKA sub0r.
-      by rewrite expnon0 //.
-    rewrite qpoly_qx // mulf_neq0 //.
+      rewrite opprB mulrBr mulr1 mulrC divff; last first.
+        by rewrite expnon0.
+      rewrite invr_expz (_ : - Posz n.+2 + 1 = - Posz n.+1) //.
+      rewrite -addn1 (_ : Posz (n.+1 + 1)%N = Posz n.+1 + 1) //.
+      by rewrite addrC [Posz n.+1 + 1]addrC -{1}(add0r 1) addrKA sub0r.
+    rewrite qbinom_qx // mulf_neq0 //.
       by rewrite expnon0.
-    rewrite qpoly_nonneg_head mulf_neq0 //.
+    rewrite qbinom_pos_head mulf_neq0 //.
     rewrite (_ : Negz n.+1 + 1 - 1 = Negz n.+1) //.
       by rewrite addrK.
-    move: Hqpoly => /=.
+    move: Hqbinom => /=.
     move/mulnon0.
     by rewrite addrK mulrA -{2}(expr1z q) -expfzDr.
-Qed.
-\end{lstlisting}
-と, 非常に長くなっているが積の交換則や結合則などが多く, {\tt qderiv\_quot}が商の$q$-微分公式の形式化であるため, \cite{Kac}の証明をそのまま形式化したものになっている.  また, いくつかの項が$0$でないという条件がついているが, これらの項は Definition \ref{qpoly_neg} において分母に現れるため, {\tt qderiv\_of\_pow}のときと同様妥当であると考えられる. これらをまとめて, 
+Qed.\end{lstlisting}
+と, 非常に長くなっているが積の交換則や結合則などが多く, {\tt Dq\_quot}が商の$q$-微分公式の形式化であるため, \cite{Kac}の証明をそのまま形式化したものになっている.  また, いくつかの項が$0$でないという条件がついているが, これらの項は Definition \ref{qbinom_neg} において分母に現れるため, {\tt Dq\_of\_pow}のときと同様妥当であると考えられる. これらをまとめて, 
 \begin{lstlisting}{Coq}
-Theorem qderiv_qpoly a n x : q != 0 -> x != 0 ->
+Theorem Dq_qbinom a n x : q != 0 -> x != 0 ->
   x - q ^ (n - 1) * a != 0 ->
-  qpoly (q ^ n * a) (- n) x != 0 ->
-  Dq (qpoly a n) x = qnat n * qpoly a (n - 1) x.
+  qbinom (q ^ n * a) (- n) x != 0 ->
+  Dq (qbinom a n) x = qnat n * qbinom a (n - 1) x.
 Proof.
-  move=> Hq0 Hx Hxqa Hqpoly.
-  case: n Hxqa Hqpoly => [|/=] n Hxqa Hqpoly.
+  move=> Hq0 Hx Hxqa Hqbinom.
+  case: n Hxqa Hqbinom => [|/=] n Hxqa Hqbinom.
   - destruct n.
-    + by rewrite qderiv_qpoly_0.
-    + rewrite qderiv_qpoly_nonneg //.
-      rewrite (_ : Posz n.+1 - 1 = n) //.
-      rewrite -addn1.
-      rewrite (_ : Posz (n + 1)%N = Posz n + 1) //.
-      by rewrite addrK.
-  - rewrite Dq_qpoly_int_to_neg qderiv_qpoly_neg //.
-        rewrite NegzK.
+    + by rewrite Dq_qbinomn0.
+    + rewrite Dq_qbinom_pos //.
+      rewrite (_ : Posz n.+1 - 1 = n) // -addn1.
+      by rewrite (_ : Posz (n + 1)%N = Posz n + 1) ?addrK.
+  - rewrite Dq_qbinom_int_to_neg Dq_qbinom_neg //.
+        rewrite Negz_addK.
         rewrite (_ : (n + 1).+1 = (n + 0).+2) //.
         by rewrite addn0 addn1.
       rewrite (_ : Negz (n + 1) = Negz n - 1) //.
-      by apply itransposition; rewrite NegzK.
-    by rewrite NegzK addn1.
+      by apply itransposition; rewrite Negz_addK.
+    by rewrite Negz_addK addn1.
 Qed.
 \end{lstlisting}
-と形式化できる. {\tt case:\,n}で{\tt n}が$0$以上か負かで場合分けを行い, {\tt destruct n}で$0$か$1$以上かの場合分けをしており, それぞれの場合で{\tt qderiv\_qpoly\_0}, {\tt qderiv\_qpoly\_nonneg}, {\tt qderiv\_qpoly\_neg}を使っていることが見て取れる. 
+と形式化できる. {\tt case:\,n}で{\tt n}が$0$以上か負かで場合分けを行い, {\tt destruct n}で$0$か$1$以上かの場合分けをしており, それぞれの場合で{\tt Dq\_qbinom\_0}, {\tt Dq\_qbinom\_nonneg}, {\tt Dq\_qbinom\_neg}を使っていることが見て取れる. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsubsection{$q$-Taylor展開}
 この節では, 有限次Taylor展開の$q$-類似が成り立つこと, そしてその系として本論文の目的である Gauss's binomial formula が成り立つことを示し, 形式化する. 
@@ -700,8 +678,8 @@ Theorem general_Taylor D n P (f : {poly R}) a :
   (forall n, (P n.+1).[a] = 0) ->
   (forall m, size (P m) = m.+1) ->
   size f = n.+1 ->
-  f = \sum_(0 <= i < n.+1) ((D \^ i) f).[a] *: P i.
-\end{lstlisting}
+  f = \sum_(0 <= i < n.+1)
+          ((D \^ i) f).[a] *: P i. \end{lstlisting}
 記号の意味などは以下の通りである. 
 \begin{itemize}
   \item {\tt \{poly R\}}は{\tt R}係数多項式を表す型であり, {\tt p : {poly R}, a : R}に対して
@@ -747,7 +725,7 @@ $f(x)$を, $N$次の実数係数多項式とする. 任意の$c\in\R$に対し,
 が成り立つ. 
 \ethm
 \bpf
-$\frac{(x-a)^n_q}{[n]!}$が, $a$, $D_q$に対してTheorem \ref{general_Taylor}の三条件をみたすことを確かめればよい. (i), (ii)は$(x-a)^n_q$の定義から, (iii)はProposition\ref{q_deriv_qpoly_nonneg}から分かる. 
+$\frac{(x-a)^n_q}{[n]!}$が, $a$, $D_q$に対してTheorem \ref{general_Taylor}の三条件をみたすことを確かめればよい. (i), (ii)は$(x-a)^n_q$の定義から, (iii)はProposition\ref{Dq_qbinom_nonneg}から分かる. 
 \epf
 この定理を形式化したいが, 型が合わないという問題が発生する. 実際, {\tt general\_Taylor}の型を調べてみると, 
 \begin{lstlisting}{Coq}
@@ -761,13 +739,13 @@ q_binom_pos : R -> nat -> R -> R \end{lstlisting}
 であり, 型が合わず代入できない. そこで, この問題を回避するため, 多項式に対しての$q$-微分と
 多項式としての$(x - a)^n_q$を改めて定義する. まず, $q$-微分について, 
 \begin{lstlisting}{Coq}
-Definition scaleq (p : {poly R}):= \poly_(i < size p) (q ^ i * p`_i).
-Definition dqp p := scaleq p - p.
+Definition scale_var (p : {poly R}):= \poly_(i < size p) (q ^ i * p`_i).
+Definition dqp p := scale_var p - p.
 Definition Dqp p := dqp p %/ dqp 'X.
 \end{lstlisting}
 と定義する. 
 \begin{itemize}
-  \item {\tt p`\_i}は多項式{\tt p}の{\tt i}次の係数を表すため, {\tt scaleq}は多項式{\tt p}
+  \item {\tt p`\_i}は多項式{\tt p}の{\tt i}次の係数を表すため, {\tt scale\_var}は多項式{\tt p}
     を受け取り, $i$次の係数を$q^i$倍した多項式を返す操作である.
   \item もとの$d_q$の定義は$f(qx) - f(x)$であるが, 多項式を入力して多項式を返す型で定義
     したいため, 値を入力することができないので, この形で定義した. 多項式に対しては$d_q$と同じ
@@ -818,42 +796,56 @@ Fixpoint qbinom_pos_poly a n :=
 Lemma qbinom_posE a n x :
   qbinom_pos a n x = (qbinom_pos_poly a n).[x].
 \end{lstlisting}
-この{\tt Dqp}と{\tt qbinom\_pos\_poly}に対してもProposition \ref{q_deriv_qpoly_nonneg}と同じことが成り立つ. 
+この{\tt Dqp}と{\tt qbinom\_pos\_poly}に対してもProposition \ref{Dq_qbinom_nonneg}と同じことが成り立つ. 
 \begin{lstlisting}{Coq}
 Lemma Dqp'_qbinom_poly a n :
   Dqp' (qbinom_pos_poly a n.+1) = (qnat n.+1) *: (qbinom_pos_poly a n).
 \end{lstlisting}
 \brmk
   基本的な証明の方針は\cite{Kac}と同じだが, {\tt Dq\_prod'}に対応する補題の証明のため, 
-  {\tt scaleq}が積について分解できること, つまり
+  {\tt scale\_var}が積について分解できること, つまり
   \begin{lstlisting}{Coq}
-Lemma scaleq_prod (p p' : {poly R}) n : (size p <= n)%N ->
-  scaleq (p * p') = scaleq p * scaleq p'. \end{lstlisting}
-  を示しているが, 多項式の{\tt size}に関する帰納法を使いたいため, {\tt (size p <= n)\%N}
-  という仮定を加えている. 実際にこの補題を使う際には, {\tt n}として{\tt size p}をとれば常に
-  {\tt (size p <= size p)\%N}が成り立つので問題ない. 
+Lemma scale_var_prod (p p' : {poly R}) : scale_var (p * p') = scale_var p * scale_var p'. \end{lstlisting}
+  を示しているが, 証明は
+  \begin{lstlisting}{Coq}
+Proof.
+  pose n := size p.
+  have : (size p <= n)%N by [].
+  clearbody n.
+  have Hp0 : forall (p : {poly R}), size p = 0%N ->
+    scale_var (p * p') = scale_var p * scale_var p'.
+    move=> p0.
+    move/eqP.
+    rewrite size_poly_eq0.
+    move/eqP ->.
+    by rewrite mul0r scale_varC mul0r.
+  elim: n p => [|n IH] p Hsize.
+  ...
+  Qed. \end{lstlisting}
+  というように, 多項式の{\tt size}に関する帰納法を使いたいため, {\tt (size p <= n)\%N}
+  という仮定を加えている. 
 \ermk
 これで準備が整ったため, Theorem \ref{q_Taylor}を形式化する. 
 \begin{lstlisting}{Coq}
-Fixpoint q_fact n := match n with
+Fixpoint qfact n := match n with
   | 0 => 1
-  | n.+1 => q_fact n * qnat n.+1
+  | n.+1 => qfact n * qnat n.+1
   end.
 
 Theorem q_Taylorp n (f : {poly R}) c :
-  (forall n, q_fact n != 0) ->
+  (forall n, qfact n != 0) ->
   size f = n.+1 ->
-  f = \sum_(0 <= i < n.+1) ((Dqp' \^ i) f).[c] *: (qbinom_pos_poly c i / (q_fact i)%:P).
+  f = \sum_(0 <= i < n.+1) ((Dqp' \^ i) f).[c] *: (qbinom_pos_poly c i / (qfact i)%:P).
 \end{lstlisting}
 {\tt Dqp}, {\tt qbinom\_pos\_poly}をもとの定義に戻したものについては, 
 \begin{lstlisting}{Coq}
 Theorem q_Taylor n (f : {poly R}) x c :
   q != 0 ->
   c != 0 ->
-  (forall n, q_fact n != 0) ->
+  (forall n, qfact n != 0) ->
   size f = n.+1 ->
   f.[x] =  \sum_(0 <= i < n.+1)
-             ((Dq \^ i) # f) c * qbinom_pos c i x / q_fact i.
+             ((Dq \^ i) # f) c * qbinom_pos c i x / qfact i.
 \end{lstlisting}
 というように形式化できる. 
 \brmk
@@ -950,39 +942,38 @@ Qed. \end{lstlisting}
 \epf
 この二つの等式の形式化はそれぞれ
 \begin{lstlisting}{Coq}
-Lemma q_Taylorp_pow n : (forall n, q_fact n != 0) ->
-  'X^n = \sum_(0 <= i < n.+1) (q_bicoef n i *: qbinom_pos_poly 1 i).
+Lemma q_Taylorp_pow n : (forall n, qfact n != 0) ->
+  'X^n = \sum_(0 <= i < n.+1) (qbicoef n i *: qbinom_pos_poly 1 i).
 
-Definition q_bicoef n j := q_fact n / (q_fact j * q_fact (n - j)).
-Theorem Gauss_binomial' a n : (forall n, q_fact n != 0) ->
+Definition qbicoef n j := qfact n / (qfact j * qfact (n - j)).
+Theorem Gauss_binomial' a n : (forall n, qfact n != 0) ->
   qbinom_pos_poly (-a) n =
-  \sum_(0 <= i < n.+1) (q_bicoef n i * q ^+ ((n - i) * (n - i - 1))./2 * a ^+ (n - i)) *: 'X^i.
-Theorem Gauss_binomial a n : (forall n, q_fact n != 0) ->
+  \sum_(0 <= i < n.+1) (qbicoef n i * q ^+ ((n - i) * (n - i - 1))./2 * a ^+ (n - i)) *: 'X^i.
+Theorem Gauss_binomial a n : (forall n, qfact n != 0) ->
   qbinom_pos_poly (-a) n =
-  \sum_(0 <= i < n.+1) (q_bicoef n i * q ^+ (i * (i - 1))./2 * a ^+ i) *: 'X^(n - i).
-Qed. \end{lstlisting}
+  \sum_(0 <= i < n.+1) (qbicoef n i * q ^+ (i * (i - 1))./2 * a ^+ i) *: 'X^(n - i). \end{lstlisting}
 となる. 
 \brmk
 {\tt Gauss\_binomial'}の証明は
 \begin{lstlisting}{Coq}
 Proof.
-move=> Hfact.
-rewrite (q_Taylorp n (qbinom_pos_poly (-a) n) 0) //; last first.
-  by rewrite qbinom_size.
-under eq_big_nat => i /andP [_ Hi].
-  rewrite hoDqp'_qbinom0 //.
-  rewrite [(qbinom_pos_poly 0 i / (q_fact i)%:P)]mulrC.
-  rewrite polyCV.
-  rewrite scalerAl scale_constpoly.
-  have -> : q_bicoef n i * q_fact i * q ^+ ((n - i) * (n - i - 1))./2 *
-            a ^+ (n - i) / q_fact i =
-            q_bicoef n i * q ^+ ((n - i) * (n - i - 1))./2 * a ^+ (n - i).
-    rewrite -!mulrA; f_equal; f_equal.
-    rewrite mulrC -mulrA; f_equal.
-    by rewrite denomK.
-  rewrite mul_polyC qbinom_x0.
-over.
-done.
+  move=> Hfact.
+  rewrite (q_Taylorp n (qbinom_pos_poly (-a) n) 0) //; last first.
+    by rewrite qbinom_size.
+  under eq_big_nat => i /andP [_ Hi].
+    rewrite hoDqp'_qbinom0 //.
+    rewrite [(qbinom_pos_poly 0 i / (qfact i)%:P)]mulrC.
+    rewrite polyCV.
+    rewrite scalerAl scale_constpoly.
+    have -> : qbicoef n i * qfact i * q ^+ ((n - i) * (n - i - 1))./2 *
+              a ^+ (n - i) / qfact i =
+              qbicoef n i * q ^+ ((n - i) * (n - i - 1))./2 * a ^+ (n - i).
+      rewrite -!mulrA; f_equal; f_equal.
+      rewrite mulrC -mulrA; f_equal.
+      by rewrite denomK.
+    rewrite mul_polyC qbinom_x0.
+  over.
+  done.
 Qed. \end{lstlisting}
 となっており, {\tt q\_Taylor}ではなく{\tt q\_Taylorp}において{\tt c = 0}として証明している. 
 {\tt q\_Taylor}には{\tt c != 0}という前提があるため, この証明には使えない. 
