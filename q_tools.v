@@ -1,29 +1,16 @@
-From mathcomp Require Import all_ssreflect ssralg ssrint ssrnum matrix.
-From mathcomp Require Import interval rat.
-From mathcomp Require Import boolp classical_sets.
-From mathcomp Require Import functions set_interval mathcomp_extra.
-From mathcomp Require Import reals ereal signed topology normedtype landau.
-From mathcomp Require Import sequences.
-From mathcomp Require Import all_algebra.
-
-(* Unset Strict Implicit. *)
-Unset Printing Implicit Defensive.
-Import Order.TTheory GRing.Theory Num.Def Num.Theory.
-Import numFieldNormedType.Exports.
-
-Local Open Scope classical_set_scope.
-Local Open Scope ring_scope.
+From mathcomp Require Import all_ssreflect all_algebra.
+Import GRing.
 
 Section q_tools.
-Variable (R : realType) (q : R).
+Local Open Scope ring_scope.
+
+Variable (R : rcfType) (q : R).
 Hypothesis Hq : q - 1 != 0.
+Axiom funext : forall A B (f g : A -> B), f =1 g -> f = g.
 
-Notation "f ** g" := (fun x => f x * g x) (at level 49).
-Notation "f // g" := (fun x => f x / g x) (at level 49).
-Notation "a */ f" := (fun x => a * (f x)) (at level 49).
-
-(*Definition cvg a b (f : R -> R) := forall e : R, e > 0 -> 
-  exists d, (forall x,`|x - a| < d -> `|f x - b| < e).*)
+Notation "f ** g" := (fun x => f x * g x) (at level 40).
+Notation "f // g" := (fun x => f x / g x) (at level 40).
+Notation "a */ f" := (fun x => a * (f x)) (at level 40).
 
 (*Lemma lim_add a b c (f g : R -> R) : cvg a b f -> cvg a c g ->
   cvg a (b + c) (f \+ g).
@@ -65,9 +52,7 @@ Lemma halfdistr m n : ~ odd m ->
 Proof.
   move=> em.
   rewrite halfD.
-  have -> : odd m && odd n = false => //=.
-  apply /andP /not_andP.
-  by left.
+  by case Hm : (odd m).
 Qed.
 
 Lemma half_add n : (n.+1 + (n.+1 * n)./2 = (n.+2 * (n.+1))./2)%N.
@@ -253,7 +238,7 @@ Proof.
 Qed.
 
 Lemma opp_frac (x y : R) : - x / - y = x / y.
-Proof. by rewrite -mulrN1 -(mulrN1 y) red_frac_r //. Qed.
+Proof. by rewrite -mulrN1 -(mulrN1 y) red_frac_r ?oppr_eq0 ?oner_neq0. Qed.
 
 Lemma inv_invE (x : R) : 1 / (1 / x) = x.
 Proof. by rewrite divKf // oner_neq0. Qed.
@@ -363,7 +348,7 @@ Proof.
   move=> H.
   rewrite poly_def.
   rewrite (@big_cat_nat _ _ _ (size p)) //= big_mkord big_nat -[LHS]addr0.
-  congr (_ + _).
+  f_equal.
   rewrite big1 // => i /andP [Hi _].
   move/leq_sizeP : Hi -> => //.
   by rewrite mulr0 scale0r.
@@ -397,6 +382,13 @@ Qed.
 Lemma polyX_div n : (polyX R) ^ n.+1 %/ (polyX R) = (polyX R) ^ n.
 Proof.
 by rewrite exprSzr mulpK ?polyX_eq0.
+Qed.
+
+Lemma scalerAr' c d (p : {poly R}) j : c * (d *: p)`_j = d * (c * p`_j).
+Proof.
+  rewrite mulrA (mulrC d) -mulrA.
+  f_equal.
+  by rewrite coefZ.
 Qed.
 
 Lemma scale_div c d (p p' : {poly R}) : d != 0 ->
