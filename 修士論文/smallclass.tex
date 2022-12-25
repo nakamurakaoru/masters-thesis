@@ -1,0 +1,213 @@
+\documentclass[11pt]{jarticle}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[a4paper,margin=25mm]{geometry}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{ascmac}
+\newtheoremstyle{mystyle}% % Name
+    {}%                      % Space above
+    {}%                      % Space below
+    {\normalfont}%           % Body font
+    {}%                      % Indent amount
+    {\bfseries}%             % Theorem head font
+    {}%                      % Punctuation after theorem head
+    { }%                     % Space after theorem head, ' ', or \newline
+    {}%                      % Theorem head spec (can be left empty, meaning `normal')
+\theoremstyle{mystyle}
+\usepackage{amssymb}
+\usepackage{ascmac}
+\usepackage{txfonts}
+%\usepackage{graphics}
+\input{poster_packages.tex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newtheorem{df}{$\textrm{Definition}$}[subsection]
+\newtheorem{ex}[df]{$\textrm{Example}$}
+\newtheorem{prop}[df]{$\textrm{Proposition}$}
+\newtheorem{lem}[df]{$\textrm{Lemmma}$}
+\newtheorem{cor}[df]{$\textrm{Corollary}$}
+\newtheorem{rmk}[df]{$\textrm{Remark}$}
+\newtheorem{thm}[df]{$\textrm{Theorem}$}
+\newtheorem{axi}[df]{$\textrm{Axiom}$}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\bdf}{\begin{shadebox} \begin{df}}
+\newcommand{\edf}{\end{df} \end{shadebox}}
+\newcommand{\bex}{\begin{ex}}
+\newcommand{\eex}{\end{ex}}
+\newcommand{\bprop}{\begin{shadebox} \begin{prop}}
+\newcommand{\eprop}{\end{prop} \end{shadebox}}
+\newcommand{\blem}{\begin{shadebox} \begin{lem}}
+\newcommand{\elem}{\end{lem} \end{shadebox}}
+\newcommand{\bcor}{\begin{shadebox} \begin{cor}}
+\newcommand{\ecor}{\end{cor} \end{shadebox}}
+\newcommand{\brmk}{\begin{rmk}}
+\newcommand{\ermk}{\end{rmk}}
+\newcommand{\bthm}{\begin{shadebox} \begin{thm}}
+\newcommand{\ethm}{\end{thm} \end{shadebox}}
+\newcommand{\bpf}{\begin{proof}}
+\newcommand{\epf}{\end{proof}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\D}{\mathbb{D}}
+\newcommand{\U}{\mathcal{U}}
+\newcommand{\plim}{{\displaystyle \lim_{\substack{\longleftarrow\\ n}}}}
+\newcommand{\seq}[2]{(#1_{#2})_{#2\ge1}}
+\newcommand{\Zmod}[1]{\Z/p^{#1}\Z}
+\newcommand{\Lra}{\Longrightarrow}
+\newcommand{\Llra}{\Longleftrightarrow}
+\newcommand{\lra}{\leftrightarrow}
+\newcommand{\ra}{\rightarrow}
+\newcommand{\ol}[1]{{\overline{#1}}}
+\newcommand{\ul}[1]{{\underline{#1}}}
+\newcommand{\sem}[1]{[\hspace{-2pt}[{#1}]\hspace{-2pt}]}
+\newcommand{\pros}[1]{\begin{array}{c} \ast \ast\\ \tt{#1} \end{array}}
+\newcommand{\pgm}[1]{{\tt{#1}}\text{-プログラム}}
+\newcommand{\pgms}[1]{{\tt{#1}}\text{-プログラム集合}}
+\newcommand{\dtm}[1]{{\tt{#1}}\text{-データ}}
+\newcommand{\data}[1]{{\tt{#1}}\text{-データ集合}}
+\newcommand{\rtf}[3]{time^{\tt{#1}}_{\tt{#2}}({\tt{#3}})}
+\newcommand{\id}{\textrm{id}}
+\newcommand{\refl}{\textrm{refl}}
+\newcommand{\ap}{\textrm{ap}}
+\newcommand{\apd}{\textrm{apd}}
+\newcommand{\pr}[1]{\textrm{pr}_{#1}}
+\newcommand{\tp}{\textrm{transport}}
+\newcommand{\qinv}{\textrm{qinv}}
+\newcommand{\iseq}{\textrm{isequiv}}
+\newcommand{\peq}{\textrm{pair}^=}
+\newcommand{\sig}[3]{\sum_{{#1} : {#2}} {#3}\ ({#1})}
+\newcommand{\0}{\textbf{0}}
+\newcommand{\1}{\textbf{1}}
+\newcommand{\2}{\textbf{2}}
+\newcommand{\fune}{\textrm{funext}}
+\newcommand{\happ}{\textrm{happly}}
+\newcommand{\ua}{\textrm{ua}}
+\newcommand{\ide}{\textrm{idtoequiv}}
+\newcommand{\set}[1]{\textrm{isSet({#1})}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+\title{少人数クラス内容報告}
+\author{アドバイザー $\colon$ Jacques Garrigue教授\\
+           学籍番号 $\colon$ 322101289\\
+           氏名 $\colon$ 中村　薫}
+\date{\today}
+\maketitle
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\tableofcontents
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{HoTT}
+HoTT とは, Homotopy Type Theory の略であり, 
+\begin{align*}
+  \text{$a$が型$A$の要素である} &\leftrightarrow \text{$a$が空間$A$の点である} \\
+  \text{$a = b$である} &\leftrightarrow \text{点$a$と点$b$の間にパスが存在する}
+\end{align*}
+というように, 型理論に対してホモトピー的解釈を与えたものである. 本章では, HoTT の大きな特徴の一つである, univalence axiom について説明する. 大雑把にいえば, univalence axiom は「型$A$と型$B$が同型ならば, $A$と$B$は等しい」という公理である. この意味を正確にとらえるため, 型同士の等しさや同型を定義していく. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{型から型を作る}
+$A$と$B$の2つの型が与えられたとき, そこから関数型$A \to B$が構成できる. このとき, 
+\begin{align*}
+  f : A \to B,\ a : A &\Lra f(a) : B \\
+  a : A,\ b(x) : B &\Lra \lambda a. b : A \to B 
+\end{align*}
+である. より一般に, 型$A$と$A$上の型族$B \to \U$が与えられれば($\U$はユニバース), 依存関数型$\prod_{a : A} B(a)$が構成でき, 
+\begin{align*}
+  f :\prod_{a : A} B(a),\ a : A &\Lra f(a) : B(a) \\
+  a : A,\ b(x) : B(x) &\Lra \lambda a. b : \prod_{a : A} B(a) 
+\end{align*}
+である. さらに, 既存の型から新たな型を作るやり方として, 構成規則, 導入規則, 除去規則, 計算規則の4つを与える帰納的な方法がある. 例えば, 依存和型$\sum_{x : A} B(x)$は, 
+\begin{itemize}
+  \item 構成規則：$A : \U$, $B : A \to \U \Lra \sum_{x : A} B(x)$
+  \item 導入規則：$a : A$, $b : B(a) \Lra (a, b) : \sum_{x : A} B(x)$
+  \item 除去規則：ind$_{\sum_{x : A} B(x)} : \prod_{C : (\sum_{x : A} B(x)) \to \U} 
+                               \left(\prod_{a : A} \prod_{b : B(a)} C((a, b)) \right) \to 
+                                      \prod_{w : \sum_{x : A} B(x)} C(w)$
+  \item 計算規則：ind$_{\sum_{x : A} B(x)} (C, g, (a, b)) :\equiv g(a)(b)$
+\end{itemize}
+で定義できる. 除去規則は, 「任意の$w : \sum_{x : A} B(x)$について$C(w)$を示したければ, 任意の$a : A$, $b : B(a)$について$C((a, b))$を示せばよい」と読むことができる. 
+ここで, Curry-Howard 同型に基づいて考えると, 「ある要素$a$とある要素$b$が等しい」という命題は, なにかしらの型と対応するはずである. よってその型 identity type を, 
+\begin{itemize}
+  \item 構成規則：$A : \U \Lra \_ =_A \_ : \U$
+  \item 導入規則：refl$_a : \prod_{a : A} (a =_A a)$
+  \item 除去規則：ind$_{=_A} : \prod_{\left( C : \prod_{(x, y : A)} (x =_A y) \to \U \right)} 
+                                       \left( \prod_{(x : A)} C(x, x, {\rm refl}_x) \right) \to
+                                       \prod_{(x, y : A)} \prod_{(p : x =_A y)} C(x, y, p)$
+  \item 計算規則：ind$_{=_A} (C, c, x, x, {\rm refl}_x) : \equiv c(x)$
+\end{itemize}
+と定義する. 除去規則は, 依存和型のときと同様に考えると, 「任意の$x$, $y : A$, $x = y$について$C(x, y, p)$を示したければ, 任意の$x : A$について$C(x, x, \refl{x})$を示せばよい」となる. 
+\subsection{型の同型}
+ここで, 型と型の間の同型を定義したい. まず, 関数の間のホモトピーを定義する. 
+\bdf[\cite{hott} Definition 2.4.1]
+  $A : \U$, $P : A \to \U$とする. $f$, $g : \prod_{x : A} P(x)$に対して, 
+  \[
+    (f \sim g) :\equiv \prod_{x : A} (f(x) = g(x))
+  \]
+  と定める. 
+\edf
+次に, 「逆写像」を定義する. 
+\bdf[\cite{hott} Definition 2.4.6]
+  $A$, $B : \U$, $f : A \to B$とする. このとき, $f$の quasi-inverse qinv($f$)を, 
+  \[
+    \qinv(f) :\equiv \sum_{g : B \to A} ((f \circ g \sim \id_B) \times
+                                                   (g \circ f \sim \id_A))
+  \]
+\edf
+例えば, id$_A$の quasi-inverse はid$_A$自身である. さらに, この qinv を用いて, isequiv を, 
+\begin{itemize}
+  \item qinv($f$) $\to$ isequiv($f$)
+  \item isequiv($f$) $\to$ qinv($f$)
+  \item $e_1$, $e_2 :$isequiv($f$) ならば $e_1 = e_2$
+\end{itemize}
+をみたすものとして定義したい. ここでは, 
+\[
+  \iseq(f) :\equiv \left( \sum_{g : B \to A} (f \circ g \sim \id_B) \right) \times
+                           \left( \sum_{h : B \to A} (h \circ f \sim \id_A) \right) \quad
+                           \text{(\cite{hott} p73 (2.4.10))}
+\]
+と定めることにする. isequiv を使って型同士の同型を定義する. 
+\bdf[\cite{hott} p73 (2.4.11)]
+  $A$, $B : \U$について, 
+  \[
+    A \simeq B :\equiv \sum_{f : A \to B} \iseq(f)
+  \]
+  と定める. 
+\edf
+\bex
+$A$, $B$, $C : \U$について, 
+\begin{itemize}
+  \item $A \simeq A$
+  \item $A \simeq B \to B \simeq A$
+  \item $A \simeq B \to B \simeq C \to A \simeq C$
+\end{itemize}
+などが成り立つ. 
+\eex
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Univalence axiom}
+これまでに定義した$=$と$\simeq$を用いて, univalence axiom の主張を正しく述べる. まず, 
+\[
+  \textrm{idtoeqv} : \prod_{A, B : \U} (A =_{\U} B) \to (A \simeq B)
+\]
+を定める. この関数が存在することは, path induction よりわかる. このidtoeqvに対して, 
+\begin{shadebox}
+\begin{axi}[\cite{hott} Axiom 2.10.3]
+  \[
+    \textrm{ua} : \prod_{A, B : \U} \iseq(\textrm{idtoeqv}(A, B))
+  \]
+\end{axi}
+\end{shadebox}
+が univalence axiom である. とくに, この公理を仮定すれば, 
+\[
+  (A =_{\U} B) \simeq (A \simeq B)
+\]
+となる. さらに, 関数の外延性
+\[
+  \textrm{funext} : \left( \prod_{x : A} (f(x) = g(x)) \right) \to (f = g)
+\]
+が従うことも知られている. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{thebibliography}{9}
+  \bibitem{hott} The Univalent Foundations Program, 
+                      {\it{Homotopy Type Theory: Univalent Foundations of Mathematics}}
+\end{thebibliography}
+\end{document}
