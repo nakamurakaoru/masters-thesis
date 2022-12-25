@@ -20,7 +20,7 @@
 %\usepackage{graphics}
 \input{poster_packages.tex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newtheorem{df}{$\textrm{Definition}$}[subsection]
+\newtheorem{df}{$\textrm{Definition}$}[section]
 \newtheorem{ex}[df]{$\textrm{Example}$}
 \newtheorem{prop}[df]{$\textrm{Proposition}$}
 \newtheorem{lem}[df]{$\textrm{Lemmma}$}
@@ -43,6 +43,8 @@
 \newcommand{\ermk}{\end{rmk}}
 \newcommand{\bthm}{\begin{shadebox} \begin{thm}}
 \newcommand{\ethm}{\end{thm} \end{shadebox}}
+\newcommand{\baxi}{\begin{shadebox} \begin{axi}}
+\newcommand{\eaxi}{\end{axi} \end{shadebox}}
 \newcommand{\bpf}{\begin{proof}}
 \newcommand{\epf}{\end{proof}}
 \newcommand{\N}{\mathbb{N}}
@@ -72,7 +74,7 @@
 \newcommand{\refl}{\textrm{refl}}
 \newcommand{\ap}{\textrm{ap}}
 \newcommand{\apd}{\textrm{apd}}
-\newcommand{\pr}[1]{\textrm{pr}_{#1}}
+\newcommand{\pr}{\textrm{pr}}
 \newcommand{\tp}{\textrm{transport}}
 \newcommand{\qinv}{\textrm{qinv}}
 \newcommand{\iseq}{\textrm{isequiv}}
@@ -86,6 +88,10 @@
 \newcommand{\ua}{\textrm{ua}}
 \newcommand{\ide}{\textrm{idtoequiv}}
 \newcommand{\set}[1]{\textrm{isSet({#1})}}
+\newcommand{\fib}{\textrm{fib}}
+\newcommand{\iscont}{\textrm{isContr}}
+\newcommand{\total}{\textrm{total}}
+\newcommand{\idtoeqv}{\textrm{idtoeqv}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
 \title{少人数クラス内容報告}
@@ -97,15 +103,15 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \tableofcontents
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{HoTT}
-HoTT とは, Homotopy Type Theory の略であり, 
+\section{はじめに}
+本稿では, \cite{hott}を教科書にして修士2年次に少人数クラスで学習した Homotopy Type Theory (HoTT) についてまとめる. HoTT とは, 
 \begin{align*}
   \text{$a$が型$A$の要素である} &\leftrightarrow \text{$a$が空間$A$の点である} \\
   \text{$a = b$である} &\leftrightarrow \text{点$a$と点$b$の間にパスが存在する}
 \end{align*}
-というように, 型理論に対してホモトピー的解釈を与えたものである. 本章では, HoTT の大きな特徴の一つである, univalence axiom について説明する. 大雑把にいえば, univalence axiom は「型$A$と型$B$が同型ならば, $A$と$B$は等しい」という公理である. この意味を正確にとらえるため, 型同士の等しさや同型を定義していく. 
+というように, 型理論に対してホモトピー的解釈を与えたものである. \ref{sec ua}章で HoTT の大きな特徴の一つである, univalence axiom について説明する. 大雑把にいえば, univalence axiom は「型$A$と型$B$が同型ならば, $A$と$B$は等しい」という公理である. この意味を正確にとらえるため, 型同士の等しさや同型を定義していく. また, いくつかの定義や補題を準備した後, univalence axiom から関数の外延性がしたがうことを\ref{sec funext}章で確認する. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{型から型を作る}
+\section{型から型を作る} \label{sec inductive}
 $A$と$B$の2つの型が与えられたとき, そこから関数型$A \to B$が構成できる. このとき, 
 \begin{align*}
   f : A \to B,\ a : A &\Lra f(a) : B \\
@@ -136,7 +142,8 @@ $A$と$B$の2つの型が与えられたとき, そこから関数型$A \to B$�
   \item 計算規則：ind$_{=_A} (C, c, x, x, {\rm refl}_x) : \equiv c(x)$
 \end{itemize}
 と定義する. 除去規則は, 依存和型のときと同様に考えると, 「任意の$x$, $y : A$, $x = y$について$C(x, y, p)$を示したければ, 任意の$x : A$について$C(x, x, \refl{x})$を示せばよい」となる. 
-\subsection{型の同型}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{型の同型}
 ここで, 型と型の間の同型を定義したい. まず, 関数の間のホモトピーを定義する. 
 \bdf[\cite{hott} Definition 2.4.1]
   $A : \U$, $P : A \to \U$とする. $f$, $g : \prod_{x : A} P(x)$に対して, 
@@ -173,22 +180,33 @@ $A$と$B$の2つの型が与えられたとき, そこから関数型$A \to B$�
   \]
   と定める. 
 \edf
-\bex
+型の同型については, 例えば以下のような例がある. 
+\bex[\cite{hott} Lemma 2.4.12]
 $A$, $B$, $C : \U$について, 
 \begin{itemize}
   \item $A \simeq A$
   \item $A \simeq B \to B \simeq A$
   \item $A \simeq B \to B \simeq C \to A \simeq C$
 \end{itemize}
-などが成り立つ. 
+が成り立つ. 
+\eex
+\bex[\cite{hott} Exercise 2.10] \label{ex sigA}
+  $\sum$型は「結合的」である. つまり任意の型$A$, 型族$B : A \to \U$, 
+  型族上の型族$C : (\sum_{x : A} B(x)) \to \U$に対して, 
+  \[
+    \left( \sum_{x : A} \sum_{y : B(x)} C((x, y))\right) \simeq
+    \left( \sum_{p : \sum_{x : A} B(x)} C(p) \right)
+  \]
+  が成り立つ. 
 \eex
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Univalence axiom}
+\section{Univalence axiom} \label{sec ua}
 これまでに定義した$=$と$\simeq$を用いて, univalence axiom の主張を正しく述べる. まず, 
 \[
   \textrm{idtoeqv} : \prod_{A, B : \U} (A =_{\U} B) \to (A \simeq B)
+    \quad (\text{\cite{hott} p89 (2.10.2)})
 \]
-を定める. この関数が存在することは, path induction よりわかる. このidtoeqvに対して, 
+を定める. この関数が存在することは, path induction よりわかる(\cite{hott} Lemma 2.10.1). このidtoeqvに対して, 
 \begin{shadebox}
 \begin{axi}[\cite{hott} Axiom 2.10.3]
   \[
@@ -200,11 +218,450 @@ $A$, $B$, $C : \U$について,
 \[
   (A =_{\U} B) \simeq (A \simeq B)
 \]
-となる. さらに, 関数の外延性
+が成り立つ. \ref{sec inductive}章のときのように, $\ua$や$\ide$を$A =_{\U} B$という型を構成する規則だと考えれば, 
+\begin{itemize}
+  \item 導入規則：$A : \U,\ B: \U \Lra \ua : (A \simeq B) \to (A =_{\U} B)$
+  \item 除去規則：$\ide \equiv \tp^{X \mapsto X} : (A =_{\U} B) \to (A \simeq B)$
+  \item (propositional)計算規則：$\ide (\ua (f), x) = f(x)$
+  \item (propositional)一意性：任意の$p : A = B$について, $p = \ua (\ide (p))$
+\end{itemize}
+となる($\tp$の定義は\cite{hott} p72 Lemma 2.3.1). univalence axiom をみたすようなユニバース$\U$を univalent であるという.  
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{関数の外延性} \label{sec funext}
+関数$f$, $g$について, 
+\[
+  f = g \lra \text{任意の$f$, $g$の定義域の要素$x$に対して, $f(x) = g(x)$}
+\]
+という関数の外延性の公理について述べる. 正確には, まず path induction から, 
+依存関数$f$, $g : \prod_{x : A} B(x)$に対して
+\[
+  \happ : (f = g) \to (f \sim g) \left( \prod_{x : A} (f(x) = g(x))\right)
+    \quad (\text{\cite{hott} p86 (2.9.2)})
+\]
+という関数を定義できる. このとき, 
+\baxi[\cite{hott} Axiom 2.9.3]
+  任意の$A$, $B$, $f$, $g$について, $\happ$は equivalence である
+\eaxi
+を関数の外延性と呼ぶ. この公理から$\happ$の quasi-inverse
 \[
   \textrm{funext} : \left( \prod_{x : A} (f(x) = g(x)) \right) \to (f = g)
 \]
-が従うことも知られている. 
+の存在が従う. この関数のことを関数の外延性と呼ぶこともある. univalence axiom のときと同じように考えると,
+\begin{itemize}
+  \item 導入規則：$\fune$
+  \item 除去規則：$\happ$
+  \item (propositional)計算規則：$\happ (\fune (h), x) = h(x)
+    \quad \left(h : \prod_{x : A} (f(x) = g(x)) \right)$
+  \item (propositional)一意性：$p = \fune (x \mapsto \happ(p, x)) \quad (p : f = g)$
+\end{itemize}
+となる. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{可縮, ファイバー}
+この章と次の章では, univalence axiom から関数の外延性が従うことを示すために必要な定義や補題の準備をする. まずは, 型が可縮であるということを定義する. 
+\bdf[\cite{hott} Definition 3.11.1]
+  $A$を型とする. 中心と呼ばれる$a : A$が存在して, 任意の$x : A$に対して$a = x$をみたす
+  とき, $A$は可縮(contractible)であるという. このことを表す型$\iscont (A)$を, 
+  \[
+    \iscont (A) :\equiv \sum_{a : A} \prod_{x : A} (a = x)
+  \]
+  と定める. 
+\edf
+次に, ホモトピー論ではホモトピーファイバーに対応する概念を定める. 
+\bdf[\cite{hott} Definition 4.2.4]
+  関数$f : A \to B$の点$y : B$の上でのファイバーを
+  \[
+    \fib_f(y) :\equiv \sum_{x : A} (f(x) = y)
+  \]
+  と定める. 
+\edf
+このファイバーを用いて, 関数の可縮性を定義する. 
+\bdf[\cite{hott} Definition4.4.1]
+  関数$f : A \to B$が可縮であるとは, 任意の$y : B$に対して$\fib_f{y}$が可縮であることである. 
+  このことを表す型$\iscont (f)$を, 
+  \[
+    \iscont (f) :\equiv \prod_{y : B} \iscont (\fib_{f}(y))
+  \]
+  と定める. 
+\edf
+このように定義した$\iscont (f)$について, 
+\[
+  \iscont (f) \simeq \iseq (f)
+\]
+が成り立つ(\cite{hott} p138 4.5節参照). よって, ある関数が equivalence であることを示すには, 可縮であることを示せば十分である. 可縮性に関するものでよく使う補題として, 以下のようなものがある. 
+\blem[\cite{hott} Lemma 3.11.8] \label{lem sigeq_cont}
+  任意の$A$, $a : A$について, $\sum_{x : A} (a = x)$は可縮である
+\elem
+\blem[\cite{hott} Lemma 3.11.9] \label{lem sig_eq}
+  $P : A \to \U$を型族とする. このとき, 以下の2つが成り立つ. 
+  \begin{enumerate}
+    \item 各$P(x)$が可縮である, $\sum_{x : A} P(x) \simeq A$
+    \item $A$が$a$を中心として可縮であるとき, $\sum_{x : A} P(x) \simeq P(a)$
+  \end{enumerate}
+\elem
+この2つの補題と univalence axiom から示せることとして,  
+\blem[\cite{hott} Lemma 4.8.1] \label{lem fib_pr_eq}
+  任意の型族$B : A \to \U$について, $\pr_1 : \sum_{x : A} B(x) \to A$の$a : A$上での
+  ファイバーは$B(a)$と同型である, つまり, 
+  \[
+    \fib_{\pr_1} (a) \simeq B(a)
+  \]
+  が成り立つ. 
+\elem
+\bpf
+  \begin{align*}
+    \fib_{\pr_1} (a) &\equiv \sum_{u : \sum_{x : A} B(x)} \pr_1 (u) a \\
+                        &\simeq \sum_{x : A} \sum_{b : B(x)} (x = a)
+                          \quad \text{(by Example \ref{ex sigA})} \\
+                        &\simeq \sum_{x : A} \sum_{b : B(x)} \sum_{p : x = a} \1 \\
+                        &\simeq \sum_{x : A} \sum_{p : x = a} \sum_{b : B(x)} \1 \\ 
+                        &\simeq \sum_{x : A} \sum_{p : x = a} B(x) \\
+                        &\simeq B(a)
+                    \quad \text{(by Example \ref{ex sigA}, Lemma \ref{lem sigeq_cont}, 
+                                          Lemma \ref{lem sig_eq})}
+  \end{align*}
+\epf
+がある. この補題は, 写像はファイブレーションと同型であるというホモトピー論での基本的な結果に対応している.  
+最後に, ファイバーごとの equivalence は全空間(total space)の equivalence という言葉で特徴付けられることを示す. 
+%最後に、ファイバーワイズ同値が全空間の同値で特徴付けられることを示す。
+%2.3 節で、型族 P : A → U は全空間 ∑(x:A) P(x) を持つ A 上の fibration と見なすことができ、その fibration は射影 pr1 : ∑(x:A) P(x) → A であることを説明する。この観点から、二つの型族 P, Q : A → U が与えられたとき、関数 f : ∏(P(x) → Q(x)) をファイバーワイズ写像またはファイバーワイズ変換と呼ぶことがある。
+%このような写像は全空間上の関数を誘導する。
+\bdf[\cite{hott} Definition 4.7.5]
+  型族$P$, $Q : A \to \U$と依存関数$f : \prod_{x : A} P(x) \to Q(x)$
+  (このような関数を fiberwise map または fiberwise transformation と呼ぶ)が与えられたとき, 
+  \[
+    \total (f) :\equiv \lambda w.\ (\pr_1 w, f(\pr_1 w, \pr_2 w)) :
+      \sum_{x : A} P(x) \to \sum_{x : A} Q(x)
+  \]
+  と定める. 
+\edf
+\bthm[\cite{hott} Theorem 4.7.6] \label{thm_total}
+  $f$が$A$上の型族$P$と$Q$の間の fiberwise transformation 
+  (つまり$f : \prod_{x : A} P(x) \to Q(x)$)であり, $x : A$と$v : Q(x)$が与えられたとする. このとき, 
+  \[
+    \fib_{\total(f)} ((x, v)) \simeq \fib_{f(x)} (v)
+  \]
+  である. 
+\ethm
+\bpf
+  \begin{align*}
+    \fib_{\total(f)} ((x, v))
+    &\equiv \sum_{w : \sum_{x : A} P(x)} (\pr_1 w, f(\pr_1 w, \pr_2 w)) = (x, v)\\
+    &\simeq \sum_{a : A} \sum_{u : P(a)} (a, f(a, u)) = (x, v)
+      \quad \text{(by Example \ref{ex sigA})}\\
+    &\simeq \sum_{a : A} \sum_{u : P(a)} \sum_{p : a = x} p_* (f(a, u)) = v
+      \quad \text{(by \cite{hott} Theorem 2.7.2)}\\
+    &\simeq \sum_{a : A} \sum_{p : a = x} \sum_{u : P(a)} p_* (f(a, u)) = v\\
+    &\simeq \sum_{g : \sum_{a : A} a = x}
+                  \left( \sum_{u : P(\pr_1 (q))} (\pr_2 (q))_* (f (pr_1(q), u) = v \right)
+      \quad \text{(by Example \ref{ex sigA})}\\
+    &\simeq \sum_{u : P(x)} (\refl_x)_* (f(x, u) = v)
+     \quad \text{(by Lemma \ref{lem sigeq_cont} and
+       Lemma \ref{lem sig_eq} (ii) as center $\equiv (x, \refl_x)$)}\\
+    &\simeq \sum_{u : P(x)} f (x, u) = v
+  \end{align*}
+\epf
+fiberwise transformation $f : \prod_{x : A} P(x) \to Q(x)$が fiberwise equivalence であるということを, 任意の$x : A$について$f(x) : P(x) \to Q(x)$が equivalence であることと定めると, 以下が成り立つ. 
+\bthm[\cite{hott} Theorem 4.7.7] \label{thm fibeq_totaleq}
+  $f$を$A$上の型族$P$と$Q$の間の fiberwise transformation とする. このとき, 
+  $f$が fiberwise equivalence であることと$\total (f)$が equivalence であることは同値である
+\ethm
+\bpf
+  \begin{align*}
+    f \text{が fiberwise equivalence} &\equiv \prod_{x : A} \iseq (f(x)) \\
+                                                &\lra \prod_{x : A} \iscont (f(x)) \\
+                                     &\equiv \prod_{x : A} \prod_{v : Q(x)} \iscont (\fib_{f(x)} (v)) \\
+                           &\simeq \prod_{x : A} \prod_{v : Q(x)} \iscont (\fib_{\total(f)} ((x, v)))
+                             \quad \text{(by Theorem \ref{thm_total})} \\
+                           &\lra \prod_{w : \sum_{x : A} Q(x)} \iscont (\fib_{\total(f)} (w)) \\
+                           &\equiv \iscont (\total(f)) \\
+                           &\lra \iseq (\total(f))
+  \end{align*}
+\epf
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{レトラクト} \label{sec retract}
+この章では, 型のレトラクトと関数のレトラクトをそれぞれ定義し, 後の章で使う補題を紹介する. 
+まず, 型のレトラクトと定義は以下のとおりである. 
+\bdf[\cite{hott} p125]
+  型$A$, $B$について, 2つの関数レトラクション$r : A \to B$とセクション$s : B \to A$が存在し, 
+  更にホモトピー
+  \[
+    \epsilon : \prod_{y : B} (r(s(y)) = y)
+  \]
+  が存在するとき, $B$は$A$のレトラクトであるという. 
+\edf
+このレトラクトに対して, 次の補題が成り立つ. 
+\blem[\cite{hott} Lemma 3.11.7] \label{lem ret_cont}
+  $B$が$A$のレトラクトであり, かつ$A$が可縮であるとき, $B$も可縮である. 
+\elem
+次に, 関数のレトラクトを定義する. 
+\bdf[\cite{hott} Definition 4.7.2] \label{def_retract}
+  関数$g : A \to B$が関数$f : X \to Y$のレトラクトであるとは, 4つのホモトピー
+  \begin{align*}
+    &R : r \circ s \sim \id_{A} \\
+    &R' : r' \circ s' \sim \id_{b} \\
+    &L : f \circ s \sim s' \circ g \\
+    &K : g \circ r \sim r' \circ f
+  \end{align*}
+  が存在するような$r : X \to A$, $s : A \to X$, $r' : Y \to B$, $s' : B \to Y$が存在し, 更に
+  任意の$a : A$に対して, パス
+  \[
+    H(a) : K(s(a)) \cdot r'(L(a)) = g(R(a)) \cdot R'(g(a)) ^ {-1}
+  \]
+  が存在することをいう. 
+\edf
+この定義において, ホモトピー$R$, $R'$はそれぞれ$A$が$X$のレトラクト, $B$が$Y$のレトラクトであるという条件である. 
+また, 型についてのレトラクションは, 上の定義において$B \equiv Y \equiv \1$としたときの特別な場合である. 関数のレトラクトについて, まず次のことが成り立つ. 
+\blem[\cite{hott} Lemma 4.7.3] \label{lem_close_retract}
+  関数$g : A \to B$が関数$f : X \to Y$のレトラクトであるならば, $\fib_g(b)$は$\fib_f(s'(b))$の
+  レトラクトである. ただし, $s'$は Definition \ref{def_retract}のものとする. 
+\elem
+\bpf
+  証明の概略を述べる. 
+  Definition \ref{def_retract} のとおりに記号を定める. 任意の$b : B$に対して, 
+  \begin{align*}
+    &\varphi_b : \fib_g (b) \to \fib_f (s'(b)), \quad
+      \varphi (a, p) :\equiv (s(a), L(a) \cdot s'(p)) \\
+    &\psi_b : \fib_f(s'(b)) \to \fib_g (b), \quad
+      \psi (x, q) :\equiv (r(x), K(x) \cdot r'(q) \cdot R'(b))
+  \end{align*}
+  と定義したとき, ($\sum$の induction から)任意の$(a, p) : \fib_g (b)$に対して
+  $\psi_b \varphi (a, p) = (a, p)$が成り立つ, つまり
+  \[
+    \prod_{b : B} \prod_{a : A} \prod_{p : g(a) = b} \psi_b \varphi (a, p) = (a, p)
+  \]
+  を示せば良い. 詳細は\cite{hott} p140 参照のこと. 
+%  初めの2つの$\prod$を入れ替え, $p$についての path induction から
+%  \[
+%    \prod_{a :A} \psi_{g(a)} (\varphi_{g(a)} (a, \refl_{g(a)})) = (a, \refl_{g(a)})
+%  \]
+%  となる. ここで, \cite{hott} Theorem 2.7.2 を用いると, $r(s(a)) = a$のパスとして$R(a)$がとれることから, 
+%  \[
+%    R(a)_* (K(s(a)) \cdot r'(L(a)) \cdot R'(g(a))) = \refl_{g(a)}
+%  \] 
+%  を示せばよいことになる. このとき, $R(a)_* \equiv \tp^{x \mapsto g(x) = g(a)} (R(a), -)$
+%  であるので, Theorem 2.11.3 より, 定数関数の ap は $\refl$になることに注意すれば, 
+%  \[
+%    R(a)_* (K(s(a)) \cdot r'(L(a)) \cdot R'(g(a))) =
+%    g(R(a))^{-1} \cdot K(s(a)) \cdot r'(L(a)) \cdot R'(g(a))
+%  \]
+%  となる. 
+\epf
+この補題から, equivalence とレトラクトに関する補題が従う. 
+\bthm[\cite{hott} Theorem 4.7.4]
+  $g$が equivalence な$f$のレトラクトであれば, $g$も equivalence である. 
+\ethm
+\bpf
+  Lemma \ref{lem_close_retract} より, $g$の任意のファイバーは$f$のファイバーのレトラクトで
+  あり, $\iseq (f) \lra \iscont (f)$と Lemma \ref{lem ret_cont} から$\iseq (g)$が分かる. 
+\epf
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\section{Closure properties of equivalences}
+%Lemma 2.4.12 で見たように, equivalence は合成について閉じている. 更に, 以下が成り立つ.
+%\bthm
+%  $f : A \to B$, $g : B \to C$とする. このとき, $f$, $g$, $g \circ f$のうち2つが equivalence 
+%  であれば, 残りの1つも equivalence である.
+%\ethm
+%\bpf
+%  $f$, $g$が equivalence のときは Lemma 2.4.12 そのもので, $g \circ f$, $g$が equivalence 
+%  のときは資料にあるため, $g \circ f$, $f$が equivalence であるときを示す. このとき, 
+%  $f \circ (g \circ f)^{-1}$が$g$の quasi-inverse になる. 
+%  まず, $g \circ (f \circ (g \circ f)^{-1}) \sim \id_{C}$である. また, 資料と同様に, 
+%  \begin{align*}
+%    f \circ (g \circ f)^{-1} \circ g
+%    &\sim g ^ {-1} \circ g \circ f \circ (g \circ f)^{-1} \circ g \\
+%    &\sim g ^ {-1} \circ g \\
+%    &\sim \id_{B}
+%  \end{align*}
+%  であるから, $g$も equivalence となる.
+%\epf
+%同様に, equivalence はレトラクトについても閉じている. 
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\section{The object classifier}
+%\blem[\cite{hott} 4.8.2] \label{lem_domfib}
+%  任意の関数$f : A \to B$に対して, $A \simeq \sum_{b : B} \fib_{f} (b)$である.
+%\elem
+%\bpf
+%  \begin{align*}
+%    \sum_{b : B} \fib_{f} (b) &\equiv \sum_{b : B} \sum_{a : A} (f(a) = b) \\
+%                                   &\simeq \sum_{a : A} \sum_{b : B} (f(a) = b) \\
+%                                   &\simeq A \quad \text{(by Lemma \ref{lem sigeq_cont} and
+%                                                                        Lemma \ref{lem sig_eq})}
+%  \end{align*}
+%\epf
+%\bthm
+%  任意の型$B$について, 
+%  \[
+%    \chi : \left( \sum_{A : \U} (A \to B) \right) \simeq (B \to \U)
+%  \]
+%  である. 
+%\ethm
+%\bpf
+%  quasi-inverse な
+%  \begin{align*}
+%    \chi : \left( \sum_{A : \U} (A \to B) \right) \to (B \to \U) \\
+%    \psi : (B \to \U)\to \left( \sum_{A : \U} (A \to B) \right)
+%  \end{align*}
+%  を構成すれば良い. $\chi$として$\chi((A, f), b) :\equiv \fib_{f} b$, $\psi$として
+%  $\psi(P) :\equiv \left( (\sum_{b : B} P(b)), \pr_1 \right)$と定める. このとき, 
+%  $\chi \circ \psi \sim \id$と$\psi \circ \chi \sim \id$を示せば良い. まず, 前者について, 
+%  任意の$P : A \to \U$について, 
+%  \[
+%    \chi (\psi (P)) \equiv \lambda b.\ \fib_{\pr_1} (b)
+%  \]
+%  であり, 任意の$b : B$について$\fib_{\pr_1} (b) \simeq P(b)$から, $\chi (\psi (P)) \sim P$
+%  となるので, $\chi \circ \psi \sim \id$が成り立つ. 
+%  次に後者について, 関数$f : A \to B$に対して, 
+%  \[
+%    \psi (\chi (A, f)) \equiv  \left( \sum_{b : B} \fib_{f} (b), \pr_1 \right) = (A, f)
+%  \]
+%  のパスを見つければよい. 初めに, 
+%%  Lemma \ref{lem_domfib} から, $e (b, a, p) \equiv a$かつ
+%%  $e^{-1} (a) \equiv (f(a), a, \refl_{f(a)})$をみたす$e : \sum_{b : B} fib_f (b)$が得られる
+%%  (Admitted). 
+%  $e (b, a, p) \equiv a$, $e^{-1} (a) \equiv (f(a), a, \refl_{f(a)})$とすれば, 
+%  $e : \sum_{b : B} \fib_f (b) \simeq A$である. 
+%  $\ua(e) : \sum_{b : B} \fib_f (b) = A$から, \cite{hott} Theorem 2.7.2 より, 
+%  $(\ua(e))_* (\pr_1) = f$を示せばよい. このとき, $\ua$の computation rule と (2.9.4)式から, 
+%  $(\ua(e))_* (\pr_1) = \pr_1 \circ e^{-1}$となり, $e^{-1}$の定義から
+%  $\pr_1 \circ e^{-1} \equiv f$はすぐに従う. 
+%\epf
+%この定理から, トポスにおける object classifier(対象分類子)が存在することがわかる. 
+%Definition 2.1.7 のときと同様, $\U_{	\bullet}$で基点付き型$\sum_{A : \U} A$を表すとする. 
+%\bthm
+%  資料参照
+%\ethm
+%\bpf
+%  まず, 定義から$\pr_1 \circ \vartheta_f = \chi \circ f$が確認できる. 
+%  また, 
+%  \begin{align*}
+%    A &\simeq \sum_{b : B} \fib_f (b) \quad \text{(by Lemma 4.8.2)} \\
+%       &\simeq \sum_{b : B} \sum_{X : \U} \sum_{p : \fib_f (b) = X} X\\
+%       &\simeq \sum_{b : B} \sum_{X : \U} \sum_{x : X} \fib_f (b) = X
+%         \quad \text{(Lemma \ref{lem fib_pr_eq} の証明と同様)}\\
+%       &\simeq \sum_{b : B} \sum_{Y : \U_{\bullet}} \fib_f (b) = \pr_1 (Y)
+%         \quad \text{(Example \ref{ex sigA})}\\
+%       &\simeq B \times_{\U} \U_{\bullet}
+%           \quad \text{(by (2.15.11) as $f :\equiv \chi_f$, $g :\equiv \pr_1$)}\\
+%  \end{align*}
+%  であり, これらの同型の合成を$e$とすれば, 
+%  \[
+%    e(a) \equiv (f(a), \fib_{f} (f(a)), (a, \refl_{f(a)}), \refl_{\fib_{f}(f(a))})
+%  \]
+%  と計算できるので, $f \sim \pr_1 \circ e$かつ$\vartheta_f \circ e$が成り立つ. 
+%\epf
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Univalence implies function extensionality} \label{sec funext}
+最後に, univalence axiom から関数の外延性が導けることを示す.
+%よって, この節では関数の外延性を仮定しない. 
+証明は, まず univalence axiom から弱い関数の外延性が導けることを示し, 次に弱い関数の外延性から通常の関数の外延性が従うことを示すという2段階で行われる. 
+$\U$をユニバースとし, どこで univalent を仮定しているかを明記することにする. 
+\bdf[\cite{hott} Lemma 4.9.1]
+  弱い関数の外延性の原理を, 任意の$A$上の型族$B : A \to \U$に対して
+  \[
+    \left( \prod_{x : A} \iscont(P(x)) \right) \to \iscont \left( \prod_{x :A} P(x) \right)
+  \]
+  が成り立つことと定義する. 
+\edf
+次の補題は関数の外延性を仮定すればすぐに証明できるが, 関数の外延性を仮定しなくても univalence axiom から証明できるのがポイントである. 
+\blem[\cite{hott} Lemma 4.9.2] \label{lem XA_eq_XB}
+  $\U$が univalent であると仮定する. 任意の$A$, $B$, $X : \U$と任意の$e : A \equiv B$
+  に対して, 
+  \[
+    (X \to A) \simeq (X \to B)
+  \]
+  の同型射は, $(e(\text{の同型射}) \circ -)$で与えられる. 
+\elem
+\bpf
+%  Lemma 4.1.1 の証明の時と同様, 
+  ある$p : A = B$について$e = \idtoeqv (p)$と仮定してよい. 
+  よって, path induction より $B \equiv A$, $p \equiv \refl_{A}$とすれば, 
+  $e = \idtoeqv(\refl_A) = \id_A$となる. このとき, $(e \circ -)$は$(\id_A \circ -)$となり, これは
+  $X \to A$上の$\id$であるので, equivalence である. 
+\epf
+\bcor[\cite{hott} Corollary 4.9.3] 
+  $P : A \to \U$を可縮な型の族, つまり$\prod_{x : A} \iscont(P(x))$とする. このとき, 
+  射影$\pr_1 : (\sum_{x : A} P (x)) \to A$は equivalence である.
+  更に, $\U$が univalent であれば, 
+  \[
+    (\pr_1 \circ -) : \left( A \to \sum_{x : A} P(x) \right) \simeq (A \to A)
+  \]
+  である. 
+\ecor
+\bpf
+  前半について, Lemma {\ref{lem fib_pr_eq}} から, $x : A$について, $\fib_{\pr_1} (x) \equiv P(x)$である. 
+  $P$が可縮な型の族なので, $\iscont(\pr_1)$が成り立つ.
+  後半については, Lemma \ref{lem XA_eq_XB} よりわかる. 
+\epf
+上記の$\alpha \equiv (\pr_1 \circ -)$のホモトピーファイバーは可縮であるため, 特に$\id_A$上でも可縮, つまり$\iscont(\fib_{\alpha} (\id_A))$である. よって, $\prod_{x : A} P(x)$が
+$\fib_{\alpha} (\id_A)$のレトラクトであることを示せば, 弱い関数の外延性が univalence axiom から従うことになる. 
+\bthm[\cite{hott} Theorem 4.9.4]
+  $\U$が univalent であるとし, $P : A \to \U$を可縮な型の族とする. 
+  $\alpha : \left( A \to \sum_{x : A} P(x) \right) \equiv (A \to A)$とすると, 
+  $\prod_{x : A} P(x)$は$\fib_{\alpha} (\id_A)$のレトラクトである. つまり, $\prod_{x : A} P(x)$
+  は可縮となるので, univalence axiom から弱い関数の外延性の原理が従う. 
+\ethm
+\bpf
+  関数$\varphi : (\prod_{x : A} P(x)) \to \fib_{\alpha} (\id_A)$, 
+  $\psi : \fib_{\alpha} (\id_A) \to \prod_{x : A} P(x)$をそれぞれ, 
+  \begin{align*}
+    \varphi (f) :\equiv (\lambda x.\ (x, f(x)), \refl_{id_A}) \\
+    \psi (g, p) :\equiv \lambda x.\ \happ (p, x)_* (\pr_2(g(x)))
+  \end{align*}
+  と定める. このとき, 
+  \begin{align*}
+    \psi (\varphi (f)) &\equiv \lambda x.\ \happ (\refl_{id_A}, y)_* (\pr_2(x, f(x))) \\
+                           &\equiv \lambda x.\ \refl_* (f(x)) \\
+                           &\equiv \lambda x.\ f(x) \\
+                           &= f
+  \end{align*}
+  より成り立つ. 
+\epf
+\bthm[\cite{hott} Theorem 4.9.5] \label{thm weakfe_to_fe}
+  弱い関数の外延性から通常の関数の外延性が従う. 
+\ethm
+\bpf
+示したいことは
+  \[
+    \prod_{A : \U} \prod_{P : A \to P} \prod_{f, g : \prod_{x : A} P(x)} \iseq (\happ (f, g))
+  \]
+  である. このとき, 
+  \[
+    \prod_{g : \prod_{x : A} P (x)} \iseq (\happ(f, g))
+  \]
+  は, $\lambda g.\ \happ (f, g)$が fiberwise equivalence であるということなので, 
+  Theorem \ref{thm fibeq_totaleq} から, 
+  \[
+    \total (\lambda g.\ \happ (f, g)) : \sum_{g : \prod_{x : A} P (x)} (f = g) \to
+                                                 \sum_{g : \prod_{x : A} P (x)} (f \sim g)
+  \]
+  が equivalence であればよい. ここで, Lemma \ref{lem sigeq_cont} より
+  送り元の型は可縮なので, 送り先の型
+  \[
+    \sum_{g : \prod_{x : A} P (x)} \prod_{x : A} (f(x) = g(x))
+  \]
+  が可縮であれば十分である. \cite{hott} Theorem 2.15.7 の証明のうち, 関数の外延性を
+  仮定しなければ, 
+  \[
+    \sum_{g : \prod_{x : A} P (x)} \prod_{x : A} (f(x) = g(x))
+  \]
+  は
+  \[
+    \prod_{x : A} \sum_{u : P(x)} f(x) = u
+  \]
+  のレトラクトであることが示せる(逆向きの合成が$\id$とホモトピックであることにのみ
+  関数の外延性を使っている).さらに, $\sum_{u : P(x)} f(x) = u$は Lemma \ref{lem sigeq_cont}
+  から可縮であるため, 弱い関数の外延性から$\prod_{x : A} \sum_{u : P(x)} f(x) = u$も
+  可縮になる. したがって, 
+  \[
+    \sum_{g : \prod_{x : A} P (x)} \prod_{x : A} (f(x) = g(x))
+  \]
+  も可縮である.  
+\epf
+\brmk
+  Theorem \ref{thm weakfe_to_fe} の証明には univalent axiom は用いていない. 
+\ermk
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{thebibliography}{9}
   \bibitem{hott} The Univalent Foundations Program, 

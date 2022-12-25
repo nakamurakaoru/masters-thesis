@@ -1,4 +1,8 @@
-\contentsline {section}{\numberline {1}HoTT}{1}
-\contentsline {subsection}{\numberline {1.1}型から型を作る}{1}
-\contentsline {subsection}{\numberline {1.2}型の同型}{2}
-\contentsline {subsection}{\numberline {1.3}Univalence axiom}{3}
+\contentsline {section}{\numberline {1}はじめに}{1}
+\contentsline {section}{\numberline {2}型から型を作る}{2}
+\contentsline {section}{\numberline {3}型の同型}{2}
+\contentsline {section}{\numberline {4}Univalence axiom}{3}
+\contentsline {section}{\numberline {5}関数の外延性}{4}
+\contentsline {section}{\numberline {6}可縮, ファイバー}{5}
+\contentsline {section}{\numberline {7}レトラクト}{7}
+\contentsline {section}{\numberline {8}Univalence implies function extensionality}{9}

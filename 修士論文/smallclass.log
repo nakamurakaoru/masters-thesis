@@ -1,4 +1,4 @@
-This is e-pTeX, Version 3.14159265-p3.8.1-180518-2.6 (utf8.sjis) (TeX Live 2018/W32TeX) (preloaded format=platex 2018.7.29)  25 DEC 2022 10:57
+This is e-pTeX, Version 3.14159265-p3.8.1-180518-2.6 (utf8.sjis) (TeX Live 2018/W32TeX) (preloaded format=platex 2018.7.29)  26 DEC 2022 02:07
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -343,51 +343,55 @@ File: lstlang2.sty 2015/06/04 1.6 listings language file
 File: lstmisc.sty 2015/06/04 1.6 (Carsten Heinz)
 ))
 \c@df=\count117
- (./smallclass.aux)
+ (./smallclass.aux
+
+LaTeX Warning: Label `sec funext' multiply defined.
+
+)
 \openout1 = `smallclass.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/txmi/m/it on input line 90.
-LaTeX Font Info:    Try loading font information for OML+txmi on input line 90.
+LaTeX Font Info:    Checking defaults for OML/txmi/m/it on input line 96.
+LaTeX Font Info:    Try loading font information for OML+txmi on input line 96.
 
-(c:/w32tex/share/texmf-dist/tex/latex/txr/omltxmi.fd
+ (c:/w32tex/share/texmf-dist/tex/latex/txr/omltxmi.fd
 File: omltxmi.fd 2000/12/15 v3.1
 )
-LaTeX Font Info:    ... okay on input line 90.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 90.
-LaTeX Font Info:    ... okay on input line 90.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 90.
-LaTeX Font Info:    ... okay on input line 90.
-LaTeX Font Info:    Checking defaults for OMS/txsy/m/n on input line 90.
-LaTeX Font Info:    Try loading font information for OMS+txsy on input line 90.
+LaTeX Font Info:    ... okay on input line 96.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 96.
+LaTeX Font Info:    ... okay on input line 96.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 96.
+LaTeX Font Info:    ... okay on input line 96.
+LaTeX Font Info:    Checking defaults for OMS/txsy/m/n on input line 96.
+LaTeX Font Info:    Try loading font information for OMS+txsy on input line 96.
 
 
 (c:/w32tex/share/texmf-dist/tex/latex/txr/omstxsy.fd
 File: omstxsy.fd 2000/12/15 v3.1
 )
-LaTeX Font Info:    ... okay on input line 90.
-LaTeX Font Info:    Checking defaults for OMX/txex/m/n on input line 90.
-LaTeX Font Info:    Try loading font information for OMX+txex on input line 90.
+LaTeX Font Info:    ... okay on input line 96.
+LaTeX Font Info:    Checking defaults for OMX/txex/m/n on input line 96.
+LaTeX Font Info:    Try loading font information for OMX+txex on input line 96.
 
 
 (c:/w32tex/share/texmf-dist/tex/latex/txr/omxtxex.fd
 File: omxtxex.fd 2000/12/15 v3.1
 )
-LaTeX Font Info:    ... okay on input line 90.
-LaTeX Font Info:    Checking defaults for U/txexa/m/n on input line 90.
-LaTeX Font Info:    Try loading font information for U+txexa on input line 90.
+LaTeX Font Info:    ... okay on input line 96.
+LaTeX Font Info:    Checking defaults for U/txexa/m/n on input line 96.
+LaTeX Font Info:    Try loading font information for U+txexa on input line 96.
 
 (c:/w32tex/share/texmf-dist/tex/latex/txr/utxexa.fd
 File: utxexa.fd 2000/12/15 v3.1
 )
-LaTeX Font Info:    ... okay on input line 90.
-LaTeX Font Info:    Checking defaults for JY1/mc/m/n on input line 90.
-LaTeX Font Info:    ... okay on input line 90.
-LaTeX Font Info:    Checking defaults for JT1/mc/m/n on input line 90.
-LaTeX Font Info:    ... okay on input line 90.
+LaTeX Font Info:    ... okay on input line 96.
+LaTeX Font Info:    Checking defaults for JY1/mc/m/n on input line 96.
+LaTeX Font Info:    ... okay on input line 96.
+LaTeX Font Info:    Checking defaults for JT1/mc/m/n on input line 96.
+LaTeX Font Info:    ... okay on input line 96.
 
 (I search kanjifont definition file: . . ) (I search font definition file: . .
 . . . . . )
-LaTeX Font Info:    Try loading font information for OT1+txr on input line 90.
+LaTeX Font Info:    Try loading font information for OT1+txr on input line 96.
  (c:/w32tex/share/texmf-dist/tex/latex/txr/ot1txr.fd
 File: ot1txr.fd 2000/12/15 v3.1
 )
@@ -426,34 +430,38 @@ File: ot1txr.fd 2000/12/15 v3.1
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
 \c@lstlisting=\count118
-LaTeX Font Info:    Try loading font information for U+txsya on input line 96.
+LaTeX Font Info:    Try loading font information for U+txsya on input line 102.
+
 (c:/w32tex/share/texmf-dist/tex/latex/txr/utxsya.fd
 File: utxsya.fd 2000/12/15 v3.1
 )
-LaTeX Font Info:    Try loading font information for U+txsyb on input line 96.
+LaTeX Font Info:    Try loading font information for U+txsyb on input line 102.
+
 
 (c:/w32tex/share/texmf-dist/tex/latex/txr/utxsyb.fd
 File: utxsyb.fd 2000/12/15 v3.1
 )
-LaTeX Font Info:    Try loading font information for U+txmia on input line 96.
+LaTeX Font Info:    Try loading font information for U+txmia on input line 102.
+
 
 (c:/w32tex/share/texmf-dist/tex/latex/txr/utxmia.fd
 File: utxmia.fd 2000/12/15 v3.1
 )
-LaTeX Font Info:    Try loading font information for U+txsyc on input line 96.
+LaTeX Font Info:    Try loading font information for U+txsyc on input line 102.
+
 
 (c:/w32tex/share/texmf-dist/tex/latex/txr/utxsyc.fd
 File: utxsyc.fd 2000/12/15 v3.1
 )
-LaTeX Font Info:    Try loading font information for U+rsfs on input line 96.
+LaTeX Font Info:    Try loading font information for U+rsfs on input line 102.
 
 (c:/w32tex/share/texmf-dist/tex/latex/jknappen/ursfs.fd
 File: ursfs.fd 1998/03/24 rsfs font definition file (jk)
 )
 LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <14.4> not available
-(Font)              Font shape `JT1/gt/m/n' tried instead on input line 98.
+(Font)              Font shape `JT1/gt/m/n' tried instead on input line 104.
 LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <14.4> not available
-(Font)              Font shape `JY1/gt/m/n' tried instead on input line 98.
+(Font)              Font shape `JY1/gt/m/n' tried instead on input line 104.
  (./smallclass.toc
 LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <10.95> not available
 (Font)              Font shape `JT1/gt/m/n' tried instead on input line 1.
@@ -463,55 +471,54 @@ LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <10.95> not available
 \tf@toc=\write3
 \openout3 = `smallclass.toc'.
 
-LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <12> not available
-(Font)              Font shape `JT1/gt/m/n' tried instead on input line 108.
-LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <12> not available
-(Font)              Font shape `JY1/gt/m/n' tried instead on input line 108.
-LaTeX Font Info:    Try loading font information for U+eus on input line 114.
 
-(c:/w32tex/share/texmf-dist/tex/latex/amsfonts/ueus.fd
+[1
+
+]
+LaTeX Font Info:    Try loading font information for U+eus on input line 120.
+ (c:/w32tex/share/texmf-dist/tex/latex/amsfonts/ueus.fd
 File: ueus.fd 2013/01/14 v3.01 Euler Script
 )
-LaTeX Font Info:    Try loading font information for OMS+txr on input line 121.
+LaTeX Font Info:    Try loading font information for OMS+txr on input line 127.
 
 
 (c:/w32tex/share/texmf-dist/tex/latex/txr/omstxr.fd
 File: omstxr.fd 2000/12/15 v3.1
 )
 LaTeX Font Info:    Font shape `OMS/txr/m/n' in size <10.95> not available
-(Font)              Font shape `OMS/txsy/m/n' tried instead on input line 121.
- [1
-
-]
+(Font)              Font shape `OMS/txsy/m/n' tried instead on input line 127.
 LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <8> not available
-(Font)              Font shape `JT1/gt/m/n' tried instead on input line 141.
+(Font)              Font shape `JT1/gt/m/n' tried instead on input line 148.
 LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <8> not available
-(Font)              Font shape `JY1/gt/m/n' tried instead on input line 141.
+(Font)              Font shape `JY1/gt/m/n' tried instead on input line 148.
 LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <6> not available
-(Font)              Font shape `JT1/gt/m/n' tried instead on input line 141.
+(Font)              Font shape `JT1/gt/m/n' tried instead on input line 148.
 LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <6> not available
-(Font)              Font shape `JY1/gt/m/n' tried instead on input line 141.
- [2]
+(Font)              Font shape `JY1/gt/m/n' tried instead on input line 148.
+ [2] [3] [4]
 
 LaTeX Font Warning: Font shape `JT1/mc/m/it' undefined
-(Font)              using `JT1/mc/m/n' instead on input line 211.
+(Font)              using `JT1/mc/m/n' instead on input line 311.
 
 
 LaTeX Font Warning: Font shape `JY1/mc/m/it' undefined
-(Font)              using `JY1/mc/m/n' instead on input line 211.
+(Font)              using `JY1/mc/m/n' instead on input line 311.
 
-[3] (./smallclass.aux)
+[5] [6] [7] [8] [9] [10] (./smallclass.aux)
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
+
+LaTeX Warning: There were multiply-defined labels.
+
  ) 
 Here is how much of TeX's memory you used:
- 4906 strings out of 493249
- 62832 string characters out of 6146370
- 174614 words of memory out of 5000000
- 8758 multiletter control sequences out of 15000+600000
- 34143 words of font info for 116 fonts, out of 8000000 for 9000
+ 4926 strings out of 493249
+ 63042 string characters out of 6146370
+ 175614 words of memory out of 5000000
+ 8777 multiletter control sequences out of 15000+600000
+ 33754 words of font info for 116 fonts, out of 8000000 for 9000
  929 hyphenation exceptions out of 8191
- 35i,13n,58p,322b,293s stack positions out of 5000i,500n,10000p,500000b,80000s
+ 35i,14n,58p,460b,308s stack positions out of 5000i,500n,10000p,500000b,80000s
 
-Output written on smallclass.dvi (3 pages, 13076 bytes).
+Output written on smallclass.dvi (10 pages, 43864 bytes).
