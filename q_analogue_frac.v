@@ -19,25 +19,26 @@ Import FracField.
 Import q_analogue.
 
 Section q_analogue_farc.
-Variable (R : realType) (q : R).
+Variable (R : rcfType) (q : R).
 Hypothesis Hq : q - 1 != 0.
 
 Local Notation tofrac := (@tofrac [idomainType of {poly R}]).
 Local Notation "x %:F" := (tofrac x).
+
 (* Goal (\n_(repr ((tofrac 1) / (tofrac (1 + 'X))))).[0] = 1.
 rewrite unlock /repr_of /= /EquivQuot.erepr /=.
 rewrite !unlock /=.
 Abort. *)
 
-Lemma test1 : ('X ^+ 2)%:F / 'X%:F = 'X%:F.
+(* Lemma test1 : ('X ^+ 2)%:F / 'X%:F = 'X%:F.
 Proof.
 rewrite expr2 tofracM -mulrA divrr ?mulr1 //.
 by rewrite unitfE -tofrac0 tofrac_eq polyX_eq0.
-Qed.
+Qed. *)
 
-Lemma sumW {V : zmodType} n (F : nat -> V) :
+(* Lemma sumW {V : zmodType} n (F : nat -> V) :
   \sum_(i < n) F i = \sum_(0 <= i < n) F i.
-Proof. by rewrite big_mkord. Qed.
+Proof. by rewrite big_mkord. Qed. *)
 
 (* Lemma tofrac_div (p p' p'' : {poly R}) : p = p' * p'' -> p %/ p' = p''.
 Proof.
@@ -142,7 +143,6 @@ have Hp0 : forall (p : {poly R}), size p = 0%N ->
   move/eqP ->.
   by rewrite mul0r scaleqC mul0r.
 elim: n p => [|n IH] p Hsize.
-  Search (_ <= 0)%N.
   move: Hsize.
   rewrite leqn0 => /eqP.
   by apply Hp0.
@@ -262,6 +262,51 @@ Definition Dq_f p := dq_f p %/ dq_f 'X.
 Lemma Dq_f_ok p : dq_f 'X %| dq_f p.
 Proof.
 by rewrite dq_fXE dvdpZl ?dq_fpXE ?dvdp_mulIl.
+Qed.
+
+Theorem Dq_f_ok_frac' p : (dq_f p)%:F = (Dq_f p)%:F * (dq_f 'X)%:F.
+Proof.
+rewrite /(Dq_f).
+rewrite -tofracM.
+Search (_ %/ _ * _).
+Check tofrac_eq.
+apply /eqP.
+rewrite tofrac_eq.
+apply /eqP.
+by rewrite divpK ?Dq_f_ok.
+Qed.
+
+Theorem frac_same_prod (a b c : {fraction [idomainType of {poly R}]}) :
+  c != 0 ->
+  a * c = b * c -> a = b.
+Proof.
+  move=> Hc.
+  by rewrite -{2}(mulr1 a) -{2}(mulr1 b)
+     -(@divff _ c) // !mulrA => ->.
+Qed.
+
+Theorem Dq_f_ok_frac p : (dq_f p)%:F / (dq_f 'X)%:F = (Dq_f p)%:F.
+Proof.
+  have Hn0 : (dq_f 'X)%:F != 0.
+    rewrite tofrac_eq.
+    rewrite dq_fXE.
+    rewrite lreg_polyZ_eq0.
+      by rewrite polyX_eq0.
+    rewrite /(GRing.lreg).
+    rewrite /(injective).
+    move=> x y.
+    rewrite mulrC (mulrC (q - 1)).
+    by apply same_prod.
+  apply (frac_same_prod _ _ (dq_f 'X)%:F) => //.
+  rewrite [LHS]mulC.
+  rewrite mulA.
+  rewrite (mulC ((dq_f 'X))%:F).
+  rewrite -mulA.
+  rewrite (mulC ((dq_f 'X))%:F).
+  rewrite mulV_l //.
+  rewrite mulC.
+  rewrite mul1_l.
+  apply Dq_f_ok_frac'.
 Qed.
 
 Lemma Dq_fE' p : Dq_f p = dq_f p %/ ((q - 1) *: 'X).
