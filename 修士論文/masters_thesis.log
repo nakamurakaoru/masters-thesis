@@ -1,4 +1,4 @@
-This is e-pTeX, Version 3.14159265-p3.8.1-180518-2.6 (utf8.sjis) (TeX Live 2018/W32TeX) (preloaded format=platex 2018.7.29)  26 DEC 2022 14:42
+This is e-pTeX, Version 3.14159265-p3.8.1-180518-2.6 (utf8.sjis) (TeX Live 2018/W32TeX) (preloaded format=platex 2018.7.29)  27 DEC 2022 15:19
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -464,87 +464,87 @@ LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <10.95> not available
 \tf@toc=\write3
 \openout3 = `masters_thesis.toc'.
 
+
+LaTeX Font Warning: Font shape `JT1/mc/m/it' undefined
+(Font)              using `JT1/mc/m/n' instead on input line 104.
+
+
+LaTeX Font Warning: Font shape `JY1/mc/m/it' undefined
+(Font)              using `JY1/mc/m/n' instead on input line 104.
+
 [1
 
 ]
 LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <12> not available
-(Font)              Font shape `JT1/gt/m/n' tried instead on input line 153.
+(Font)              Font shape `JT1/gt/m/n' tried instead on input line 155.
 LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <12> not available
-(Font)              Font shape `JY1/gt/m/n' tried instead on input line 153.
-LaTeX Font Info:    Try loading font information for OMS+txr on input line 165.
+(Font)              Font shape `JY1/gt/m/n' tried instead on input line 155.
+LaTeX Font Info:    Try loading font information for OMS+txr on input line 167.
 
  (c:/w32tex/share/texmf-dist/tex/latex/txr/omstxr.fd
 File: omstxr.fd 2000/12/15 v3.1
 )
 LaTeX Font Info:    Font shape `OMS/txr/m/n' in size <10.95> not available
-(Font)              Font shape `OMS/txsy/m/n' tried instead on input line 165.
+(Font)              Font shape `OMS/txsy/m/n' tried instead on input line 167.
  [2]
 (I search kanjifont definition file: . . ) (I search font definition file: . .
 . . . . . )
-LaTeX Font Info:    Try loading font information for OT1+txtt on input line 191
+LaTeX Font Info:    Try loading font information for OT1+txtt on input line 193
 .
  (c:/w32tex/share/texmf-dist/tex/latex/txr/ot1txtt.fd
 File: ot1txtt.fd 2000/12/15 v3.1
 ) [3]
 LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <8> not available
-(Font)              Font shape `JT1/gt/m/n' tried instead on input line 238.
+(Font)              Font shape `JT1/gt/m/n' tried instead on input line 240.
 LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <8> not available
-(Font)              Font shape `JY1/gt/m/n' tried instead on input line 238.
+(Font)              Font shape `JY1/gt/m/n' tried instead on input line 240.
 LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <6> not available
-(Font)              Font shape `JT1/gt/m/n' tried instead on input line 238.
+(Font)              Font shape `JT1/gt/m/n' tried instead on input line 240.
 LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <6> not available
-(Font)              Font shape `JY1/gt/m/n' tried instead on input line 238.
+(Font)              Font shape `JY1/gt/m/n' tried instead on input line 240.
  [4]
-
-LaTeX Font Warning: Font shape `JT1/mc/m/it' undefined
-(Font)              using `JT1/mc/m/n' instead on input line 306.
-
-
-LaTeX Font Warning: Font shape `JY1/mc/m/it' undefined
-(Font)              using `JY1/mc/m/n' instead on input line 306.
-
 [5] [6] [7] [8] [9] [10] [11] [12]
-LaTeX Font Info:    Try loading font information for OMS+txtt on input line 766
+LaTeX Font Info:    Try loading font information for OMS+txtt on input line 757
 .
-LaTeX Font Info:    No file OMStxtt.fd. on input line 766.
+LaTeX Font Info:    No file OMStxtt.fd. on input line 757.
 
 
 LaTeX Font Warning: Font shape `OMS/txtt/m/n' undefined
 (Font)              using `OMS/txsy/m/n' instead
-(Font)              for symbol `textbraceleft' on input line 766.
+(Font)              for symbol `textbraceleft' on input line 757.
 
 [13]
-Overfull \hbox (42.40448pt too wide) in paragraph at lines 814--814
+Overfull \hbox (42.40448pt too wide) in paragraph at lines 802--802
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
 [14]
-Overfull \hbox (17.25452pt too wide) in paragraph at lines 889--889
+Overfull \hbox (17.25452pt too wide) in paragraph at lines 874--874
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
 [15] [16] [17]
-Overfull \hbox (34.11447pt too wide) in paragraph at lines 1032--1033
+Overfull \hbox (34.11447pt too wide) in paragraph at lines 1014--1015
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
-[18] [19] (./masters_thesis.aux)
+[18] (./masters_thesis.aux)
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
  ) 
 Here is how much of TeX's memory you used:
  5749 strings out of 493249
- 71445 string characters out of 6146370
+ 71425 string characters out of 6146370
  210614 words of memory out of 5000000
  9592 multiletter control sequences out of 15000+600000
  45044 words of font info for 151 fonts, out of 8000000 for 9000
  929 hyphenation exceptions out of 8191
- 35i,16n,58p,396b,1820s stack positions out of 5000i,500n,10000p,500000b,80000s
+ 35i,16n,58p,396b,1734s stack positions out of 5000i,500n,10000p,500000b,80000s
 
-Output written on masters_thesis.dvi (19 pages, 154432 bytes).
+Output written on masters_thesis.dvi (18 pages, 153760 bytes).
