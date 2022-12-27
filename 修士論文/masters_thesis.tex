@@ -101,7 +101,7 @@
 \tableofcontents
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{序文}
-本論文は, $q$-類似の初等的な結果をCoqによって形式化するものである. 具体的には\cite{Kac}の5章前半, (5.5)式
+本論文の主結果は, $q$-類似の初等的な結果をCoqによって形式化するものである. 具体的には{\it Quantum Calculus}\cite{Kac}の5章前半, (5.5)式
 \begin{screen}
   \[
     (x + a)^n_q = \sum_{j = 0}^n \qcoe{n}{j} q^{j (j - 1)/2} a^j x^{n - j}
@@ -139,7 +139,9 @@ $z$, $q \in \R$, $|q| < 1$として,
 \textbf{Coqの概要}\\
 Coqとは, 定理証明支援系の1つであり, 数学的な証明が正しいかどうか判定するプログラムである.
 人間がチェックすることが難しい複雑な証明でも正しさが保証され, また証明付きプログラミングにも応用される. 実際にCoqが用いられた有名な例として, 四色定理やフェイト・トンプソンの定理(奇数位数定理)などがある. Coqは型付き$\lambda$計算という理論に基づいている. 修士1年次に学習した\cite{Bar}に沿って, 型付き$\lambda$計算の概要について\ref{sssec lambdacal}で述べる. 
-今回の証明に関しては, Coqの標準ライブラリ(\cite{coq sl})に加えて, 数学の証明のために整備されたライブラリである mathcomp(\cite{coq mc}) も用いている. Coq や mathcompの使い方については\ref{ssec Coq}節で説明するが, より詳細な情報については\cite{Hag}等を参照のこと. 
+今回の証明に関しては, Coqの標準ライブラリ \cite{coq sl}に加えて, 数学の証明のために整備されたライブラリである mathcomp \cite{coq mc}も用いている. Coq や mathcompの使い方については\ref{ssec Coq}節で説明するが, より詳細な情報については\cite{Hag}等を参照のこと. 
+
+%\textbf{今後の展望}\\
 
 %研究に至った背景
 %修士1年次後半で学習した型付き$\lambda$計算の応用としてCoqによる形式化に挑戦したい
@@ -319,10 +321,8 @@ Lemma Dq_pow n x :
 Proof.
   move=> Hx.
   rewrite /Dq /dq /qnat.
-  rewrite -{4}(mul1r x) -mulrBl expfzMl -add_div; last first.
-    by apply mulf_neq0.
-  rewrite [in x ^ n](_ : n = (n -1) +1) //; last first.
-    by rewrite subrK.
+  rewrite -{4}(mul1r x) -mulrBl expfzMl -add_div; last by apply mulf_neq0.
+  rewrite [in x ^ n](_ : n = (n -1) +1) //; last by rewrite subrK.
   rewrite expfzDr ?expr1z ?mulrA -?mulNr ?red_frac_r ?add_div //.
   rewrite -{2}[x ^ (n - 1)]mul1r -mulrBl mulrC mulrA.
   by rewrite [in (q - 1)^-1 * (q ^ n - 1)] mulrC.
@@ -376,12 +376,8 @@ red_frac_r : forall x y z : R, z != 0 -> x * z / (y * z) = x / y \end{lstlisting
 まず, $(x - a)^n_q$の定義を形式化すると, 
 \begin{lstlisting}{Coq}
 Fixpoint qbinom_pos a n x :=
-  match n with
-  | 0 => 1
-  | n.+1 => (qbinom_pos a n x) * (x - q ^ n * a)
-  end.
-\end{lstlisting}
-となる. {\tt Fixpoint}を用いて再帰的な定義をしており, {\tt match}を使って{\tt n}が{\tt 0}かどうかで場合分けしている. 補題の証明については 
+  if n is m.+1 then (qbinom_pos a m x) * (x - q ^ m * a) else 1. \end{lstlisting}
+となる. {\tt Fixpoint}を用いて再帰的な定義をしており, {\tt if then else}を使って{\tt n}が{\tt 0}かどうかで場合分けしている. 補題の証明については 
 \begin{lstlisting}{Coq}
 Theorem Dq_qbinom_pos a n x : x != 0 ->
   Dq (qbinom_pos a n.+1) x =
@@ -398,8 +394,7 @@ Proof.
                  (fun x => (x - q ^ (n.+1) * a))) x) //.
     rewrite Dq_prod' //.
     rewrite [Dq (+%R^~ (- (q ^ n.+1 * a))) x]/Dq /dq.
-    rewrite opprB subrKA divff //; last first.
-      by apply denom_is_nonzero.
+    rewrite opprB subrKA divff //; last by apply denom_is_nonzero.
     rewrite mulr1 exprSz.
     rewrite -[q * q ^ n * a]mulrA -(mulrBr q) IH.
     rewrite -[q * (x - q ^ n * a) * (qnat n.+1 * qbinom_pos a n x)]mulrA.
@@ -536,11 +531,8 @@ Qed.
 となる. 証明の構造としては, まず{\tt case:m}で{\tt m}が$0$以上か負かの場合分けを行い, 更にそれぞれの場合について{\tt case:n}で{\tt n}の場合分けを行っている. 
 ここで, 前提の{\tt qbinom\_denom}の定義は
 \begin{lstlisting}{Coq}
-Definition qbinom_denom a n x := match n with
-  | Posz n0 => 1
-  | Negz n0 => qbinom_pos (q ^ Negz n0 * a) n0.+1 x
-  end.
-\end{lstlisting}
+Definition qbinom_denom a n x :=
+  if n is Negz m then qbinom_pos (q ^ Negz m * a) m.+1 x else 1. \end{lstlisting}
 であり, 2つの前提は補題の右辺に出現する項の分母が$0$にならないということである. 
 証明中に使われている補題のうち, {\tt qbinom\_exp\_pos\_neg}, {\tt qbinom\_exp\_neg\_pos}, {\tt qbinom\_exp\_neg\_neg}はそれぞれ$m \ge 0$かつ$n < 0$, $m <0$かつ$n \ge 0$, $m < 0$かつ$n < 0$のときの証明の形式化であり, 例えば{\tt qbinom\_exp\_pos\_neg}については
 \begin{lstlisting}{Coq}
@@ -678,8 +670,7 @@ Proof.
       congr (_ * _).
       rewrite NegzE mulrC /qnat -mulNr mulrA.
       congr (_ / _).
-      rewrite opprB mulrBr mulr1 mulrC divff; last first.
-        by rewrite expnon0.
+      rewrite opprB mulrBr mulr1 mulrC divff; last by rewrite expnon0.
       rewrite invr_expz (_ : - Posz n.+2 + 1 = - Posz n.+1) //.
       rewrite -addn1 (_ : Posz (n.+1 + 1)%N = Posz n.+1 + 1) //.
       by rewrite addrC [Posz n.+1 + 1]addrC -{1}(add0r 1) addrKA sub0r.
@@ -772,10 +763,7 @@ Definition islinear (D : {poly R} -> {poly R}) :=
   forall a b f g, D ((a *: f) + (b *: g)) = a *: D f + b *: D g.
 
 Definition isfderiv D (P : nat -> {poly R}) := forall n,
- match n with
-  | 0 => (D (P n)) = 0
-  | n.+1 => (D (P n.+1)) = P n
-  end. \end{lstlisting}
+  if n is m.+1 then (D (P m.+1)) = P m else (D (P n)) = 0. \end{lstlisting}
     という定義であり, 前者が線形作用素であること, 後者は条件(iii)を形式化したものである. 
   \item \cite{Kac}での証明には, $\{P_0(x), P_1(x), \ldots , P_n(x)\}$が$V$の基底
     となることを用いている. これを以下のように形式化した. 
@@ -816,7 +804,7 @@ general_Taylor
 \begin{lstlisting}{Coq}
 Dq : (R -> R) -> R -> R
 
-q_binom_pos : R -> nat -> R -> R \end{lstlisting}
+qbinom_pos : R -> nat -> R -> R \end{lstlisting}
 であり, 型が合わず代入できない. そこで, この問題を回避するため, 多項式に対しての$q$-微分と
 多項式としての$(x - a)^n_q$を改めて定義する. まず, $q$-微分について, 
 \begin{lstlisting}{Coq}
@@ -857,20 +845,17 @@ Definition Dqp' (p : {poly R}) := \poly_(i < size p) (qnat (i.+1) * p`_i.+1).
 Lemma Dqp_Dqp'E p : Dqp p = Dqp' p.
 \end{lstlisting}
 \brmk
-この{\tt Lemma}で注意すべき点は, {\tt X \%/ 'X = 1\%:P}という計算をする際に特に条件が必要ないことである. Coqで約分の計算を行う際には分母が$0$でないという条件が必要だが, {\tt 'X}は単項式であるため, ゼロ多項式とは異なる. よって自動的に条件がみたされることになる. 
+この{\tt Lemma}で注意すべき点は, {\tt 'X \%/ 'X = 1\%:P}という計算をする際に特に条件が必要ないことである. Coqで約分の計算を行う際には分母が$0$でないという条件が必要だが, {\tt 'X}は単項式であるため, ゼロ多項式とは異なる. よって自動的に条件がみたされることになる. 
 一方, {\tt Dqp}と{\tt Dq}が等しいことを示そうとすると, 
 \begin{lstlisting}{Coq}
 Lemma Dqp'_DqE p x : x != 0 -> (Dqp' p).[x] = (Dq # p) x.
 \end{lstlisting}
-というように{\tt x != 0}という条件が必要になる. これは多項式の割り算ではなく実数の値の割り算での約分を計算する必要があるからである.
+というように$x \neq 0$という条件が必要になる. これは多項式の割り算ではなく実数の値の割り算での約分を計算する必要があるからである.
 \ermk
 次に, $(x - a)^n_q$を多項式として以下のように定義しなおす. 
 \begin{lstlisting}{Coq}
 Fixpoint qbinom_pos_poly a n :=
-  match n with
-  | 0 => 1
-  | n.+1 => (qbinom_pos_poly a n) * ('X - (q ^ n * a)%:P)
-  end.
+  if n is m.+1 then (qbinom_pos_poly a m) * ('X - (q ^ m * a)%:P) else 1.
 \end{lstlisting}
 この多項式の{\tt x}での値は元の定義の{\tt qbinom\_pos}と等しくなる. 
 \begin{lstlisting}{Coq}
@@ -895,8 +880,7 @@ Proof.
   clearbody n.
   have Hp0 : forall (p : {poly R}), size p = 0%N ->
     scale_var (p * p') = scale_var p * scale_var p'.
-    move=> p0.
-    move/eqP.
+    move=> p0 /eqP.
     rewrite size_poly_eq0.
     move/eqP ->.
     by rewrite mul0r scale_varC mul0r.
@@ -908,10 +892,8 @@ Proof.
 \ermk
 これで準備が整ったため, Theorem \ref{q_Taylor}を形式化する. 
 \begin{lstlisting}{Coq}
-Fixpoint qfact n := match n with
-  | 0 => 1
-  | n.+1 => qfact n * qnat n.+1
-  end.
+Fixpoint qfact n :=
+  if n is m.+1 then qfact m * qnat m.+1 else 1.
 
 Theorem q_Taylorp n (f : {poly R}) c :
   (forall n, qfact n != 0) ->
@@ -930,7 +912,7 @@ Theorem q_Taylor n (f : {poly R}) x c :
 \end{lstlisting}
 というように形式化できる. 
 \brmk
-  {\tt c != 0}という条件は約分のためのものであるが, {\tt q != 0}はなぜ必要なのであろうか. 
+  $c \neq 0$という条件は約分のためのものであるが, $q \neq 0$はなぜ必要なのであろうか. 
   これは, 高階{\tt Dqp'}と{\tt Dq}を一致させる補題
   \begin{lstlisting}{Coq}
 Lemma hoDqp'_DqE p x n : q != 0 -> x != 0 ->
@@ -942,8 +924,8 @@ Proof.
   rewrite Dqp'_DqE // {2}/Dq /dq -!IH //.
   by apply mulf_neq0 => //.
 Qed. \end{lstlisting}
-  の証明において, {\tt IH}を使う際に{\tt q * x != 0}という条件が必要だからである. 
-  さらに, 高階{\tt Dq}が定義できないという点からも{\tt q != 0}という条件は妥当である.
+  の証明において, {\tt IH}を使う際に$q \ast x \neq 0$という条件が必要だからである. 
+  さらに, 高階{\tt Dq}が定義できないという点からも$q \neq 0$という条件は妥当である.
   実際, $q = 0$のとき, 
   \begin{align*}
     (D_q ^2 f) (x) = (D_0 ^2 f) (x) &= (D_0 (D_0 f)) (x) \\
@@ -961,7 +943,7 @@ Qed. \end{lstlisting}
   \]
   となってしまう
   (Coq では{\tt 0 / 0}は{\tt 0}と計算されるが, これでも正しい計算結果とはならない).
-  この問題が起きるのは{\tt dq}を値の代入を用いて定義しているからであり, 
+  この問題が起きるのは{\tt dq}を値の代入を用いて定義しているからであり, 多項式
   係数を変化させることで定義している{\tt dqp}では{\tt q = 0}でも問題が起きない. 
   よってこの{\tt dqp}を用いている{\tt Dqp}および{\tt Dqp'}については{\tt q = 0}かどうかに
   かかわらず高階の操作を定義できる. 
@@ -1039,8 +1021,7 @@ Theorem Gauss_binomial a n : (forall n, qfact n != 0) ->
 \begin{lstlisting}{Coq}
 Proof.
   move=> Hfact.
-  rewrite (q_Taylorp n (qbinom_pos_poly (-a) n) 0) //; last first.
-    by rewrite qbinom_size.
+  rewrite (q_Taylorp n (qbinom_pos_poly (-a) n) 0) //; last by rewrite qbinom_size.
   under eq_big_nat => i /andP [_ Hi].
     rewrite hoDqp'_qbinom0 //.
     rewrite [(qbinom_pos_poly 0 i / (qfact i)%:P)]mulrC.
@@ -1057,7 +1038,7 @@ Proof.
   done.
 Qed. \end{lstlisting}
 となっており, {\tt q\_Taylor}ではなく{\tt q\_Taylorp}において{\tt c = 0}として証明している. 
-{\tt q\_Taylor}には{\tt c != 0}という前提があるため, この証明には使えない. 
+{\tt q\_Taylor}には$c \neq 0$という前提があるため, この証明には使えない. 
 \ermk
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{thebibliography}{9}
