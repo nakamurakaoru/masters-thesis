@@ -267,9 +267,9 @@ Definition Dq f := dq f // dq id.
 \begin{itemize}
   \item 最初の2行で必要なライブラリの指定をしている. 
   \item {\tt Variable}でそのセクション内で共通して使う変数を宣言している. 
-          {\tt R}がCoqにおける実数(正確には{\tt mathcomp}の{\tt algebra}の実数)の役割を
-          果たす. ここではまだ出てきていないが, {\tt nat}が$0$を含む自然数に, {\tt int}が整数に
-          対応する. 
+          {\tt R}がCoqにおける実数(正確には{\tt mathcomp}の{\tt algebra}の real closed field
+          ：実閉体)の役割を果たす. ここではまだ出てきていないが, {\tt nat}が$0$を含む
+          自然数に, {\tt int}が整数に対応する. 
   \item {\tt Hypothesis}で, $q$が1でないという仮定をしている. 使いやすさのため, 
           $q \ne 1$ではなく$q - 1 \ne 0$という形にしている. 
   \item {\tt Notation}で関数同士の割り算の記法を定義している. 
