@@ -108,7 +108,7 @@
 %  \]
 %\end{screen}
 %(ここで,   $x$, $q \in \R$, $n \in \Z_{>0}$であり, $(x + a)^n_q$, $\qcoe{n}{j}$はそれぞれ$(x + a)^n$, 二項係数の$q$-類似である)の形式化までを扱う. 
-本論文での$q$-類似に関する定義や定理, 証明は原本によるものだが, その形式化を行ったという点において独自性がある. \\
+本論文での$q$-類似に関する定義や定理, 証明は原本によるものだが, その形式化を行ったという点において独自性がある. 形式化したコード全体は\url{https://github.com/nakamurakaoru/q-analogue}\cite{coq qana}にある. \\
 基本的には, 原本での定義, 定理を述べた後, その形式化を与え, 必要であれば形式化をするにあたっての注意点を述べることを繰り返すという流れで構成していく. 
 証明の方針等は基本的に原本の通りであるが, \ref{sssec poly}節では一部原本から離れ, 多項式として$q$-微分や$q$-二項式を定義しなおして形式化を行っている. これらの新たな定義が多項式に対してのもとの定義を適用したものと一致していることの証明も行っている. \\
 %\textbf{$q$-類似の概要}\\
@@ -1084,6 +1084,7 @@ Qed. \end{lstlisting}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{thebibliography}{9}
   \bibitem{Kac} Victor Kac, Pokman Cheung, {\it{Quantum Calculus}}, Springer, 2001.
+  \bibitem{coq qana} \url{https://github.com/nakamurakaoru/q-analogue}
 %  \bibitem{Gar} \url{https://www.math.nagoya-u.ac.jp/~garrigue/lecture/2021_AW/                  
 %                           ssrcoq2.pdf}
   \bibitem{Hag} 萩原 学/アフェルト・レナルド, {\it Coq/SSReflect/Mathcomp}, 森北出版, 
