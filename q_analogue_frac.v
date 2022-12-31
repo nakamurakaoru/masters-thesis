@@ -264,21 +264,8 @@ Proof.
 by rewrite dq_fXE dvdpZl ?dq_fpXE ?dvdp_mulIl.
 Qed.
 
-Theorem Dq_f_ok_frac' p : (dq_f p)%:F = (Dq_f p)%:F * (dq_f 'X)%:F.
-Proof.
-rewrite /(Dq_f).
-rewrite -tofracM.
-Search (_ %/ _ * _).
-Check tofrac_eq.
-apply /eqP.
-rewrite tofrac_eq.
-apply /eqP.
-by rewrite divpK ?Dq_f_ok.
-Qed.
-
 Theorem frac_same_prod (a b c : {fraction [idomainType of {poly R}]}) :
-  c != 0 ->
-  a * c = b * c -> a = b.
+  c != 0 -> a * c = b * c -> a = b.
 Proof.
   move=> Hc.
   by rewrite -{2}(mulr1 a) -{2}(mulr1 b)
@@ -288,25 +275,18 @@ Qed.
 Theorem Dq_f_ok_frac p : (dq_f p)%:F / (dq_f 'X)%:F = (Dq_f p)%:F.
 Proof.
   have Hn0 : (dq_f 'X)%:F != 0.
-    rewrite tofrac_eq.
-    rewrite dq_fXE.
-    rewrite lreg_polyZ_eq0.
-      by rewrite polyX_eq0.
-    rewrite /(GRing.lreg).
-    rewrite /(injective).
-    move=> x y.
+    rewrite tofrac_eq dq_fXE lreg_polyZ_eq0 ?polyX_eq0 //.
+    rewrite /(GRing.lreg) /(injective) => x y.
     rewrite mulrC (mulrC (q - 1)).
     by apply same_prod.
   apply (frac_same_prod _ _ (dq_f 'X)%:F) => //.
-  rewrite [LHS]mulC.
-  rewrite mulA.
-  rewrite (mulC ((dq_f 'X))%:F).
-  rewrite -mulA.
-  rewrite (mulC ((dq_f 'X))%:F).
-  rewrite mulV_l //.
-  rewrite mulC.
-  rewrite mul1_l.
-  apply Dq_f_ok_frac'.
+  rewrite [LHS]mulC mulA (mulC ((dq_f 'X))%:F) -mulA.
+  rewrite (mulC ((dq_f 'X))%:F) mulV_l // mulC mul1_l.
+  rewrite /(Dq_f) -tofracM.
+  apply /eqP.
+  rewrite tofrac_eq.
+  apply /eqP.
+  by rewrite divpK ?Dq_f_ok.
 Qed.
 
 Lemma Dq_fE' p : Dq_f p = dq_f p %/ ((q - 1) *: 'X).
