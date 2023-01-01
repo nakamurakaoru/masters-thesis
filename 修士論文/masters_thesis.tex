@@ -151,8 +151,8 @@ Coqとは, 定理証明支援系の1つであり, 数学的な証明が正しい
 Coqは型付き$\lambda$計算という理論に基づいている. 修士1年次に少人数クラスで学習したH.P.Barendregtの{\it Lambda Calculi with Types}\cite{Bar}に沿って, 型付き$\lambda$計算の概要について\ref{ssec lambda}で述べる. 
 今回の証明に関しては, Coqの標準ライブラリ \cite{coq sl}に加えて, 数学の証明のために整備されたライブラリである mathcomp \cite{coq mc}も用いている. Coq や mathcompの使い方については\ref{sssec coq_use}節で説明するが, より詳細な情報については萩原 学/アフェルト・レナルドの{\it Coq/SSReflect/Mathcomp}\cite{Hag}等を参照のこと. \\
 %\textbf{今後の展望}\\
-今後の展望としては, まずはこれまでに形式化した$q$-類似の各概念が$q \to 1$としたときに通常の数学の概念に一致することの形式化を行いたい. このためには, 現在開発中のライブラリである mathcomp analysis\cite{coq ana}を用いる必要がある. また, このライブラリを用いると無限和に関する形式化も可能であるため, 上で紹介したJacobiの三重積の形式化にも挑戦していきたい. 
-ただし, 無限に関わる議論の形式化は通常の数学の概念を無限に拡張するよりもさらに煩雑になることに注意. 
+今後の展望としては, まずはこれまでに形式化した$q$-類似の各概念が$q \to 1$としたときに通常の数学の概念に一致することの形式化を行いたい. このためには, 現在開発中のライブラリである mathcomp analysis\cite{coq ana}を用いる必要がある. また, このライブラリを用いると無限和に関する形式化も可能であるため, 上で紹介したJacobiの三重積や, 無限和を用いて定義される指数関数や三角関数の$q$-類似の形式化にも挑戦していきたい. 
+ただし, 無限に関わる議論の形式化は通常の数学の概念を無限に拡張するよりもさらに煩雑になることには注意が必要である. 
 %現在開発中のライブラリである mathcomp analysis\cite{coq ana}を用いて, 
 %これまでに形式化した$q$-類似の各概念が$q \to 1$としたときに通常の数学の概念に一致することを形式化
 %極限操作に関する形式化を行いたい
@@ -294,18 +294,20 @@ Lemma Dq_pow n x : x != 0 -> Dq (fun x => x ^ n) x = qnat n * x ^ (n - 1). \end{
 \begin{lstlisting}{Coq}
 From mathcomp Require Import ssreflect.
 
-Theorem modus_ponens (P Q : Prop) : (P -> Q) /\ P -> Q. \end{lstlisting}
+Lemma modus_ponens (P Q : Prop) : (P -> Q) /\ P -> Q. \end{lstlisting}
 このとき, Coqのゴールエリア(コンテクストとゴールが表示される画面)は以下の通りである. 
 \begin{screen}
   \begin{lstlisting}{Coq}
+    1 subgoal
     P, Q : Prop
     -------------------------------
     (P -> Q) /\ P -> Q \end{lstlisting}
 \end{screen}
-{\tt ---}の上がコンテクスト, 下がゴ－ルである. 
+{\tt ---}の上がコンテクスト, 下がゴ－ルである. 1行目の{1 subgoal}はゴールが1つであることを示している. 用いるタクティックによってはゴールが増えることもある. 
 まずは, {\tt move=> []}で前提の{\tt /\textbackslash}を$\to$に書き換える. 
 \begin{screen}
   \begin{lstlisting}{Coq}
+    1 subgoal
     P, Q : Prop
     -------------------------------
     (P -> Q) -> P -> Q \end{lstlisting}
@@ -313,6 +315,7 @@ Theorem modus_ponens (P Q : Prop) : (P -> Q) /\ P -> Q. \end{lstlisting}
 ゴールに前提{\tt (P $\to$ Q)}があるため, {\tt move=> pq}で{\tt pq}という名前をつけてコンテクストに移動する. 
 \begin{screen}
   \begin{lstlisting}{Coq}
+    1 subgoal
     P, Q : Prop
     pq : P -> Q
     -------------------------------
@@ -321,6 +324,7 @@ Theorem modus_ponens (P Q : Prop) : (P -> Q) /\ P -> Q. \end{lstlisting}
 まだ前提{\tt P}があるため, {\tt move=> p}で{\tt p}と名付けてコンテクストに移動する. 
 \begin{screen}
   \begin{lstlisting}{Coq}
+    1 subgoal
     P, Q : Prop
     pq : P -> Q
     p : P
@@ -330,6 +334,7 @@ Theorem modus_ponens (P Q : Prop) : (P -> Q) /\ P -> Q. \end{lstlisting}
 ゴールが{\tt Q}であり, コンテクストに{\tt P $\to$ Q}という仮定{\tt pq}があるので, {\tt apply pq}でゴールを{\tt P}に書き換える. 
 \begin{screen}
   \begin{lstlisting}{Coq}
+    1 subgoal
     P, Q : Prop
     pq : P -> Q
     p : P
@@ -341,7 +346,24 @@ Theorem modus_ponens (P Q : Prop) : (P -> Q) /\ P -> Q. \end{lstlisting}
   \begin{lstlisting}{Coq}
   No more subgoals. \end{lstlisting}
 \end{screen}
-これで証明が終了したので, {\tt Qed}を書くことで補題として登録されることになる. \\
+ゴールエリアに{\tt No more subgoals.}と表示されれば証明は終了であり, {\tt Qed}を書くことで補題として登録されることになる. \\
+以上をまとめると以下のようになる. 
+\begin{lstlisting}{Coq}
+Lemma modus_ponens (P Q : Prop) : (P -> Q) /\ P -> Q.
+Proof.
+  move=> [].
+  move=> pq.
+  move=> p.
+  apply pq.
+  by [].
+Qed. \end{lstlisting}
+説明のため細かく1行づつ書いたが, 複数の{\tt move}はまとめられること, あるタクティックによりゴールが自明なもの(コンテクストに存在する, {\tt A = A}である, 計算から簡単に示されるなど)になる場合はそのタクティックの前に{\tt by}をつけることで証明を終了させられることを用いれば, 次のように短くすることができる. 
+\begin{lstlisting}{Coq}
+Lemma modus_ponens (P Q : Prop) : (P -> Q) /\ P -> Q.
+Proof.
+  move=> [] pq p.
+  by apply pq.
+Qed. \end{lstlisting}
 Coq による証明は, Curry-Howard 同型と呼ばれる, 
 \begin{align*}
   \text{命題} &\leftrightarrow \text{型} \\
@@ -357,70 +379,93 @@ Coq による証明は, Curry-Howard 同型と呼ばれる,
 まず, 前提の要素それぞれに$pq$, $p$と名前をつける. これがプログラム中の{\tt move$\Rightarrow$ [] pq p}のことである. 
 ここで, $P \to Q$という型は, 入力する値の型が$P$, 出力する値の型が$Q$であるような関数の型であるため, $P$の要素$p$に$pq$を適用することで, $Q$の要素を構成することができる. この関数適用がプログラム中の{\tt apply pq}のことである. 
 \eex
-\bex{分配法則}\\
-自然数$n$について, 
+\bex{代入計算}\\
+自然数$m$, $n$について, 
 \[
-  2(n * 1) = 2n + 2
+  m = 0 \Lra m + n = n
 \]
-という簡単な分配法則に関する計算を証明してみる. まず主張を形式化する.  
+という簡単な代入に関する計算を証明してみる. まず主張を形式化する.  
 \begin{lstlisting}{Coq}
-Theorem expand n : 2 * (n + 1) = 2 * n + 2. \end{lstlisting}
+Lemma substitution m n : m = 0 -> m + n = n. \end{lstlisting}
 このとき, ゴールエリアは以下の通りである. 
 \begin{screen}
   \begin{lstlisting}{Coq}
-    n : nat
+    1 subgoal
+    m, n : nat
     -------------------------------
-    2 * (n + 1) = 2 * n + 2 \end{lstlisting}
+    m = 0 -> m + n = n \end{lstlisting}
 \end{screen}
-まず, 左辺を分配法則で書き換えたい. mathcomp の ssrnat に{\tt mulnDr}という, \\
-{\tt forall (x y z : nat),  x * (y + z) = x * y + x * z}\\
-という等式にあたる補題があるため, {\tt rewrite mulnDr}でゴールを書き換える.
+まず{\tt m = 0}という前提を{\tt move=> Hm}で{\tt Hm}という名前をつけてコンテクストに移動する. 
 \begin{screen}
   \begin{lstlisting}{Coq}
-    n : nat
+    1 subgoal
+    m, n : nat
+    Hm : m = 0
     -------------------------------
-    2 * n + 2 * 1 = 2 * n + 2 \end{lstlisting}
+    m + n = 0 \end{lstlisting}
 \end{screen}
-次に, {\tt 2 * 1}を{\tt 2}に書き換えたい. {\tt muln1}という補題が 
-{\tt forall n, n * 1 = n}
-にあたるので, {\tt rewrite muln1}で書き換える. \\
+{\tt rewrite}は補題だけでなく仮定を使った書き換えも行えるため, {\tt rewrite Hm}でゴールの
+{\tt m}を{\tt 0}に書き換える. 
 \begin{screen}
   \begin{lstlisting}{Coq}
-    n : nat
+    1 subgoal
+    m, n : nat
+    Hm : m = 0
     -------------------------------
-    2 * n + 2 = 2 * n + 2 \end{lstlisting}
+    0 + n = n \end{lstlisting}
 \end{screen}
-このとき, ゴールは全く同じもの同士の等号であるため, 自明に成り立つ, つまり{\tt by []}で終了する. 
+次に, {\tt 0 + n}を{\tt n}に書き換えたい. mathcomp の ssrnat に{\tt add0n}という, \\
+{\tt forall n : nat, 0 + n = n}\\
+に対応する補題があるため, {\tt rewrite add0n}を実行する. 
+\begin{screen}
+  \begin{lstlisting}{Coq}
+    1 subgoal
+    m, n : nat
+    Hm : m = 0
+    -------------------------------
+    n = n \end{lstlisting}
+\end{screen}
+このとき, ゴールは同じもの同士の等号であるため, 自明に成り立つ, つまり{\tt by []}で終了する. 
 \begin{screen}
   \begin{lstlisting}{Coq}
     No more subgoals.  \end{lstlisting}
 \end{screen}
+この証明をまとめると以下の通りである. 
+\begin{lstlisting}{Coq}
+Lemma substitution m n : m = 0 -> m + n = n.
+Proof.
+  move=> Hm.
+  rewrite Hm.
+  rewrite add0n.
+  by [].
+Qed. \end{lstlisting}
+複数の{\tt rewrite}がまとめられることと{\tt by}の使い方から, より短く次のように書ける. 
+\begin{lstlisting}{Coq}
+Lemma substitution m n : m = 0 -> m + n = n.
+Proof.
+  move=> Hm.
+  by rewrite Hm add0n.
+Qed. \end{lstlisting}
+更に, 前提が{\tt A = B}の形であるとき, {\tt move$\to$}でゴールの{\tt A}を{\tt B}に書き換えられること, {\tt ;}で異なるタクティックをつなげられることを用いれば以下のように書くこともでできる. 
+\begin{lstlisting}{Coq}
+Lemma substitution m n : m = 0 -> m + n = n.
+Proof. by move->; by rewrite add0n. Qed. \end{lstlisting}
 \eex
 \brmk
-  正確には, {\tt mulnDr}は
+  正確には, {\tt add0n}は
   \begin{lstlisting}{Coq}
-right_distributive muln addn \end{lstlisting}
-  という補題であり, {\tt muln}と{\tt addn}はそれぞれ自然数同士の乗法と加法である.  
-  {\tt right\_distributive}の定義は
+left_id 0 addn \end{lstlisting}
+  という補題であり, {\tt addn}は自然数同士の加法である.  
+  {\tt left\_id}の定義は
   \begin{lstlisting}{Coq}
-fun (S T : Type) (op : S -> T -> T) (add : T -> T -> T) =>
-forall (x : S) (y z : T), op x (add y z) = add (op x y) (op x z) \end{lstlisting}
-  であり, 分配法則を一般的に定義している. {\tt mulnDr}は{\tt right\_distributive}の{\tt op}に    
-  {\tt muln}, {\tt add}に{\tt addn}を入れたものであるので,
+fun (S T : Type) (e : S) (op : S -> T -> T) => forall x : T, op e x = x \end{lstlisting}
+  であり, 単位元を左から作用させても元のままであるということを一般的に定義している. 
+  {\tt add0n}は{\tt left\_id}の{\tt e}に{\tt 0}を, {\tt op}に{\tt addn}を入れたものであるので,
   \begin{lstlisting}{Coq}
-forall (x : nat) (y z : nat), muln x (addn y z) = addn (muln x y) (muln x z) \end{lstlisting}
-  となる. 同様に, {\tt muln1}の定義も正確には
-  \begin{lstlisting}{Coq}
-right_id 1 muln \end{lstlisting}
-  であり, {\tt right\_id}の定義は
-  \begin{lstlisting}{Coq}
-fun (S T : Type) (e : T) (op : S -> T -> S) => forall x : S, op x e = x \end{lstlisting}
-  である. {\tt e}に{\tt 1}, {\tt op}に{\tt muln}を入れると
-  \begin{lstlisting}{Coq}
-forall x : nat, muln x 1 = 1 \end{lstlisting}
+forall x : nat, addn 0 x = x \end{lstlisting}
   となる. 
 \ermk
-このように, Coqでの証明は, ゴールを自明な形になるまで簡単な形に書き変えることを繰り返すやり方が基本である. 
+このように, Coqでの証明は, ゴールを自明な形になるまで繰り返し書き変えていくやり方が基本である. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{形式化}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -518,7 +563,10 @@ Qed.
 ここで, {\tt red\_frac\_r}は, 
 \begin{lstlisting}{Coq}
 red_frac_r : forall x y z : R, z != 0 -> x * z / (y * z) = x / y \end{lstlisting}
-という補題である. この補題を使うため, もともとはなかった{\tt $x \ne 0$}という前提を加えている. 実際, $D_q$の定義において分母に$x$が出現するので, $x$が$0$でないという前提は妥当である. 
+という自分で用意した補題である(このように直接$q$-類似に関係はしないが, 形式化をするために用意した補題は\cite{coq qana}に q\_tool.v というファイルにまとめている). この補題の本質は$z / z = 1$という約分計算であり, mathcomp の ssralg の補題
+\begin{lstlisting}{Coq}
+divff : forall (F : fieldType) (x : F), x != 0 -> x / x = 1 \end{lstlisting}
+を用いているため{\tt z $\neq$ 0}という仮定が必要になる. よって, {\tt Dq\_pow}にももともとはなかった{\tt $x \ne 0$}という前提を加えている. 今後も補題を形式化するにあたって, その証明の中で約分を行う際には$0$でないという前提を付け加えることになる. 
 %\begin{itemize}
 %  \item {\tt Definition}と同様, {\tt Lemma}について, {\tt $\coloneqq$}の前に補題の名前と
 %          引数が, 後に補題の主張が書いてある. 今回であれば, {\tt Dq\_of\_pow}が補題の
