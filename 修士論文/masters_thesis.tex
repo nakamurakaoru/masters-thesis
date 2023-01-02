@@ -1312,8 +1312,8 @@ Theorem q_Taylor n (f : {poly R}) x c :
              ((Dq \^ i) # f) c * qbinom_pos c i x / qfact i.
 \end{lstlisting}
 \brmk
-  $c \neq 0$という条件は約分のためのものであるが, $q \neq 0$はなぜ必要なのであろうか. 
-  これは, 高階{\tt Dqp'}と{\tt Dq}を一致させる補題
+  約分のための$c \neq 0$という条件に加え, 高階$D_q$を扱うため前述の通り$q \neq 0$も
+  必要となる. 具体的には高階{\tt Dqp'}と{\tt Dq}を一致させる補題
   \begin{lstlisting}{Coq}
 Lemma hoDqp'_DqE p x n : q != 0 -> x != 0 ->
   ((Dqp' \^ n) p).[x] = ((Dq \^ n) # p) x.
@@ -1324,29 +1324,7 @@ Proof.
   rewrite Dqp'_DqE // {2}/Dq /dq -!IH //.
   by apply mulf_neq0 => //.
 Qed. \end{lstlisting}
-  の証明において, {\tt IH}を使う際に$q \ast x \neq 0$という条件が必要だからである. 
-  さらに, 高階{\tt Dq}が定義できないという点からも$q \neq 0$という条件は妥当である.
-  実際, $q = 0$のとき, 
-  \begin{align*}
-    (D_q ^2 f) (x) = (D_0 ^2 f) (x) &= (D_0 (D_0 f)) (x) \\
-                      &= D_0 \left( \lambda x.\ \frac{f (0 x) - f(x)}{(0 - 1)x} \right) (x) \\
-                      &= D_0 \left( \lambda x.\ \frac{f(x) - f(0)}{x} \right) (x) \\
-                      &= (D_0 F) (x)
-                        \quad (\text{ここで}F \coloneqq \lambda x.\ \frac{f(x) - f(0)}{x}
-                                  \text{とおいた})\\
-                      &= \lambda x.\ \frac{F(x) - F(0)}{x} (x) \\
-                      &= \frac{F(x) - F(0)}{x}
-  \end{align*}
-  となるが, 
-  \[
-    F(0) = \frac{f(0) - f(0)}{0} = \frac{0}{0}
-  \]
-  となってしまう
-  (Coq では{\tt 0 / 0}は{\tt 0}と計算されるが, これでも正しい計算結果とはならない).
-  この問題が起きるのは{\tt dq}を値の代入を用いて定義しているからであり, 多項式
-  係数を変化させることで定義している{\tt dqp}では{\tt q = 0}でも問題が起きない. 
-  よってこの{\tt dqp}を用いている{\tt Dqp}および{\tt Dqp'}については{\tt q = 0}かどうかに
-  かかわらず高階の操作を定義できる. 
+  の証明において, {\tt IH}(Inductive Hypothesis, 帰納の仮定)を使う際に$q \ast x \neq 0$という条件が必要となる. 
 \ermk
 本論文の最後に, $x ^ n$と$(x - a)^n_q$にこのTaylor展開の$q$-類似を適用する. 
 \blem[\cite{Kac} p12 Example (4.4)]
@@ -1403,7 +1381,7 @@ Qed. \end{lstlisting}
   \]
   が成り立つ. 
 \epf
-この二つの等式の形式化はそれぞれ
+この二つの等式の形式化はそれぞれ次の通り. 
 \begin{lstlisting}{Coq}
 Lemma q_Taylorp_pow n : (forall n, qfact n != 0) ->
   'X^n = \sum_(0 <= i < n.+1) (qbicoef n i *: qbinom_pos_poly 1 i).
@@ -1415,7 +1393,7 @@ Theorem Gauss_binomial' a n : (forall n, qfact n != 0) ->
 Theorem Gauss_binomial a n : (forall n, qfact n != 0) ->
   qbinom_pos_poly (-a) n =
   \sum_(0 <= i < n.+1) (qbicoef n i * q ^+ (i * (i - 1))./2 * a ^+ i) *: 'X^(n - i). \end{lstlisting}
-となる. 
+{\tt Gauss\_binomial'}は{\tt j}を{\tt n - j}に置き換える前の等式である. 
 \brmk
 {\tt Gauss\_binomial'}の証明は
 \begin{lstlisting}{Coq}
@@ -1425,8 +1403,7 @@ Proof.
   under eq_big_nat => i /andP [_ Hi].
     rewrite hoDqp'_qbinom0 //.
     rewrite [(qbinom_pos_poly 0 i / (qfact i)%:P)]mulrC.
-    rewrite polyCV.
-    rewrite scalerAl scale_constpoly.
+    rewrite polyCV scalerAl scale_constpoly.
     have -> : qbicoef n i * qfact i * q ^+ ((n - i) * (n - i - 1))./2 *
               a ^+ (n - i) / qfact i =
               qbicoef n i * q ^+ ((n - i) * (n - i - 1))./2 * a ^+ (n - i).
