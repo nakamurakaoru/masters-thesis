@@ -107,7 +107,7 @@
 %\end{screen}
 %(ここで,   $x$, $q \in \R$, $n \in \Z_{>0}$であり, $(x + a)^n_q$, $\qcoe{n}{j}$はそれぞれ$(x + a)^n$, 二項係数の$q$-類似である)の形式化までを扱う. 
 本論文での$q$-類似に関する定義や定理, 証明は\cite{Kac}によるものだが, その形式化を行ったという点において独自性がある. 形式化したコード全体は\url{https://github.com/nakamurakaoru/q-analogue}\cite{coq qana}にある. \\
-基本的には, \cite{Kac}での定義, 定理を述べた後, その形式化を与え, 必要であれば形式化をするにあたっての注意点を述べることを繰り返すという流れで構成していく. 
+本論文の構成は, \cite{Kac}での定義, 定理を述べた後, その形式化を与え, 必要であれば形式化をするにあたっての注意点を述べることを繰り返すという流れである. 
 証明の方針等は基本的に\cite{Kac}の通りであるが, \ref{sssec poly}節では一部\cite{Kac}から離れ, 多項式として$q$-微分や$q$-二項式を定義しなおして形式化を行っている. これらの新たな定義が多項式に対してのもとの定義を適用したものと一致していることの証明も行っている. \\
 %\textbf{$q$-類似の概要}\\
 $q$-類似は, 学部4年次に卒業研究のテーマとして扱ったものであり, 実数パラメータ$q$, 実数上の関数$f$に対して
@@ -276,8 +276,9 @@ Lemma Dq_pow n x : x != 0 -> Dq (fun x => x ^ n) x = qnat n * x ^ (n - 1). \end{
 次に, タクティックについて述べる. よく使われるタクティックは{\tt move}, {\tt apply}, {\tt rewrite}の3つである. 
 \begin{itemize}
   \item {\tt move}\\
-    {\tt move=> H}でゴールの前提に{\tt H}という名前をつけてコンテクストに移動する. また
-    {\tt move: H}で補題{\tt H}もしくはコンテクストに存在する{\tt H}をゴールの前提に移す. 
+    {\tt move=> H}でゴールの前提に{\tt H}という名前をつけてコンテクストに移動する. 
+    また{\tt move$\colon$H}で補題{\tt H}もしくはコンテクストに存在する{\tt H}をゴールの
+    前提に移す. 
   \item {\tt apply}\\
     補題{\it lem}が{\tt P1 $\to$ P2}という形で, ゴールが{\tt P2}のとき, 
     {\tt apply {\it lem}}でゴールを{\tt P1}に変える. 
@@ -304,7 +305,7 @@ Lemma modus_ponens (P Q : Prop) : (P -> Q) /\ P -> Q. \end{lstlisting}
     (P -> Q) /\ P -> Q \end{lstlisting}
 \end{screen}
 {\tt ---}の上がコンテクスト, 下がゴ－ルである. 1行目の{1 subgoal}はゴールが1つであることを示している. 用いるタクティックによってはゴールが増えることもある. 
-まずは, {\tt move=> []}で前提の{\tt /\textbackslash}を$\to$に書き換える. 
+一般に命題$P_1$, $P_2$, $P_3$について$P_1 /\backslash P_2 \to P_3$と$P_1 \to P_2 \to P_3$は同じ意味であり, この書き換えは{\tt move=> []}で行える.
 \begin{screen}
   \begin{lstlisting}{Coq}
     1 subgoal
@@ -1024,11 +1025,11 @@ Lemma Dqp'_qbinom_poly a n :
   Dqp' (qbinom_pos_poly a n.+1) = (qnat n.+1) *: (qbinom_pos_poly a n).
 \end{lstlisting}
 \brmk
-  基本的な証明の方針は\cite{Kac}と同じだが, {\tt Dq\_prod'}に対応する補題の証明のため, 
-  {\tt scale\_var}が積について分解できること, つまり
+  証明の方針はこれまでの関数としての場合と同じだが, {\tt Dq\_prod'}($q$-微分の積の法則)に
+  対応する補題の証明のため, {\tt scale\_var}が積について分解できること, つまり
   \begin{lstlisting}{Coq}
 Lemma scale_var_prod (p p' : {poly R}) : scale_var (p * p') = scale_var p * scale_var p'. \end{lstlisting}
-  を示しているが, 証明は
+  を示している. ここで証明の冒頭を抜き出すと以下のようになっている. 
   \begin{lstlisting}{Coq}
 Proof.
   pose n := size p.
@@ -1042,9 +1043,12 @@ Proof.
     by rewrite mul0r scale_varC mul0r.
   elim: n p => [|n IH] p Hsize.
   ...
-  Qed. \end{lstlisting}
-  というように, 多項式の{\tt size}に関する帰納法を使いたいため, {\tt (size p <= n)\%N}
-  という仮定を加えている. 
+Qed. \end{lstlisting}
+  {\tt pose n := size p.}で多項式{\tt p}の{\tt size}を{\tt n}と置いており, 
+  {\tt have$\colon$(size p <= n)\%N by [].}で{\tt size p}が{\tt n}以下という自明な主張を
+  あえて置いているが, これは多項式の{\tt size}に関する帰納法を用いるためである. 
+  このように, 当たり前の内容を明示的に書かなければならないことに加え, 
+  形式化するための証明の構造を工夫しなければならない場合もある. 
 \ermk
 多項式で考える理由は, $q$-Taylor展開が多項式に対する定理であることに加え, 以下の2つの目的がある. 
 \begin{enumerate}
@@ -1089,7 +1093,6 @@ Proof.
 	問題が起きない. よってこの{\tt dqp}を用いている{\tt Dqp}および{\tt Dqp'}については
 	$q = 0$かどうかにかかわらず高階の操作を定義できる. 
 \end{enumerate}
-このように定義した{\tt dqp}や{\tt Dqp}がもとの定義とどのような関係にあるのか,
 %\brmk
 %この{\tt Lemma}で注意すべき点は, {\tt 'X \%/ 'X = 1\%:P}という計算をする際に特に条件が必要ないことである. Coqで約分の計算を行う際には分母が$0$でないという条件が必要だが, {\tt 'X}は単項式であるため, ゼロ多項式とは異なる. よって自動的に条件がみたされることになる. 
 %一方, {\tt Dqp}と{\tt Dq}が等しいことを示そうとすると, 
@@ -1100,13 +1103,13 @@ Proof.
 %\ermk
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{$q$-Taylor展開} \label{sssec q_Taylor}
-この節では, 有限次Taylor展開の$q$-類似が成り立つこと, そしてその系として本論文の目的である Gauss's binomial formula が成り立つことを示し, 形式化する. 
+この節では, 有限次Taylor展開の$q$-類似が成り立つこと, そしてその系として Gauss's binomial formula が成り立つことを示し, 形式化する. 
 まず, 一般に以下のことが成り立つことを確認しておく. 
 \bthm[\cite{Kac} p5 Theorem 2.1] \label{general_Taylor}
 $\K\coloneqq\R$または$\C$, $V\coloneqq\K[x]$とし, $D$を$V$上の線型作用素とする. また, 
 $\{P_n(x)\}_{n=0}\subset V$ ($n=0,1,2,\cdots$)は次の三条件をみたすとする. 
   \begin{align*}
-    &\textrm{(i)}\,P_0 = 1,\,P_n(a)=0 \quad ({}^{\forall}n\ge1)\\
+    &\textrm{(i)}\,P_0(a) = 1,\,P_n(a)=0 \quad ({}^{\forall}n\ge1)\\
     &\textrm{(ii)}\,\deg P_n = n \quad ({}^{\forall}n\ge0)\\
     &\textrm{(iii)}\,DP_n(x) = P_{n-1}(x) \quad ({}^{\forall}n\ge1), \quad D(1) = 0
   \end{align*}
@@ -1166,7 +1169,8 @@ Lemma poly_basis n (P : nat -> {poly R}) (f : {poly R}) :
   (forall m, size (P m) = m.+1) ->
   (size f <= n.+1)%N ->
   exists (c : nat -> R), f = \sum_(0 <= i < n.+1) c i *: P i. \end{lstlisting}
-    実際には生成系であることを示している. 
+    この主張には係数列{\tt c}の一意性は含まれていないため, 実際には生成系であることを
+    示している. 
 \end{itemize}
 この定理において, 
 \[
@@ -1190,17 +1194,17 @@ $f(x)$を, $N$次の実数係数多項式とする. 任意の$c\in\R$に対し,
 \bpf
 $\frac{(x-a)^n_q}{[n]!}$が, $a$, $D_q$に対してTheorem \ref{general_Taylor}の三条件をみたすことを確かめればよい. (i), (ii)は$(x-a)^n_q$の定義から, (iii)はProposition\ref{Dq_qbinom_nonneg}から分かる. 
 \epf
-この定理を形式化したいが, 型が合わないという問題が発生する. 実際, {\tt general\_Taylor}の型を調べてみると, 
-\begin{lstlisting}{Coq}
-general_Taylor
-     : forall (D : {poly R} -> {poly R}) (n : nat) (P : nat -> {poly R}) (f : {poly R}) (a : R), ...\end{lstlisting}
-となっているが, ${\tt D}_{\tt q}$, {\tt q\_binom}の型は
-\begin{lstlisting}{Coq}
-Dq : (R -> R) -> R -> R
-
-qbinom_pos : R -> nat -> R -> R \end{lstlisting}
-であり, 型が合わず代入できない. そこで, この問題を回避するため, 多項式に対しての$q$-微分と
-多項式としての$(x - a)^n_q$を改めて定義する. まず, $q$-微分について, 
+%この定理を形式化したいが, 型が合わないという問題が発生する. 実際, {\tt general\_Taylor}の型を調べてみると, 
+%\begin{lstlisting}{Coq}
+%general_Taylor
+%     : forall (D : {poly R} -> {poly R}) (n : nat) (P : nat -> {poly R}) (f : {poly R}) (a : R), ...\end{lstlisting}
+%となっているが, ${\tt D}_{\tt q}$, {\tt q\_binom}の型は
+%\begin{lstlisting}{Coq}
+%Dq : (R -> R) -> R -> R
+%
+%qbinom_pos : R -> nat -> R -> R \end{lstlisting}
+%であり, 型が合わず代入できない. そこで, この問題を回避するため, 多項式に対しての$q$-微分と
+%多項式としての$(x - a)^n_q$を改めて定義する. まず, $q$-微分について, 
 %\begin{lstlisting}{Coq}
 %Definition scale_var (p : {poly R}):= \poly_(i < size p) (q ^ i * p`_i).
 %Definition dqp p := scale_var p - p.
@@ -1285,7 +1289,7 @@ qbinom_pos : R -> nat -> R -> R \end{lstlisting}
 %  というように, 多項式の{\tt size}に関する帰納法を使いたいため, {\tt (size p <= n)\%N}
 %  という仮定を加えている. 
 %\ermk
-これで準備が整ったため, Theorem \ref{q_Taylor}を形式化する. 
+前節で準備した{\tt Dqp}, {\tt qbinom\_pos\_poly}を用いて Theorem \ref{q_Taylor}を形式化する. 
 \begin{lstlisting}{Coq}
 Fixpoint qfact n := match n with
   | 0 => 1
@@ -1307,7 +1311,6 @@ Theorem q_Taylor n (f : {poly R}) x c :
   f.[x] =  \sum_(0 <= i < n.+1)
              ((Dq \^ i) # f) c * qbinom_pos c i x / qfact i.
 \end{lstlisting}
-というように形式化できる. 
 \brmk
   $c \neq 0$という条件は約分のためのものであるが, $q \neq 0$はなぜ必要なのであろうか. 
   これは, 高階{\tt Dqp'}と{\tt Dq}を一致させる補題
