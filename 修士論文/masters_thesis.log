@@ -1,4 +1,4 @@
-This is e-pTeX, Version 3.14159265-p3.8.1-180518-2.6 (utf8.sjis) (TeX Live 2018/W32TeX) (preloaded format=platex 2018.7.29)  2 JAN 2023 13:59
+This is e-pTeX, Version 3.14159265-p3.8.1-180518-2.6 (utf8.sjis) (TeX Live 2018/W32TeX) (preloaded format=platex 2018.7.29)  2 JAN 2023 18:57
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -504,30 +504,30 @@ LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <6> not available
 LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <6> not available
 (Font)              Font shape `JY1/gt/m/n' tried instead on input line 292.
  [5] [6] [7] [8] [9] [10] [11] [12] [13] [14] [15] [16]
-LaTeX Font Info:    Try loading font information for OMS+txtt on input line 958
+LaTeX Font Info:    Try loading font information for OMS+txtt on input line 959
 .
-LaTeX Font Info:    No file OMStxtt.fd. on input line 958.
+LaTeX Font Info:    No file OMStxtt.fd. on input line 959.
 
 
 LaTeX Font Warning: Font shape `OMS/txtt/m/n' undefined
 (Font)              using `OMS/txsy/m/n' instead
-(Font)              for symbol `textbraceleft' on input line 958.
+(Font)              for symbol `textbraceleft' on input line 959.
 
 
-Overfull \hbox (19.06456pt too wide) in paragraph at lines 981--982
+Overfull \hbox (19.06456pt too wide) in paragraph at lines 982--983
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][] 
  []
 
 [17]
-Overfull \hbox (17.25452pt too wide) in paragraph at lines 1031--1031
+Overfull \hbox (17.25452pt too wide) in paragraph at lines 1032--1032
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
 [18] [19] [20] [21]
-Overfull \hbox (34.11447pt too wide) in paragraph at lines 1392--1393
+Overfull \hbox (34.11447pt too wide) in paragraph at lines 1393--1394
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]
 [][][][][][][][][][][][][][][][][][][][][][][][][] 
@@ -539,12 +539,12 @@ LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
  ) 
 Here is how much of TeX's memory you used:
- 5790 strings out of 493249
- 71900 string characters out of 6146370
+ 5758 strings out of 493249
+ 71514 string characters out of 6146370
  211614 words of memory out of 5000000
- 9633 multiletter control sequences out of 15000+600000
+ 9601 multiletter control sequences out of 15000+600000
  48216 words of font info for 162 fonts, out of 8000000 for 9000
  929 hyphenation exceptions out of 8191
- 35i,16n,58p,560b,1818s stack positions out of 5000i,500n,10000p,500000b,80000s
+ 35i,16n,58p,560b,1734s stack positions out of 5000i,500n,10000p,500000b,80000s
 
-Output written on masters_thesis.dvi (23 pages, 180680 bytes).
+Output written on masters_thesis.dvi (23 pages, 177548 bytes).

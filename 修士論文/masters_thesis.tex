@@ -483,7 +483,8 @@ forall x : nat, addn 0 x = x \end{lstlisting}
   \]
   と定める. 
 \edf
-この定義の形式化は以下の通りである.  
+この定義を形式化するためまずは実数の形式化を行う. 今回は mathcomp の ssrnum にある{\tt rcfType}の要素を実数として用いることにする. mathcomp はある型を構成するために他の型を用いているため, ヒエラルキー(階層構造)がある. 通常の数学において体が環の性質を, 環が群の性質を引き継ぐように, mathcomp でもより一般の型の性質を引き継いでいる. {\tt rcfType}も多くの性質を引き継いでおり, 特に{\tt GRing}の性質を持っていることが重要である. 
+この定義の形式化は以下の通りである. 
 \begin{lstlisting}{Coq}
 From mathcomp Require Import all_ssreflect all_algebra.
 Import GRing.
@@ -1395,27 +1396,27 @@ Theorem Gauss_binomial a n : (forall n, qfact n != 0) ->
   \sum_(0 <= i < n.+1) (qbicoef n i * q ^+ (i * (i - 1))./2 * a ^+ i) *: 'X^(n - i). \end{lstlisting}
 {\tt Gauss\_binomial'}は{\tt j}を{\tt n - j}に置き換える前の等式である. 
 \brmk
-{\tt Gauss\_binomial'}の証明は
-\begin{lstlisting}{Coq}
-Proof.
-  move=> Hfact.
-  rewrite (q_Taylorp n (qbinom_pos_poly (-a) n) 0) //; last by rewrite qbinom_size.
-  under eq_big_nat => i /andP [_ Hi].
-    rewrite hoDqp'_qbinom0 //.
-    rewrite [(qbinom_pos_poly 0 i / (qfact i)%:P)]mulrC.
-    rewrite polyCV scalerAl scale_constpoly.
-    have -> : qbicoef n i * qfact i * q ^+ ((n - i) * (n - i - 1))./2 *
-              a ^+ (n - i) / qfact i =
-              qbicoef n i * q ^+ ((n - i) * (n - i - 1))./2 * a ^+ (n - i).
-      rewrite -!mulrA; f_equal; f_equal.
-      rewrite mulrC -mulrA; f_equal.
-      by rewrite denomK.
-    rewrite mul_polyC qbinom_x0.
-  over.
-  done.
-Qed. \end{lstlisting}
-となっており, {\tt q\_Taylor}ではなく{\tt q\_Taylorp}において{\tt c = 0}として証明している. 
-{\tt q\_Taylor}には$c \neq 0$という前提があるため, この証明には使えない. 
+{\tt Gauss\_binomial'}は{\tt q\_Taylorp}において{\tt c = 0}として証明している. {\tt q\_Taylorp}では約分の計算をしているが, 多項式を用いて定義しているため$0$での値を計算できる. 
+%\begin{lstlisting}{Coq}
+%Proof.
+%  move=> Hfact.
+%  rewrite (q_Taylorp n (qbinom_pos_poly (-a) n) 0) //; last by rewrite qbinom_size.
+%  under eq_big_nat => i /andP [_ Hi].
+%    rewrite hoDqp'_qbinom0 //.
+%    rewrite [(qbinom_pos_poly 0 i / (qfact i)%:P)]mulrC.
+%    rewrite polyCV scalerAl scale_constpoly.
+%    have -> : qbicoef n i * qfact i * q ^+ ((n - i) * (n - i - 1))./2 *
+%              a ^+ (n - i) / qfact i =
+%              qbicoef n i * q ^+ ((n - i) * (n - i - 1))./2 * a ^+ (n - i).
+%      rewrite -!mulrA; f_equal; f_equal.
+%      rewrite mulrC -mulrA; f_equal.
+%      by rewrite denomK.
+%    rewrite mul_polyC qbinom_x0.
+%  over.
+%  done.
+%Qed. \end{lstlisting}
+%となっており, {\tt q\_Taylor}ではなく{\tt q\_Taylorp}において{\tt c = 0}として証明している. 
+%{\tt q\_Taylor}には$c \neq 0$という前提があるため, この証明には使えない. 
 \ermk
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{thebibliography}{9}
