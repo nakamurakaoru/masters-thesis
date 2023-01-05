@@ -5,8 +5,8 @@
 \contentsline {section}{\numberline {3}Coq}{4}
 \contentsline {subsection}{\numberline {3.1}$\lambda $-cube と CIC}{4}
 \contentsline {subsection}{\numberline {3.2}Coqの使い方}{4}
-\contentsline {section}{\numberline {4}形式化}{8}
-\contentsline {subsection}{\numberline {4.1}$q$-微分の定義}{8}
-\contentsline {subsection}{\numberline {4.2}$(x - a)^n$の$q$-類似}{10}
+\contentsline {section}{\numberline {4}形式化}{9}
+\contentsline {subsection}{\numberline {4.1}$q$-微分の定義}{9}
+\contentsline {subsection}{\numberline {4.2}$(x - a)^n$の$q$-類似}{11}
 \contentsline {subsection}{\numberline {4.3}関数から多項式へ}{17}
-\contentsline {subsection}{\numberline {4.4}$q$-Taylor展開}{19}
+\contentsline {subsection}{\numberline {4.4}$q$-Taylor展開}{20}

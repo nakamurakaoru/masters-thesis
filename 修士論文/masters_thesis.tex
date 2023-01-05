@@ -146,25 +146,13 @@ $z$, $q \in \R$, $|q| < 1$として,
 を用いることで簡単に証明できる. \\
 %\textbf{Coqの概要}\\
 Coqとは, 定理証明支援系の1つであり, 数学的な証明が正しいかどうか判定するプログラムである.
-人間がチェックすることが難しい複雑な証明でも正しさが保証され, また証明付きプログラミングにも応用される. Mizar, Isabelle/HOL等他にも定理証明支援系存在するが, 修士1年次後期に履修した授業でCoqの使い方を学んだため, 形式化に利用した. 
-実際にCoqが用いられた有名な例として, 四色定理やフェイト・トンプソンの定理(奇数位数定理)などがある. 
-Coqは型付き$\lambda$計算という理論に基づいている. 修士1年次に少人数クラスで学習したH.P.Barendregtの{\it Lambda Calculi with Types}\cite{Bar}に沿って, 型付き$\lambda$計算の概要について\ref{ssec lambda}で述べる. 
-今回の証明に関しては, Coqの標準ライブラリ \cite{coq sl}に加えて, 数学の証明のために整備されたライブラリである mathcomp \cite{coq mc}も用いている. Coq や mathcompの使い方については\ref{sssec coq_use}節で説明するが, より詳細な情報については萩原 学/アフェルト・レナルドの{\it Coq/SSReflect/Mathcomp}\cite{Hag}等を参照のこと. \\
+人間がチェックすることが難しい複雑な証明でも正しさが保証され, また証明付きプログラミングにも応用される. Mizar, Isabelle/HOL等他にも定理証明支援系は存在するが, 修士1年次後期に履修した授業でCoqの使い方を学んだため, 今回の形式化に利用した. 
+実際にCoqが用いられた有名な例として, 四色定理や Feit-Thompson の定理(奇数位数定理)などがある. 
+Coqは型付き$\lambda$計算という理論に基づいている. 修士1年次に少人数クラスで学習したH.P.Barendregtの{\it Lambda Calculi with Types}\cite{Bar}に沿って, 型付き$\lambda$計算の概要について\ref{ssec lambda}章で述べる. 
+今回の証明に関しては, Coqの標準ライブラリ \cite{coq sl}に加えて, 数学の証明のために整備されたライブラリ群である mathcomp \cite{coq mc}も用いている. Coq や mathcompの使い方については\ref{sssec coq_use}節で説明するが, より詳細な情報については萩原 学/アフェルト・レナルドの{\it Coq/SSReflect/Mathcomp}\cite{Hag}等を参照のこと. \\
 %\textbf{今後の展望}\\
-今後の展望としては, まずはこれまでに形式化した$q$-類似の各概念が$q \to 1$としたときに通常の数学の概念に一致することの形式化を行いたい. このためには, 現在開発中のライブラリである mathcomp analysis\cite{coq ana}を用いる必要がある. また, このライブラリを用いると無限和に関する形式化も可能であるため, 上で紹介したJacobiの三重積や, 無限和を用いて定義される指数関数や三角関数の$q$-類似の形式化にも挑戦していきたい. 
+今後の展望としては, まずはこれまでに形式化した$q$-類似の各概念が$q \to 1$としたときに通常の数学の概念に一致することの形式化を行いたい. このためには, 現在開発中のライブラリである mathcomp analysis\cite{coq ana}を用いる必要がある. また, このライブラリを用いると無限和に関する形式化も可能であるため, 上で紹介したJacobiの三重積や, 無限和を用いて定義される指数関数, 三角関数の$q$-類似の形式化にも挑戦していきたい. 
 ただし, 無限に関わる議論の形式化は通常の数学の概念を無限に拡張するよりもさらに煩雑になることには注意が必要である. 
-%現在開発中のライブラリである mathcomp analysis\cite{coq ana}を用いて, 
-%これまでに形式化した$q$-類似の各概念が$q \to 1$としたときに通常の数学の概念に一致することを形式化
-%極限操作に関する形式化を行いたい
-%(自然数の$q$-類似が$q \to 1$とすると通常の自然数に一致すること等)や無限和の形式化を行っていきたい. 
-%無限和をつかうことでE1, E2(-> triple product)や指数関数, 三角関数の$q$-類似や$q$-積分を定義できる
-%ただし, 通常の数学と比べて形式化においては極限の扱いがより煩雑になることに注意. 
-%研究に至った背景
-%修士1年次後半で学習した型付き$\lambda$計算の応用としてCoqによる形式化に挑戦したい
-%学部4年次の卒業研究で扱った$q$-類似がその題材に適していると考えた
-%  特に初等的な部分に関しては代数的に操作でき, 極限操作に関する議論が必要ない
-%  (-> 極限には開発中のライブラリである mathcomp analysis が必要
-%  代数的な部分は mathcomp で足りる)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \tableofcontents
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -240,27 +228,32 @@ $\lambda$計算には, 抽象と適用の2つの基本的な操作がある. ま
 %    {\tt Section [セクション名]}, {\tt End [セクション名]}でセクションを作ることができ, 
 %    そのセクション内共通のコンテキストを宣言できる. 
   \item {\tt Variable} \\
-    {\tt Variable [変数]$\colon$[型]}で, 特定の型を持つ変数を宣言できる. \\
+    {\tt Variable [変数]$\colon$[型]}で, 特定の型を持つ変数を宣言できる. 例えば\\
     {\tt Variable n$\colon$nat}\\
     で, 変数{\tt n}が自然数型{\tt nat}の要素であることを表している. 
     {\tt Section/End}コマンドと組み合わせることで, {\tt End}まで同じ意味で扱われ, 
     {\tt End}以降は効力を失う. 
     同時に複数の変数を宣言することもできる. その場合は\\
     {\tt Variables [変数] [変数] $\cdots$ [変数]$\colon$[型]}\\
-    と書く(ただし, Coqの中では{Variable}と{Variables}に違いは無い).    
+    と書く(ただし, Coq にとっては{Variable}と{Variables}に違いは無い).    
   \item {\tt Hypothesis} \\
     {\tt Hypothesis [仮定名]$\colon$[仮定]}で仮定を置くことができる. {\tt Variable}同様, 
     {\tt Section/End}と組み合わせることで, セクション内共通の仮定を置くことができる. 
   \item {\tt Definition} \\
     新たに関数を定義するためのコマンドで, \\
-    {\tt Definition [定義名] ([引数]$\colon$[引数の型])$\colon$[定義の型] := 
-    [定義名の定義式]}\\
+    {\tt Definition [関数名] ([引数]$\colon$[引数の型])$\colon$[関数の型] := 
+    [関数の定義式]}\\
     という形で用いる. 
     \begin{lstlisting}{Coq}
 Definition dq (f : R -> R) x := f (q * x) - f x. \end{lstlisting}
     であれば, {\tt dq}が定義の名前, {\tt f}, {\tt x}が引数, {\tt R -> R}が{\tt f}の型であり, 
     {\tt f (q * x) - f x}が{\tt dq}を定義する式である. また, {\tt x}と{\tt dq}そのものの型は
     推論できるため省略できる. 
+  \item {\tt Fixpoint} \\
+    再起関数を定義するためのコマンドで, \\
+    {\tt Fixpoint [関数名] ([引数]$\colon$[引数の型])$\colon$[関数の型] := 
+    [定義中の関数を含む定義式]}\\
+    と書く. 停止しない関数を定義することはできない. 
   \item {\tt Lemma} \\
     補題を宣言するためのコマンドで, \\
     {\tt Lemma [補題名] ([引数]$\colon$[引数の型])$\colon$[補題の主張]}
@@ -270,8 +263,10 @@ Lemma Dq_pow n x : x != 0 -> Dq (fun x => x ^ n) x = qnat n * x ^ (n - 1). \end{
     であれば, {\tt Dq\_pow}が補題名, {\tt n}, {\tt x}が引数, {\tt :}以降が補題の主張である. \\
     {\tt Lemma}の代わりに{\tt Theorem}, {\tt Corollary}等でも同じ機能をもつ. 
   \item {\tt Proof/Qed} \\
-    {\tt Proof}は{\tt Lemma}の後に書いて補題の主張と証明を分ける(実際には省略可能). 
-    証明を完了させて{\tt Qed}を書くことで, 他の補題の証明に使えるようになる. 
+    {\tt Proof}は{\tt Lemma}の後に書いて補題の主張と証明を分ける(実際には省略可能で, 
+    人間の見やすさのために書いている). 
+    証明を完了させて{\tt Qed}を書くことで Coq に補題を登録することができ, 他の補題の
+    証明に使えるようになる. 
 \end{itemize}
 次に, タクティックについて述べる. よく使われるタクティックは{\tt move}, {\tt apply}, {\tt rewrite}の3つである. 
 \begin{itemize}
@@ -282,11 +277,14 @@ Lemma Dq_pow n x : x != 0 -> Dq (fun x => x ^ n) x = qnat n * x ^ (n - 1). \end{
   \item {\tt apply}\\
     補題{\it lem}が{\tt P1 $\to$ P2}という形で, ゴールが{\tt P2}のとき, 
     {\tt apply {\it lem}}でゴールを{\tt P1}に変える. 
+    コンテクストの仮定{\tt H}が{\tt P1 $\to P2$}であれば{\tt apply H}で同じことができる. 
   \item {\tt rewrite}\\
-    {\it def}が定義のとき, {\tt rewrite /{\it def}}でゴールに出現している{\it def}を展開する. 
+    {\it def}が定義のとき, {\tt rewrite /{\it def}}でゴールに出現している{\it def}を展開する. \\
     また, 補題{\it lem}が{\tt A = B}という形のとき, {\tt rewrite {\it lem}}でゴールに出現する
-    {\tt A}を{\tt B}に書き換える. 更に, {\tt rewrite {\it lem} in H}で, コンテクストの{\tt H}に
-    出現する{\tt A}を{\tt B}に書き換える. 
+    {\tt A}を{\tt B}に書き換える(ただし, {\it lem}が{\tt H $\to$ (A = B)}という形であるとき, 
+    {\tt H}がゴールに追加される). 更に, {\tt rewrite {\it lem} in H}で, コンテクストの{\tt H}に
+    出現する{\tt A}を{\tt B}に書き換える. {\tt apply}と同じく, 使いたい等式が仮定にある場合も
+    同じように使える. 
 \end{itemize}
 以下, 2つの具体例を用いて{\tt Proof}内でのタクティックの使い方を説明する. 
 \bex{モーダスポーネンス}\\
@@ -296,6 +294,7 @@ Lemma Dq_pow n x : x != 0 -> Dq (fun x => x ^ n) x = qnat n * x ^ (n - 1). \end{
 From mathcomp Require Import ssreflect.
 
 Lemma modus_ponens (P Q : Prop) : (P -> Q) /\ P -> Q. \end{lstlisting}
+{\tt Prop}とは Coq において命題全体を表す型であり, {\tt /\textbackslash}は「かつ」を表している \\
 このとき, Coqのゴールエリア(コンテクストとゴールが表示される画面)は以下の通りである. 
 \begin{screen}
   \begin{lstlisting}{Coq}
@@ -304,8 +303,8 @@ Lemma modus_ponens (P Q : Prop) : (P -> Q) /\ P -> Q. \end{lstlisting}
     -------------------------------
     (P -> Q) /\ P -> Q \end{lstlisting}
 \end{screen}
-{\tt ---}の上がコンテクスト, 下がゴ－ルである. 1行目の{1 subgoal}はゴールが1つであることを示している. 用いるタクティックによってはゴールが増えることもある. 
-一般に命題$P_1$, $P_2$, $P_3$について$P_1 /\backslash P_2 \to P_3$と$P_1 \to P_2 \to P_3$は同じ意味であり, この書き換えは{\tt move=> []}で行える.
+{\tt ---}の上がコンテクスト, 下がゴ－ルである. 1行目の{1 subgoal}はゴールが1つであることを示しており, 用いるタクティックによってはゴールが増えることもある. 
+命題$P_1$, $P_2$, $P_3$について$P_1 /\backslash P_2 \to P_3$と$P_1 \to P_2 \to P_3$は同じ意味であり, この書き換えは{\tt move=> []}で行える. 実行すると以下のようにゴールエリアが変化する. 
 \begin{screen}
   \begin{lstlisting}{Coq}
     1 subgoal
@@ -342,13 +341,13 @@ Lemma modus_ponens (P Q : Prop) : (P -> Q) /\ P -> Q. \end{lstlisting}
     -------------------------------
     P \end{lstlisting}
 \end{screen}
-ここまで来ると, ゴールが{\tt P}であり, コンテクストに{\tt P}があるため, {\tt by []}で証明を終了する. 
+ここまで来ると, ゴールが{\tt P}であり, コンテクストに{\tt P}があるため, {\tt by []}で証明を終了する. {\tt done}も{\tt by []}と同じ意味を持つ.
 \begin{screen}
   \begin{lstlisting}{Coq}
   No more subgoals. \end{lstlisting}
 \end{screen}
 ゴールエリアに{\tt No more subgoals.}と表示されれば証明は終了であり, {\tt Qed}を書くことで補題として登録されることになる. \\
-以上をまとめると以下のようになる. 
+以上をまとめると次のようになる. 
 \begin{lstlisting}{Coq}
 Lemma modus_ponens (P Q : Prop) : (P -> Q) /\ P -> Q.
 Proof.
@@ -405,8 +404,7 @@ Lemma substitution m n : m = 0 -> m + n = n. \end{lstlisting}
     -------------------------------
     m + n = 0 \end{lstlisting}
 \end{screen}
-{\tt rewrite}は補題だけでなく仮定を使った書き換えも行えるため, {\tt rewrite Hm}でゴールの
-{\tt m}を{\tt 0}に書き換える. 
+仮定に{\tt m = 0}という等式があるため, {\tt rewrite Hm}でゴールの{\tt m}を{\tt 0}に書き換える. 
 \begin{screen}
   \begin{lstlisting}{Coq}
     1 subgoal
@@ -426,7 +424,7 @@ Lemma substitution m n : m = 0 -> m + n = n. \end{lstlisting}
     -------------------------------
     n = n \end{lstlisting}
 \end{screen}
-このとき, ゴールは同じもの同士の等号であるため, 自明に成り立つ, つまり{\tt by []}で終了する. 
+このとき, ゴールは同じもの同士の等号であるため, 自明に成り立つ, つまり{\tt by []}(もしくは{\tt done})で終了する. 
 \begin{screen}
   \begin{lstlisting}{Coq}
     No more subgoals.  \end{lstlisting}
@@ -477,21 +475,20 @@ forall x : nat, addn 0 x = x \end{lstlisting}
   \[
     d_q f(x) \coloneqq f (qx) - f(x)
   \]
-  と定める. 更に, $f(x)$の$q$差分を$D_q f(x)$を, 
+  と定める. 更に, $f(x)$の$q$微分を$D_q f(x)$を, 
   \[
     D_q f(x) \coloneqq \frac{d_q f(x)}{d_q x} = \frac{f(qx) - f(x)}{(q - 1) x}
   \]
   と定める. 
 \edf
-この定義を形式化するためまずは実数の形式化を行う. 今回は mathcomp の ssrnum にある{\tt rcfType}の要素を実数として用いることにする. mathcomp はある型を構成するために他の型を用いているため, ヒエラルキー(階層構造)がある. 通常の数学において体が環の性質を, 環が群の性質を引き継ぐように, mathcomp でもより一般の型の性質を引き継いでいる. {\tt rcfType}も多くの性質を引き継いでおり, 特に{\tt GRing}の性質を持っていることが重要である. 
-この定義の形式化は以下の通りである. 
+この定義を形式化するためまずは実数の形式化を考える. 今回は mathcomp の ssrnum にある{\tt rcfType}(real closed field：実閉体)の要素を実数として用いることにする. mathcomp はある型を構成するために他の型を用いているため, ヒエラルキー(階層構造)がある. 通常の数学において体が環の性質を, 環が群の性質を引き継ぐように, mathcomp でもより一般の型の性質を引き継いでいる. {\tt rcfType}も多くの性質を引き継いでおり, 特に環の性質, {\tt ringType}を持っていることが重要である. 実際, 形式化で利用するライブラリの補題の多くは{\tt ringType}に対するものである. この{\tt rcfType}を使って$q$-微分の形式化を以下のように行う. 
 \begin{lstlisting}{Coq}
 From mathcomp Require Import all_ssreflect all_algebra.
 Import GRing.
 
 Section q_analogue.
 Local Open Scope ring_scope.
-Variable (R : rcfType) (q : R).
+Variables (R : rcfType) (q : R).
 Hypothesis Hq : q - 1 != 0.
 
 Notation "f // g" := (fun x => f x / g x) (at level 40).
@@ -516,12 +513,13 @@ Definition Dq f := dq f // dq id. \end{lstlisting}
 %          型推論があるため, 推論できるものであれば型を書く必要がないためである. )
 %          $D_q$の定義の中の{\tt id}は恒等関数のことである. 
 %\end{itemize}
+5行目の{\tt Variables (R$\colon$rcfType) (q$\colon$R).}は, {\tt R}が{\tt rcfType}の要素であること, {\tt q}が{\tt R}の要素であることを表している. {\tt rcfType}は実閉体全体を表す型であるため, {\tt R}は具体的な型ではなく, 実閉体としての性質をもつ抽象的な型として扱っている. 
 \brmk
   $f$が微分可能であるとき, 
   \[
     \lim_{q\ra1} D_qf(x) = \frac{d}{dx}f(x)
   \] 
-  が成り立つが, 本稿においては極限操作に関しての形式化は扱わない. 
+  が成り立つが, 本論文においては極限操作に関しての形式化は扱わない. 
 \ermk
 次に, $x ^ n$ ($n \in \Z_{\ge 0}$)を$q$-微分した際にうまく振る舞うように自然数の$q$-類似を定義する. 
 \bdf[\cite{Kac} p2 (1.9)]
@@ -562,13 +560,18 @@ Proof.
   by rewrite [in (q - 1)^-1 * (q ^ n - 1)] mulrC.
 Qed.
 \end{lstlisting}
-ここで, {\tt red\_frac\_r}は, 
+証明で用いている補題について, 例えば{\tt mul1r}は
 \begin{lstlisting}{Coq}
-red_frac_r : forall x y z : R, z != 0 -> x * z / (y * z) = x / y \end{lstlisting}
+forall R : ringType, right_id 1  *%R
+\end{lstlisting}
+という補題であり, 任意の{\tt ringType}を型にもつ{\tt R}について, {\tt R}上の単位元の性質を表している. ここで, 補題の{\tt R}の型は{\tt rcfType}ではなく{\tt ringType}であるが, 前述の通り{\tt rcfType}は{\tt ringType}の性質を持っているため, 今回の形式化に用いている{\tt rcfType}型の{\tt R}についてもこの補題を使うことができる. 補題名{mul1r}の{\tt r}は{\tt ringType}に対する補題であることを表しており, {\tt mulrBl}, {\tt subrK}, {\tt mulrC}なども同じである. \\
+また{\tt red\_frac\_r}は, 
+\begin{lstlisting}{Coq}
+forall x y z : R, z != 0 -> x * z / (y * z) = x / y \end{lstlisting}
 という自分で用意した補題である(このように直接$q$-類似に関係はしないが, 形式化をするために用意した補題は\cite{coq qana}に q\_tool.v というファイルにまとめている). この補題の本質は$z / z = 1$という約分計算であり, mathcomp の ssralg の補題
 \begin{lstlisting}{Coq}
 divff : forall (F : fieldType) (x : F), x != 0 -> x / x = 1 \end{lstlisting}
-を用いているため{\tt z $\neq$ 0}という仮定が必要になる. よって, {\tt Dq\_pow}にももともとはなかった{\tt $x \ne 0$}という前提を加えている. 今後も補題を形式化するにあたって, その証明の中で約分を行う際には$0$でないという前提を付け加えることになる. 
+を用いているため{\tt z $\neq$ 0}という仮定が必要になる. よって, {\tt Dq\_pow}にも{\tt $x \ne 0$}という前提を加えている. 今後も補題を形式化するにあたって, その証明の中で約分を行う際には$0$でないという前提を付け加えることになる. 
 %\begin{itemize}
 %  \item {\tt Definition}と同様, {\tt Lemma}について, {\tt $\coloneqq$}の前に補題の名前と
 %          引数が, 後に補題の主張が書いてある. 今回であれば, {\tt Dq\_of\_pow}が補題の
@@ -617,9 +620,9 @@ divff : forall (F : fieldType) (x : F), x != 0 -> x / x = 1 \end{lstlisting}
 \begin{lstlisting}{Coq}
 Fixpoint qbinom_pos a n x := match n with
   | 0 => 1
-  | n.+1 => (qbinom_pos a n x) * (x - q ^ n * a)
+  | n0.+1 => (qbinom_pos a n0 x) * (x - q ^ n0 * a)
   end. \end{lstlisting}
-{\tt Fixpoint}を用いて再帰的な定義をしており, {\tt match}を使って{\tt n}が{\tt 0}かどうかで場合分けしている. 補題の証明については以下の通り. 
+{\tt Fixpoint}を用いて再帰的な定義をしており, {\tt match}を使って{\tt n}が{\tt 0}かどうかで場合分けしている. 再帰で呼び出す際に引数{\tt n}が真に小さくなっているため停止性が保証されている. 補題の証明については以下の通り. 
 \begin{lstlisting}{Coq}
 Theorem Dq_qbinom_pos a n x : x != 0 ->
   Dq (qbinom_pos a n.+1) x =
@@ -707,7 +710,7 @@ Definition qbinom a n x :=
   | Negz n0 => qbinom_neg a n0.+1 x
   end.
 \end{lstlisting}
-整数に拡張した$(x - a)^n_q$についても, 指数法則とと$q$-微分はうまく振る舞う.
+整数に拡張した$(x - a)^n_q$についても, 指数法則と$q$-微分はうまく振る舞う.
 まず指数法則について見ていく. 
 \bprop[\cite{Kac} p10 Proposition 3.2]
   $m$, $n \in \Z$について, Proposition \ref{q_exp_low}は成り立つ. 
@@ -959,9 +962,9 @@ $(x - a)^n_q$を定義してきたが, $q$-Taylor展開やGauss's binomial formu
   \item {\tt \{poly T\}}で{\tt T}係数多項式を表す型となる. {\tt T}は{\tt ringType}で
     なくてはならないが, {\tt rcfType}は{\tt ringType}の構造を引き継いでいるため, 
     今回用いている{\tt R}に対して{\tt \{poly R\}}が定義できる. 
-  \item {\tt \{poly R\}}は{\tt ring}と{\tt lmodType}の構造を持っている. よって, 今まで使ってきた
-    {\tt ring}に対する補題である{\tt addrC}や{\tt mulrA}などがそのまま使え, 
-    またスカラー倍{\tt a *$\colon$p}(ここで{\tt a$\colon$R}, {\tt p$\colon$ \{poly R\}}である)
+  \item {\tt \{poly R\}}は{\tt ringType}と{\tt lmodType}の構造を持っている. 
+    よって, 前者の性質から今まで使ってきた{\tt ringType}に対する補題がそのまま使え, 後者から
+    スカラー倍{\tt a *$\colon$p}(ここで{\tt a$\colon$R}, {\tt p$\colon$ \{poly R\}}である)
     も定義される. 
   \item {\tt \textbackslash poly\_(i < n) E(i)}で, 次数が$n - 1$次以下, $i$次の係数が$E(i)$
     である多項式表す. 
@@ -1004,7 +1007,7 @@ Lemma Dqp_Dqp'E p : Dqp p = Dqp' p. \end{lstlisting}
 \begin{lstlisting}{Coq}
 Lemma Dqp'_DqE p x : x != 0 -> (Dqp' p).[x] = (Dq # p) x. \end{lstlisting}
 \brmk
-  {\tt Dqp\_Dqp'}には特に条件がなく, {\tt Dqp'\_DqE}には$x \neq 0$という条件がついている. 
+  {\tt Dqp\_Dqp'E}には特に条件がなく, {\tt Dqp'\_DqE}には$x \neq 0$という条件がついている. 
   この違いは, 前者は{\tt 'X / 'X = 1\%:P}という多項式での約分を, 後者は{\tt x / x = 1}という
   実数での約分を行っているということから生じている. 後で詳しく述べるが, 約分の際に条件が
   必要なくなることが多項式で考える利点の一つである. 
