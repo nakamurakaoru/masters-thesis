@@ -23,7 +23,7 @@
 \newtheorem{df}{$\textrm{Definition}$}[subsection]
 \newtheorem{ex}[df]{$\textrm{Example}$}
 \newtheorem{prop}[df]{$\textrm{Proposition}$}
-\newtheorem{lem}[df]{$\textrm{Lemmma}$}
+\newtheorem{lem}[df]{$\textrm{Lemma}$}
 \newtheorem{cor}[df]{$\textrm{Corollary}$}
 \newtheorem{rmk}[df]{$\textrm{Remark}$}
 \newtheorem{thm}[df]{$\textrm{Theorem}$}
@@ -98,7 +98,7 @@
 \date{\today}
 \maketitle
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\textbf{序文}\\
+\subsection*{序文}
 本論文の主結果は, $q$-類似の初等的な結果をCoqによって形式化するものである. 具体的にはVictor Kac, Pokman Cheungの{\it Quantum Calculus}\cite{Kac}の4章(4.1)式の$q$-Taylor 展開, 及びその系として得られる Gauss's binomial formula の形式化を目標としている. 
 %\begin{screen}
 %  \[
@@ -106,25 +106,112 @@
 %  \]
 %\end{screen}
 %(ここで,   $x$, $q \in \R$, $n \in \Z_{>0}$であり, $(x + a)^n_q$, $\qcoe{n}{j}$はそれぞれ$(x + a)^n$, 二項係数の$q$-類似である)の形式化までを扱う. 
-本論文での$q$-類似に関する定義や定理, 証明は\cite{Kac}によるものだが, その形式化を行ったという点において独自性がある. 形式化したコード全体は\url{https://github.com/nakamurakaoru/q-analogue}\cite{coq qana}にある. \\
-本論文の構成は, \cite{Kac}での定義, 定理を述べた後, その形式化を与え, 必要であれば形式化をするにあたっての注意点を述べることを繰り返すという流れである. 
-証明の方針等は基本的に\cite{Kac}の通りであるが, \ref{sssec poly}節では一部\cite{Kac}から離れ, 多項式として$q$-微分や$q$-二項式を定義しなおして形式化を行っている. これらの新たな定義が多項式に対してのもとの定義を適用したものと一致していることの証明も行っている. \\
-%\textbf{$q$-類似の概要}\\
-$q$-類似は, 学部4年次に卒業研究のテーマとして扱ったものであり, 実数パラメータ$q$, 実数上の関数$f$に対して
+本論文での$q$-類似に関する定義や定理, 証明は\cite{Kac}によるものだが, その形式化を行ったという点において独自性がある. 形式化したコード全体は\url{https://github.com/nakamurakaoru/q-analogue}\cite{coq qana}にある.
+
+$q$-類似は, 学部4年次に卒業研究のテーマとして扱ったものである. 実数パラメータ$q$, 実数上の関数$f$に対して
 \[
   D_q f(x) \coloneqq \frac{f(qx) - f(x)}{(q - 1) x}
 \]
 で定義される$q$-微分を出発点とし, この$q$-微分に対してうまく振る舞い, かつ$q$を極限で$1$に近づけると通常の定義に一致するように数学の諸概念を一般化するものである.
-例えば, $x^n$を定義に沿って$q$-微分すると, 
+例えば, 自然数$n$について$x^n$を定義に沿って$q$-微分すると, 
 \[
   D_q x^n = \frac{(qx)^n - x^n}{(q - 1) x} = \frac{q^n - 1}{q - 1} x^{n - 1}
 \]
-となる. 通常の微分では, $(x^n)' = n x^{n - 1}$となることと比較して, 
+となる. 通常の微分では, $(x^n)' = n x^{n - 1}$となることと比較して, $n$の$q$-類似$[n]$を
 \[
-  \frac{q^n - 1}{q - 1} = 1 + q + q^2 + \cdots q^{n - 1}
+  [n] = \frac{q^n - 1}{q - 1}
 \]
-を自然数の$q$-類似と定める. 
+と定める. また, $(x - a)^n$の$q$-類似は, 
+\[
+  (x - a)^n_q \coloneqq \begin{cases}
+                                  1 & (n = 0) \\
+                                  (x - a) (x - qa) \cdots (x - q^{n - 1} a) & (n \ge 1)
+                                \end{cases}
+\]
+と定義することで, $q$-微分と自然数の$q$-類似に対してうまく振る舞う, つまり
+\[
+  D_q (x - a)^n_q = [n](x - a)^{n - 1}_q
+\]
+が成り立つ. 更に, 階乗と二項係数の$q$-類似をそれぞれ
+\begin{align*}
+  [n]! &\coloneqq \begin{cases}
+                        1 & (n = 0)\\
+                        [n] \times [n   - 1] \cdots [1] & (n \ge 1)
+                      \end{cases}\\
+  \qcoe{n}{j} &\coloneqq \frac{[n]!}{[j]![n - j]!}
+\end{align*}
+で定めれば, $q$-Taylor展開, Gauss's binomial formula は以下のように書ける. 
+\begin{itembox}{$q$-Taylor展開}
+  $f(x)$を$N$次の実係数多項式とする. 任意の$c \in \R$について
+  \[
+    f(x) = \sum_{j = 0}^N (Dq^j f) (c) \frac{(x - c)^j_q}{[j]!}
+  \]
+  が成り立つ. 
+\end{itembox}
+\begin{itembox}{Gauss's binomial formula}
+  $x$, $a \in \R$, $n \in \Z_{>0}$について
+  \[
+    (x+a)^n_q = \sum_{j=0}^n \qcoe{n}{j} q^{\frac{j(j-1)}{2}} a^j x^{n-j}
+  \]
+  が成り立つ. 
+\end{itembox}
+この2つを形式化することが本論文の主目的である. 
 %$e^x$, $\sin x$などの初等関数や積分の$q$-類似も考えられる　微分積分学の基本定理も成り立つ. ただしこれらは無限和が必要なので形式化はできていない. 
+%あえてパラメータを増やす$q$-類似を考える利点の一つとしては, 証明が複雑な定理に対してより簡単な別証明を与えられる場合があることである. 例えば, Jacobiの三重積(\cite{Kac} p35 Theorem 11.1)
+%\begin{screen}
+%$z$, $q \in \R$, $|q| < 1$として, 
+%\[
+%  \sum_{n = -\infty}^{\infty} q^{n^2} z^n =
+%  \prod_{n = 1}^{\infty} (1 - q^{2n})(1 + q^{2n - 1}z)(1 + q^{2n - 1}z^{-1})
+%\]
+%が成り立つ. 
+%\end{screen}
+%はその一例である. 楕円関数論の文脈で登場する恒等式であるが(\cite{Ume} p144 (3.47)等を参照), $q$-類似で得られる式
+%\begin{align*}
+%  (1 + x)^{\infty}_q &=
+%    \sum_{j = 0}^{\infty} q^{j(j - 1)/2} \frac{x^j}{(1 - q) (1 - q^2) \cdots (1 - q^j)}
+%     \quad(\text{\cite{Kac} p30 (9.3)式}) \\
+%  \frac{1}{(1 - x)^{\infty}_q} &=
+%    \sum_{j = 0}^{\infty} \frac{x^j}{(1 - q) (1 - q^2) \cdots (1 - q^j)}
+%      \quad(\text{\cite{Kac} p30 (9.4)式})
+%\end{align*}
+%を用いることで簡単に証明できる. 
+
+Coqとは, 定理証明支援系の1つであり, 数学的な証明が正しいかどうか判定するプログラムである.
+人間がチェックすることが難しい複雑な証明でも正しさが保証され, また証明付きプログラミングにも応用される. Mizar, Isabelle/HOL等他にも定理証明支援系は存在するが, 修士1年次後期に履修した授業でCoqの使い方を学んだため, 今回の形式化に利用した. 
+実際にCoqが用いられた有名な例として, 四色定理や Feit-Thompson の定理(奇数位数定理)などがある. 
+Coqは型付き$\lambda$計算という理論に基づいている.  
+今回の証明に関しては, Coqの標準ライブラリ \cite{coq sl}に加えて, 数学の証明のために整備されたライブラリ群である mathcomp \cite{coq mc}も用いている.  
+
+今後の展望としては, まずはこれまでに形式化した$q$-類似の各概念が$q \to 1$としたときに通常の数学の概念に一致することの形式化を行いたい. このためには, 現在開発中のライブラリである mathcomp analysis\cite{coq ana}を用いる必要がある. また, このライブラリを用いると無限和に関する形式化も可能であるため, Gauss's binomial formula を無限に拡張したものや, 無限和を用いて定義される指数関数, 三角関数の$q$-類似の形式化にも挑戦していきたい. 
+%ただし, 無限に関わる議論の形式化は通常の数学の概念を無限に拡張するよりもさらに煩雑になることには注意が必要である. 
+
+最後に構成について述べる. 
+まず\ref{sec qana}節で$q$-類似の概要について説明し, 
+\ref{sec lambda}節で修士1年次に少人数クラスで学習したH.P.Barendregtの{\it Lambda Calculi with Types}\cite{Bar}に沿って, 型付き$\lambda$計算について述べる. 
+\ref{sec coq}節は Coq の概要についてで, 特に\ref{ssec coq_use}節でCoq や mathcompの使い方を具体例を交えて説明するが, より詳細な情報については萩原 学/アフェルト・レナルドの{\it Coq/SSReflect/Mathcomp}\cite{Hag}等を参照のこと. 
+これらの準備のもと, \ref{sec form}節から本題の形式化に入る. \cite{Kac}での定義, 定理を述べた後, その形式化を与え, 必要であれば形式化をするにあたっての注意点を述べることを繰り返すという流れである. 
+証明の方針等は基本的に\cite{Kac}の通りであるが, \ref{ssec poly}節では一部\cite{Kac}から離れ, 多項式として$q$-微分や$q$-二項式を定義しなおして形式化を行っている. これらの新たな定義が多項式に対してのもとの定義を適用したものと一致していることの証明も行っている.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\tableofcontents
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{$q$-類似} \label{sec qana}
+$q$-類似とは, $q \to 1$とすると通常の数学に一致するような拡張のことである. 例えば, 自然数$n$の$q$-類似$[n]$は
+\[
+  [n] = 1 + q + q^2 + \cdots q ^ {n -1} 
+\]
+であり, $(x-a)^n$の$q$-類似$(x-a)^n_q$は
+\[
+  (x-a)^n_q \coloneqq \begin{cases}
+                                  1 & (n=0)\\
+                                  (x-a)(x-qa)\cdots(x-q^{n-1}a) & (n\ge1)
+                                \end{cases}
+\]
+である. 本論文では, この$(x - a)^n_q$に対して, 
+\[
+  (x+a)^n_q = \sum_{j=0}^n \qcoe{n}{j} q^{\frac{j(j-1)}{2}} a^j x^{n-j}
+\]
+が成り立つことの形式化を目標としている. 
 あえてパラメータを増やす$q$-類似を考える利点の一つとしては, 証明が複雑な定理に対してより簡単な別証明を与えられる場合があることである. 例えば, Jacobiの三重積(\cite{Kac} p35 Theorem 11.1)
 \begin{screen}
 $z$, $q \in \R$, $|q| < 1$として, 
@@ -143,40 +230,11 @@ $z$, $q \in \R$, $|q| < 1$として,
     \sum_{j = 0}^{\infty} \frac{x^j}{(1 - q) (1 - q^2) \cdots (1 - q^j)}
       \quad(\text{\cite{Kac} p30 (9.4)式})
 \end{align*}
-を用いることで簡単に証明できる. \\
-%\textbf{Coqの概要}\\
-Coqとは, 定理証明支援系の1つであり, 数学的な証明が正しいかどうか判定するプログラムである.
-人間がチェックすることが難しい複雑な証明でも正しさが保証され, また証明付きプログラミングにも応用される. Mizar, Isabelle/HOL等他にも定理証明支援系は存在するが, 修士1年次後期に履修した授業でCoqの使い方を学んだため, 今回の形式化に利用した. 
-実際にCoqが用いられた有名な例として, 四色定理や Feit-Thompson の定理(奇数位数定理)などがある. 
-Coqは型付き$\lambda$計算という理論に基づいている. 修士1年次に少人数クラスで学習したH.P.Barendregtの{\it Lambda Calculi with Types}\cite{Bar}に沿って, 型付き$\lambda$計算の概要について\ref{ssec lambda}章で述べる. 
-今回の証明に関しては, Coqの標準ライブラリ \cite{coq sl}に加えて, 数学の証明のために整備されたライブラリ群である mathcomp \cite{coq mc}も用いている. Coq や mathcompの使い方については\ref{sssec coq_use}節で説明するが, より詳細な情報については萩原 学/アフェルト・レナルドの{\it Coq/SSReflect/Mathcomp}\cite{Hag}等を参照のこと. \\
-%\textbf{今後の展望}\\
-今後の展望としては, まずはこれまでに形式化した$q$-類似の各概念が$q \to 1$としたときに通常の数学の概念に一致することの形式化を行いたい. このためには, 現在開発中のライブラリである mathcomp analysis\cite{coq ana}を用いる必要がある. また, このライブラリを用いると無限和に関する形式化も可能であるため, 上で紹介したJacobiの三重積や, 無限和を用いて定義される指数関数, 三角関数の$q$-類似の形式化にも挑戦していきたい. 
-ただし, 無限に関わる議論の形式化は通常の数学の概念を無限に拡張するよりもさらに煩雑になることには注意が必要である. 
+を用いることで簡単に証明できる. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\tableofcontents
+\section{型付き$\lambda$計算} \label{sec lambda}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{$q$-類似}
-$q$-類似とは, $q \to 1$とすると通常の数学に一致するような拡張のことである. 例えば, 自然数$n$の$q$-類似$[n]$は
-\[
-  [n] = 1 + q + q^2 + \cdots q ^ {n -1} 
-\]
-であり, $(x-a)^n$の$q$-類似$(x-a)^n_q$は
-\[
-  (x-a)^n_q \coloneqq \begin{cases}
-                                  1 & (n=0)\\
-                                  (x-a)(x-qa)\cdots(x-q^{n-1}a) & (n\ge1)
-                                \end{cases}
-\]
-である. 本論文では, この$(x - a)^n_q$に対して, 
-\[
-  (x+a)^n_q = \sum_{j=0}^n \qcoe{n}{j} q^{\frac{j(j-1)}{2}} a^j x^{n-j}
-\]
-が成り立つことの形式化を目標としている. 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{型付き$\lambda$計算} \label{ssec lambda}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{$\lambda$計算} \label{sssec lambdacal}
+\subsection{$\lambda$計算} \label{ssec lambdacal}
 まず型のない$\lambda$計算を定義する. 初めに, $\lambda$計算がどのようなものなのかについての概要を説明し, その後厳密な定義に移る. \\
 \textbf{$\lambda$計算の概要}\\
 $\lambda$計算には, 抽象と適用の2つの基本的な操作がある. まず, 抽象については, 「式から関数を作る操作」と捉えることができる. $M$を$\lambda$計算における式($\lambda$計算においてはこれを$\lambda$項と呼ぶ)だとすると, 
@@ -207,27 +265,27 @@ $\lambda$計算には, 抽象と適用の2つの基本的な操作がある. ま
   (\lambda x. M)\ N = M[x\coloneqq N]
 \]
 と書く. \\
-\textbf{{$\lambda$計算の定義}}
+\textbf{$\lambda$計算の定義}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{$\lama$と$\lambda$2}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Coq} \label{ssec Coq}
+\section{Coq} \label{sec coq}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{$\lambda$-cube と CIC}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Coqの使い方} \label{sssec coq_use}
+\subsection{Coqの使い方} \label{ssec coq_use}
 %Coq とは, 定理証明支援系の1つであり, 数学的な証明が正しいかどうか判定するプログラムである. 人間がチェックすることが難しい複雑な証明でも正しさが保証され, また証明付きプログラミングにも応用される. 例えば, 
 この節ではCoqのコマンドとタクティックの使い方について述べる. ここでは, タクティックは証明の中でコンテクスト(変数や仮定)やゴール(証明すべき主張)を変形させるもの, コマンドはタクティック以外のものとして扱う. 
 まず, よく使うコマンドについて説明する. 
-\begin{itemize}
-  \item {Require Import} \\
-    ライブラリを読み込むためのコマンドである. \\
+\begin{description}
+  \item[\tt Require Import]
+    ライブラリを読み込むためのコマンドである.
     {\tt From mathcomp Require Import ssreflect}
     であれば, ライブラリ群 mathcomp から ssreflect を読み込んでいる.
-%  \item {\tt Section / End} \\
-%    {\tt Section [セクション名]}, {\tt End [セクション名]}でセクションを作ることができ, 
-%    そのセクション内共通のコンテキストを宣言できる. 
-  \item {\tt Variable} \\
+  \item[\tt Section / End]
+    {\tt Section [セクション名]}, {\tt End [セクション名]}でセクションを作ることができ, 
+    そのセクション内共通のコンテキストを宣言できる. 
+  \item[\tt Variable]
     {\tt Variable [変数]$\colon$[型]}で, 特定の型を持つ変数を宣言できる. 例えば\\
     {\tt Variable n$\colon$nat}\\
     で, 変数{\tt n}が自然数型{\tt nat}の要素であることを表している. 
@@ -236,10 +294,10 @@ $\lambda$計算には, 抽象と適用の2つの基本的な操作がある. ま
     同時に複数の変数を宣言することもできる. その場合は\\
     {\tt Variables [変数] [変数] $\cdots$ [変数]$\colon$[型]}\\
     と書く(ただし, Coq にとっては{Variable}と{Variables}に違いは無い).    
-  \item {\tt Hypothesis} \\
+  \item[\tt Hypothesis]
     {\tt Hypothesis [仮定名]$\colon$[仮定]}で仮定を置くことができる. {\tt Variable}同様, 
     {\tt Section/End}と組み合わせることで, セクション内共通の仮定を置くことができる. 
-  \item {\tt Definition} \\
+  \item[\tt Definition]
     新たに関数を定義するためのコマンドで, \\
     {\tt Definition [関数名] ([引数]$\colon$[引数の型])$\colon$[関数の型] := 
     [関数の定義式]}\\
@@ -249,12 +307,13 @@ Definition dq (f : R -> R) x := f (q * x) - f x. \end{lstlisting}
     であれば, {\tt dq}が定義の名前, {\tt f}, {\tt x}が引数, {\tt R -> R}が{\tt f}の型であり, 
     {\tt f (q * x) - f x}が{\tt dq}を定義する式である. また, {\tt x}と{\tt dq}そのものの型は
     推論できるため省略できる. 
-  \item {\tt Fixpoint} \\
+  \item[\tt Fixpoint]
     再起関数を定義するためのコマンドで, \\
     {\tt Fixpoint [関数名] ([引数]$\colon$[引数の型])$\colon$[関数の型] := 
     [定義中の関数を含む定義式]}\\
-    と書く. 停止しない関数を定義することはできない. 
-  \item {\tt Lemma} \\
+    と書く. 停止しない関数を認めてしまうと矛盾が生じるため, 停止性が保証されていない
+    関数を定義することはできない. 
+  \item[\tt Lemma]
     補題を宣言するためのコマンドで, \\
     {\tt Lemma [補題名] ([引数]$\colon$[引数の型])$\colon$[補題の主張]}
     という形である. 
@@ -262,30 +321,30 @@ Definition dq (f : R -> R) x := f (q * x) - f x. \end{lstlisting}
 Lemma Dq_pow n x : x != 0 -> Dq (fun x => x ^ n) x = qnat n * x ^ (n - 1). \end{lstlisting}
     であれば, {\tt Dq\_pow}が補題名, {\tt n}, {\tt x}が引数, {\tt :}以降が補題の主張である. \\
     {\tt Lemma}の代わりに{\tt Theorem}, {\tt Corollary}等でも同じ機能をもつ. 
-  \item {\tt Proof/Qed} \\
+  \item[\tt Proof/Qed]
     {\tt Proof}は{\tt Lemma}の後に書いて補題の主張と証明を分ける(実際には省略可能で, 
     人間の見やすさのために書いている). 
     証明を完了させて{\tt Qed}を書くことで Coq に補題を登録することができ, 他の補題の
     証明に使えるようになる. 
-\end{itemize}
+\end{description}
 次に, タクティックについて述べる. よく使われるタクティックは{\tt move}, {\tt apply}, {\tt rewrite}の3つである. 
-\begin{itemize}
-  \item {\tt move}\\
+\begin{description}
+  \item[\tt move]
     {\tt move=> H}でゴールの前提に{\tt H}という名前をつけてコンテクストに移動する. 
     また{\tt move$\colon$H}で補題{\tt H}もしくはコンテクストに存在する{\tt H}をゴールの
     前提に移す. 
-  \item {\tt apply}\\
+  \item[\tt apply]
     補題{\it lem}が{\tt P1 $\to$ P2}という形で, ゴールが{\tt P2}のとき, 
     {\tt apply {\it lem}}でゴールを{\tt P1}に変える. 
     コンテクストの仮定{\tt H}が{\tt P1 $\to P2$}であれば{\tt apply H}で同じことができる. 
-  \item {\tt rewrite}\\
+  \item[\tt rewrite]
     {\it def}が定義のとき, {\tt rewrite /{\it def}}でゴールに出現している{\it def}を展開する. \\
     また, 補題{\it lem}が{\tt A = B}という形のとき, {\tt rewrite {\it lem}}でゴールに出現する
     {\tt A}を{\tt B}に書き換える(ただし, {\it lem}が{\tt H $\to$ (A = B)}という形であるとき, 
     {\tt H}がゴールに追加される). 更に, {\tt rewrite {\it lem} in H}で, コンテクストの{\tt H}に
     出現する{\tt A}を{\tt B}に書き換える. {\tt apply}と同じく, 使いたい等式が仮定にある場合も
     同じように使える. 
-\end{itemize}
+\end{description}
 以下, 2つの具体例を用いて{\tt Proof}内でのタクティックの使い方を説明する. 
 \bex{モーダスポーネンス}\\
 命題$P$, $Q$について, $P \Lra Q$かつ$P$であれば, $Q$が成り立つということをCoqで証明する. 
@@ -382,18 +441,18 @@ Coq による証明は, Curry-Howard 同型と呼ばれる,
 \bex{代入計算}\\
 自然数$m$, $n$について, 
 \[
-  m = 0 \Lra m + n = n
+  m = 0 \Lra n + m = n
 \]
 という簡単な代入に関する計算を証明してみる. まず主張を形式化する.  
 \begin{lstlisting}{Coq}
-Lemma substitution m n : m = 0 -> m + n = n. \end{lstlisting}
+Lemma substitution m n : m = 0 -> n + m = n. \end{lstlisting}
 このとき, ゴールエリアは以下の通りである. 
 \begin{screen}
   \begin{lstlisting}{Coq}
     1 subgoal
     m, n : nat
     -------------------------------
-    m = 0 -> m + n = n \end{lstlisting}
+    m = 0 -> n + m = n \end{lstlisting}
 \end{screen}
 まず{\tt m = 0}という前提を{\tt move=> Hm}で{\tt Hm}という名前をつけてコンテクストに移動する. 
 \begin{screen}
@@ -402,7 +461,7 @@ Lemma substitution m n : m = 0 -> m + n = n. \end{lstlisting}
     m, n : nat
     Hm : m = 0
     -------------------------------
-    m + n = 0 \end{lstlisting}
+    n + m = 0 \end{lstlisting}
 \end{screen}
 仮定に{\tt m = 0}という等式があるため, {\tt rewrite Hm}でゴールの{\tt m}を{\tt 0}に書き換える. 
 \begin{screen}
@@ -411,11 +470,11 @@ Lemma substitution m n : m = 0 -> m + n = n. \end{lstlisting}
     m, n : nat
     Hm : m = 0
     -------------------------------
-    0 + n = n \end{lstlisting}
+    n + 0 = n \end{lstlisting}
 \end{screen}
-次に, {\tt 0 + n}を{\tt n}に書き換えたい. mathcomp の ssrnat に{\tt add0n}という, \\
-{\tt forall n : nat, 0 + n = n}\\
-に対応する補題があるため, {\tt rewrite add0n}を実行する. 
+次に, {\tt n + 0}を{\tt n}に書き換えたい. mathcomp の ssrnat に{\tt addn0}という, \\
+{\tt forall n : nat, n + 0 = n}\\
+に対応する補題があるため, {\tt rewrite addn0}を実行する. 
 \begin{screen}
   \begin{lstlisting}{Coq}
     1 subgoal
@@ -431,42 +490,50 @@ Lemma substitution m n : m = 0 -> m + n = n. \end{lstlisting}
 \end{screen}
 この証明をまとめると以下の通りである. 
 \begin{lstlisting}{Coq}
-Lemma substitution m n : m = 0 -> m + n = n.
+Lemma substitution m n : m = 0 -> n + m = n.
 Proof.
   move=> Hm.
   rewrite Hm.
-  rewrite add0n.
+  rewrite addn0.
   by [].
 Qed. \end{lstlisting}
 複数の{\tt rewrite}がまとめられることと{\tt by}の使い方から, より短く次のように書ける. 
 \begin{lstlisting}{Coq}
-Lemma substitution m n : m = 0 -> m + n = n.
+Lemma substitution m n : m = 0 -> n + m = n.
 Proof.
   move=> Hm.
-  by rewrite Hm add0n.
+  by rewrite Hm addn0.
 Qed. \end{lstlisting}
 更に, 前提が{\tt A = B}の形であるとき, {\tt move$\to$}でゴールの{\tt A}を{\tt B}に書き換えられること, {\tt ;}で異なるタクティックをつなげられることを用いれば以下のように書くこともでできる. 
 \begin{lstlisting}{Coq}
-Lemma substitution m n : m = 0 -> m + n = n.
-Proof. by move->; by rewrite add0n. Qed. \end{lstlisting}
+Lemma substitution m n : m = 0 -> n + m = n.
+Proof. by move->; by rewrite addn0. Qed. \end{lstlisting}
 \eex
 \brmk
-  正確には, {\tt add0n}は
+  正確には, {\tt addn0}は
   \begin{lstlisting}{Coq}
-left_id 0 addn \end{lstlisting}
+right_id 0 addn \end{lstlisting}
   という補題であり, {\tt addn}は自然数同士の加法である.  
-  {\tt left\_id}の定義は
+  {\tt right\_id}の定義は
   \begin{lstlisting}{Coq}
-fun (S T : Type) (e : S) (op : S -> T -> T) => forall x : T, op e x = x \end{lstlisting}
-  であり, 単位元を左から作用させても元のままであるということを一般的に定義している. 
-  {\tt add0n}は{\tt left\_id}の{\tt e}に{\tt 0}を, {\tt op}に{\tt addn}を入れたものであるので,
+fun (S T : Type) (e : T) (op : S -> T -> S) => forall x : S, op x e = x \end{lstlisting}
+  であり, 単位元を右から作用させても元のままであるということを一般的に定義している. 
+  {\tt addn0}は{\tt right\_id}の{\tt e}に{\tt 0}を, {\tt op}に{\tt addn}を入れたものであるので,
   \begin{lstlisting}{Coq}
-forall x : nat, addn 0 x = x \end{lstlisting}
+forall x : nat, addn x 0 = x \end{lstlisting}
   となる. 
 \ermk
 このように, Coqでの証明は, ゴールを自明な形になるまで繰り返し書き変えていくやり方が基本である. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{形式化}
+\subsection{mathcomp の型}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{形式化}\label{sec form}
+この定義を形式化するためまずは実数の形式化を考える. 今回は mathcomp の ssrnum にある{\tt rcfType}を用いる. {\tt rcfType}とは, real closed field, つまり実閉体全体からなる型であり, この型の要素を実数として用いることにする. mathcomp はある型を構成するために他の型を用いているため, ヒエラルキー(階層構造)がある. 通常の数学において体が環の性質を, 環が群の性質を引き継ぐように, mathcomp でもより一般の型の性質を引き継いでいる. {\tt rcfType}も多くの性質を引き継いでおり, 特に環の性質, {\tt ringType}を持っていることが重要である. 実際, 形式化で利用するライブラリの補題の多くは{\tt ringType}に対するものである.
+
+自然数型{\tt nat}
+{.+1}は{\tt nat}での後続数を表す
+
+整数型{\tt int}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{$q$-微分の定義}
 様々な$q$-類似を考えるにあたって, まずは微分の$q$-類似から始める. 以下, $q$を$1$でない実数とする. 
@@ -481,7 +548,8 @@ forall x : nat, addn 0 x = x \end{lstlisting}
   \]
   と定める. 
 \edf
-この定義を形式化するためまずは実数の形式化を考える. 今回は mathcomp の ssrnum にある{\tt rcfType}(real closed field：実閉体)の要素を実数として用いることにする. mathcomp はある型を構成するために他の型を用いているため, ヒエラルキー(階層構造)がある. 通常の数学において体が環の性質を, 環が群の性質を引き継ぐように, mathcomp でもより一般の型の性質を引き継いでいる. {\tt rcfType}も多くの性質を引き継いでおり, 特に環の性質, {\tt ringType}を持っていることが重要である. 実際, 形式化で利用するライブラリの補題の多くは{\tt ringType}に対するものである. この{\tt rcfType}を使って$q$-微分の形式化を以下のように行う. 
+%この定義を形式化するためまずは実数の形式化を考える. 今回は mathcomp の ssrnum にある{\tt rcfType}(real closed field：実閉体)の要素を実数として用いることにする. mathcomp はある型を構成するために他の型を用いているため, ヒエラルキー(階層構造)がある. 通常の数学において体が環の性質を, 環が群の性質を引き継ぐように, mathcomp でもより一般の型の性質を引き継いでいる. {\tt rcfType}も多くの性質を引き継いでおり, 特に環の性質, {\tt ringType}を持っていることが重要である. 実際, 形式化で利用するライブラリの補題の多くは{\tt ringType}に対するものである. 
+{\tt rcfType}を使って$q$-微分の形式化を以下のように行う. 
 \begin{lstlisting}{Coq}
 From mathcomp Require Import all_ssreflect all_algebra.
 Import GRing.
@@ -954,7 +1022,7 @@ Qed.
 \end{lstlisting}
 {\tt case:\,n}で{\tt n}が$0$以上か負かで場合分けを, {\tt destruct n}で$0$か$1$以上かの場合分けをしており, それぞれの場合で{\tt Dq\_qbinom\_0}, {\tt Dq\_qbinom\_pos}, {\tt Dq\_qbinom\_neg}を使っていることが見て取れる. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{関数から多項式へ} \label{sssec poly}
+\subsection{関数から多項式へ} \label{ssec poly}
 ここまでは\cite{Kac}の定義に沿って関数に対して$q$-微分を定義し, また関数として
 $(x - a)^n_q$を定義してきたが, $q$-Taylor展開やGauss's binomial formulaを形式化するに当たって多項式に対する$q$-微分と多項式としての$(x - a)^n_q$を改めて定義する. \\
 ここで, Coqにおける多項式の扱いについて説明する. 
@@ -974,7 +1042,7 @@ $(x - a)^n_q$を定義してきたが, $q$-Taylor展開やGauss's binomial formu
   \item {\tt size p}で多項式$p$の次数$+1$を表す.
   \item {\tt p.[x]}で多項式$p$の$x$での値を表す. 
 \end{itemize}
-より詳細な内容については mathcomp の poly.v \cite{coq poly}を参照のこと. \\
+より詳細な内容については mathcomp の poly.v を参照のこと. \\
 この{\tt \{poly R\}}を用いて{\tt Dq}や{\tt qbinom}を定義し直していく. 
 まず, $q$-微分について, 多項式に対する$d_q$を以下のように定義し直す. 
 \begin{lstlisting}{Coq}
@@ -1106,7 +1174,7 @@ Qed. \end{lstlisting}
 %というように$x \neq 0$という条件が必要になる. これは多項式の割り算ではなく実数の値の割り算での約分を計算する必要があるからである.
 %\ermk
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{$q$-Taylor展開} \label{sssec q_Taylor}
+\subsection{$q$-Taylor展開} \label{ssec q_Taylor}
 この節では, 有限次Taylor展開の$q$-類似が成り立つこと, そしてその系として Gauss's binomial formula が成り立つことを示し, 形式化する. 
 まず, 一般に以下のことが成り立つことを確認しておく. 
 \bthm[\cite{Kac} p5 Theorem 2.1] \label{general_Taylor}
@@ -1431,8 +1499,8 @@ Theorem Gauss_binomial a n : (forall n, qfact n != 0) ->
     2018
   \bibitem{coq sl} \url{https://coq.inria.fr/distrib/current/stdlib/}
   \bibitem{coq mc} \url{https://github.com/math-comp/math-comp}
-  \bibitem{coq poly} \url{https://github.com/math-comp/math-comp/blob/master/ 
-                                 mathcomp/algebra/poly.v}
+%  \bibitem{coq poly} \url{https://github.com/math-comp/math-comp/blob/master/ 
+%                                 mathcomp/algebra/poly.v}
   \bibitem{coq ana} \url{https://github.com/math-comp/analysis}
   \bibitem{Ume} 梅村 浩, 『楕円関数論  楕円曲線の解析学』, 東京大学出版会, 2000.
   \bibitem{Bar} H.P.Barendregt, {\it{Lambda Calculi with Types}}

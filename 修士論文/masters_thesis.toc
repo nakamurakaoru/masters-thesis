@@ -1,12 +1,13 @@
 \contentsline {section}{\numberline {1}$q$-類似}{3}
-\contentsline {section}{\numberline {2}型付き$\lambda $計算}{3}
-\contentsline {subsection}{\numberline {2.1}$\lambda $計算}{3}
+\contentsline {section}{\numberline {2}型付き$\lambda $計算}{4}
+\contentsline {subsection}{\numberline {2.1}$\lambda $計算}{4}
 \contentsline {subsection}{\numberline {2.2}$\lambda \tmspace -\thinmuskip {.1667em} \tmspace -\thinmuskip {.1667em} \to $と$\lambda $2}{4}
 \contentsline {section}{\numberline {3}Coq}{4}
 \contentsline {subsection}{\numberline {3.1}$\lambda $-cube と CIC}{4}
 \contentsline {subsection}{\numberline {3.2}Coqの使い方}{4}
+\contentsline {subsection}{\numberline {3.3}mathcomp の型}{9}
 \contentsline {section}{\numberline {4}形式化}{9}
-\contentsline {subsection}{\numberline {4.1}$q$-微分の定義}{9}
+\contentsline {subsection}{\numberline {4.1}$q$-微分の定義}{10}
 \contentsline {subsection}{\numberline {4.2}$(x - a)^n$の$q$-類似}{11}
-\contentsline {subsection}{\numberline {4.3}関数から多項式へ}{17}
-\contentsline {subsection}{\numberline {4.4}$q$-Taylor展開}{20}
+\contentsline {subsection}{\numberline {4.3}関数から多項式へ}{18}
+\contentsline {subsection}{\numberline {4.4}$q$-Taylor展開}{21}
