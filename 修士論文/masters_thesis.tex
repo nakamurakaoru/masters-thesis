@@ -743,7 +743,8 @@ Proof.
       by rewrite -[q ^ n.+1 * q ^ m] expfz_n0addr // addnC.
 Qed.
 \end{lstlisting}
-\cite{Kac}の証明では単に式変形しているが, 形式化の証明では{\tt m}, {\tt n}に関する帰納法を用いている. \\
+\cite{Kac}の証明では単に式変形しているが, 形式化の証明では{\tt m}, {\tt n}に関する帰納法を用いている. これは{\tt qbinom\_pos}が再帰的に定義されているため, $m$項と$n$項で分けるよりも最後の$1$項を取り出す方が簡単であり, 帰納法と相性が良いからである. 
+
 この指数法則を用いて, $(x - a)^n_q$の$n$を負の数に拡張する. まず, \cite{Kac}の定義は
 \bdf[\cite{Kac} p9 (3.7)] \label{qbinom_neg}
   $x$, $a \in \R$, $l\in\Z_{>0}$とする. このとき, 
@@ -773,7 +774,11 @@ Definition qbinom a n x :=
 整数に拡張した$(x - a)^n_q$についても, 指数法則と$q$-微分はうまく振る舞う.
 まず指数法則について見ていく. 
 \bprop[\cite{Kac} p10 Proposition 3.2]
-  $m$, $n \in \Z$について, Proposition \ref{q_exp_low}は成り立つ. 
+  $m$, $n \in \Z$について, Proposition \ref{q_exp_low}は成り立つ, つまり
+  \[
+    (x - a)^{m + n}_q = (x - a)^m_q (x - q^m a)^n_q
+  \]
+  が成り立つ. 
 \eprop
 \bpf
   $m$, $n$の正負で場合分けして示す. $m > 0$かつ$n > 0$の場合はすでに示しており, 
@@ -903,7 +908,7 @@ Qed.
 \bprop[\cite{Kac} p10 Proposition 3.3]
   $n \in \Z$について, 
   \[
-    D_q x^n = [n] x ^{n - 1}
+    D_q (x - a)^n_q = [n] (x - a)^{n - 1}_q
   \]
   が成り立つ. ただし, $n$が整数の場合にも, 自然数のときと同様, $[n]$の定義は
   \[
@@ -1362,7 +1367,7 @@ Theorem Gauss_binomial a n : (forall n, qfact n != 0) ->
   qbinom_pos_poly (-a) n =
   \sum_(0 <= i < n.+1) (qbicoef n i * q ^+ (i * (i - 1))./2 * a ^+ i) *: 'X^(n - i). \end{lstlisting}
 \brmk
-{\tt Gauss\_binomial'}は{\tt q\_Taylorp}において{\tt c = 0}として証明している. {\tt q\_Taylorp}では約分の計算をしているが, 多項式を用いて定義しているため$0$での値を計算できる. 
+{\tt Gauss\_binomial}は{\tt q\_Taylorp}において{\tt c = 0}として証明している. {\tt q\_Taylorp}では約分の計算をしているが, 多項式を用いて定義しているため$0$での値を計算できる. 
 %\begin{lstlisting}{Coq}
 %Proof.
 %  move=> Hfact.
