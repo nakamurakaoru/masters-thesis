@@ -1,4 +1,4 @@
-\documentclass[11pt]{jarticle}
+\documentclass[11pt]{jsreport}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage[a4paper,margin=25mm]{geometry}
 \usepackage{amsmath}
@@ -29,6 +29,7 @@
 \newtheorem{thm}[df]{$\textrm{Theorem}$}
 \newtheorem{axi}[df]{$\textrm{Axiom}$}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% theorems %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newcommand{\bdf}{\begin{shadebox} \begin{df}}
 \newcommand{\edf}{\end{df} \end{shadebox}}
 \newcommand{\bex}{\begin{ex}}
@@ -43,8 +44,18 @@
 \newcommand{\ermk}{\end{rmk}}
 \newcommand{\bthm}{\begin{shadebox} \begin{thm}}
 \newcommand{\ethm}{\end{thm} \end{shadebox}}
+\newcommand{\baxi}{\begin{shadebox} \begin{axi}}
+\newcommand{\eaxi}{\end{axi} \end{shadebox}}
 \newcommand{\bpf}{\begin{proof}}
 \newcommand{\epf}{\end{proof}}
+%% always %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\Lra}{\Longrightarrow}
+\newcommand{\Llra}{\Longleftrightarrow}
+\newcommand{\lra}{\leftrightarrow}
+\newcommand{\ra}{\rightarrow}
+\newcommand{\ol}[1]{{\overline{#1}}}
+\newcommand{\ul}[1]{{\underline{#1}}}
+%% sets %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newcommand{\N}{\mathbb{N}}
 \newcommand{\Z}{\mathbb{Z}}
 \newcommand{\Q}{\mathbb{Q}}
@@ -52,29 +63,29 @@
 \newcommand{\C}{\mathbb{C}}
 \newcommand{\K}{\mathbb{K}}
 \newcommand{\D}{\mathbb{D}}
-\newcommand{\U}{\mathcal{U}}
+%% q-analogue %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newcommand{\qcoe}[2]{\left[\begin{array}{ccc}#1\\#2\end{array}\right]}
+%% algebra %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newcommand{\plim}{{\displaystyle \lim_{\substack{\longleftarrow\\ n}}}}
 \newcommand{\seq}[2]{(#1_{#2})_{#2\ge1}}
 \newcommand{\Zmod}[1]{\Z/p^{#1}\Z}
-\newcommand{\Lra}{\Longrightarrow}
-\newcommand{\Llra}{\Longleftrightarrow}
-\newcommand{\lra}{\leftrightarrow}
-\newcommand{\ra}{\rightarrow}
-\newcommand{\ol}[1]{{\overline{#1}}}
-\newcommand{\ul}[1]{{\underline{#1}}}
 \newcommand{\sem}[1]{[\hspace{-2pt}[{#1}]\hspace{-2pt}]}
 \newcommand{\pros}[1]{\begin{array}{c} \ast \ast\\ \tt{#1} \end{array}}
+%% Jones %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newcommand{\pgm}[1]{{\tt{#1}}\text{-プログラム}}
 \newcommand{\pgms}[1]{{\tt{#1}}\text{-プログラム集合}}
 \newcommand{\dtm}[1]{{\tt{#1}}\text{-データ}}
 \newcommand{\data}[1]{{\tt{#1}}\text{-データ集合}}
 \newcommand{\rtf}[3]{time^{\tt{#1}}_{\tt{#2}}({\tt{#3}})}
+%% Barendiregt %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\lama}{\lambda \! \! \to}
+%% HoTT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\U}{\mathcal{U}}
 \newcommand{\id}{\textrm{id}}
 \newcommand{\refl}{\textrm{refl}}
 \newcommand{\ap}{\textrm{ap}}
 \newcommand{\apd}{\textrm{apd}}
-\newcommand{\pr}[1]{\textrm{pr}_{#1}}
+\newcommand{\pr}{\textrm{pr}}
 \newcommand{\tp}{\textrm{transport}}
 \newcommand{\qinv}{\textrm{qinv}}
 \newcommand{\iseq}{\textrm{isequiv}}
@@ -88,7 +99,10 @@
 \newcommand{\ua}{\textrm{ua}}
 \newcommand{\ide}{\textrm{idtoequiv}}
 \newcommand{\set}[1]{\textrm{isSet({#1})}}
-\newcommand{\lama}{\lambda \! \! \to}
+\newcommand{\fib}{\textrm{fib}}
+\newcommand{\iscont}{\textrm{isContr}}
+\newcommand{\total}{\textrm{total}}
+\newcommand{\idtoeqv}{\textrm{idtoeqv}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
 \title{$q$-類似のCoqによる形式化}
@@ -167,11 +181,13 @@ Coqは型付き$\lambda$計算という理論に基づいている. この$\lamb
 \ref{sec lambda}節で修士1年次に少人数クラスで学習したH.P.Barendregtの{\it Lambda Calculi with Types}\cite{Bar}に沿って, 型付き$\lambda$計算について述べる. 
 \ref{sec coq}節は Coq の概要についてで, 特に\ref{ssec coq_use}節でCoq や mathcompの使い方を具体例を交えて説明するが, より詳細な情報については萩原 学/アフェルト・レナルドの{\it Coq/SSReflect/Mathcomp}\cite{Hag}等を参照のこと. 
 これらの準備のもと, \ref{sec form}節から本題の形式化に入る. \cite{Kac}での定義, 定理を述べた後, その形式化を与え, 必要であれば形式化をするにあたっての注意点を述べることを繰り返すという流れである. 
-証明の方針等は基本的に\cite{Kac}の通りであるが, \ref{ssec poly}節では一部\cite{Kac}から離れ, 多項式として$q$-微分や$q$-二項式を定義しなおして形式化を行っている. これらの新たな定義が多項式に対してのもとの定義を適用したものと一致していることの証明も行っている.
+証明の方針等は基本的に\cite{Kac}の通りであるが, \ref{ssec poly}節では一部\cite{Kac}から離れ, 多項式として$q$-微分や$q$-二項式を定義しなおして形式化を行っている. これらの新たな定義が多項式に対してのもとの定義を適用したものと一致していることの証明も行っている. また, \ref{chap hott}章で少人数クラスで学習した内容についてまとめている. 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{修士論文} \label{chap thesis}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{$q$-類似} \label{sec qana}
-
+本節では, まだ形式化はできていない$q$-Taylor展開以降の\cite{Kac}の内容について, 特に$q$-類似を考える利点の1つであるJacobiの三重積について説明する. 
 $q$-類似とは, $q \to 1$とすると通常の数学に一致するような拡張のことである. 例えば, 自然数$n$の$q$-類似$[n]$は
 \[
   [n] = 1 + q + q^2 + \cdots q ^ {n -1} 
@@ -608,10 +624,10 @@ Qed.
 \begin{lstlisting}{Coq}
 forall R : ringType, right_id 1  *%R
 \end{lstlisting}
-という補題であり, 任意の{\tt ringType}を型にもつ{\tt R}について, {\tt R}上の単位元の性質を表している. ここで, 補題の{\tt R}の型は{\tt rcfType}ではなく{\tt ringType}であるが, 前述の通り{\tt rcfType}は{\tt ringType}の性質を持っているため, 今回の形式化に用いている{\tt rcfType}型の{\tt R}についてもこの補題を使うことができる. 補題名{mul1r}の{\tt r}は{\tt ringType}に対する補題であることを表しており, {\tt mulrBl}, {\tt subrK}, {\tt mulrC}なども同じである. \\
+という補題であり, 任意の{\tt ringType}を型にもつ{\tt R}について, {\tt R}上の単位元の性質を表している. ここで, 補題の{\tt R}の型は{\tt rcfType}ではなく{\tt ringType}であるが, 前述の通り{\tt rcfType}は{\tt ringType}の性質を持っているため, 今回の形式化に用いている{\tt rcfType}型の{\tt R}についてもこの補題を使うことができる. 補題名{\tt mul1r}の{\tt r}は{\tt ringType}に対する補題であることを表しており, {\tt mulrBl}, {\tt subrK}, {\tt mulrC}なども同じである. \\
 また{\tt red\_frac\_r}は, 
 \begin{lstlisting}{Coq}
-forall x y z : R, z != 0 -> x * z / (y * z) = x / y \end{lstlisting}
+forall x y z : R, z != 0 -> (x * z) / (y * z) = x / y \end{lstlisting}
 という自分で用意した補題である(このように直接$q$-類似に関係はしないが, 形式化をするために用意した補題は\cite{coq qana}に q\_tool.v というファイルにまとめている). この補題の本質は$z / z = 1$という約分計算であり, mathcomp の ssralg の補題
 \begin{lstlisting}{Coq}
 divff : forall (F : fieldType) (x : F), x != 0 -> x / x = 1 \end{lstlisting}
@@ -1015,7 +1031,9 @@ $(x - a)^n_q$を定義してきたが, $q$-Taylor展開やGauss's binomial formu
   \item {\tt c\%:P}で定数$c$のみからなる単項式を表す. 
   \item {\tt 'X}で変数$x$のみからなる単項式を表す. 
   \item {\tt p`\_i}で多項式$p$の$i$次の係数を表す. 
-  \item {\tt size p}で多項式$p$の次数$+1$を表す.
+  \item {\tt size p}で多項式$p$の次数$+1$を表す. 
+    {\tt size}が$0$である多項式はゼロ多項式のみであり, 
+    {\tt size}が$1$である多項式は定数項のみからなる式である. 
   \item {\tt p.[x]}で多項式$p$の$x$での値を表す. 
 \end{itemize}
 より詳細な内容については mathcomp の poly.v を参照のこと. \\
@@ -1026,8 +1044,8 @@ Definition scale_var (p : {poly R}):= \poly_(i < size p) (q ^ i * p`_i).
 Definition dqp p := scale_var p - p. \end{lstlisting}
 {\tt scale\_var}は多項式{\tt p}を受け取り, $i$次の係数を$q^i$倍した多項式を返す操作である. また, {\tt dqp}は多項式に対しての$d_q$と同じ結果になることが確認できる(正確には, {\tt dqp}を適用した多項式での{\tt x}での値と${\tt x} \mapsto {\tt p.[x]}$という関数に${\tt d}_{\tt q}$を適用した関数の{\tt x}での値が等しいということである). 
 \begin{lstlisting}{Coq}
-Definition polyderiv (D : (R -> R) -> (R -> R)) (p : {poly R}) := D (fun (x : R) => p.[x]).
-Notation "D # p" := (polyderiv D p) (at level 49).
+Definition ap_op_poly (D : (R -> R) -> (R -> R)) (p : {poly R}) := D (fun (x : R) => p.[x]).
+Notation "D # p" := (ap_op_poly D p) (at level 49).
 Lemma dqp_dqE p x : (dqp p).[x] = (dq # p) x. \end{lstlisting}
 この{\tt dqp}を用いて, 多項式に対する$D_q$を定義する. 
 \begin{lstlisting}{Coq}
@@ -1135,11 +1153,11 @@ Qed. \end{lstlisting}
 	  F(0) = \frac{f(0) - f(0)}{0} = \frac{0}{0}
 	\]
 	となってしまう
-	(Coq では$0/0$は$0$と計算されるが, これでも正しい計算結果とはならない).
+	(Coq では$0/0$は$0$と定義されているが, これでも正しい計算結果とはならない).
 	この問題が起きるのはもともとの{\tt dq}を関数の引数に対して各点ごとに定義しているから
 	であり, 多項式の係数を変化させることで定義している{\tt dqp}では$q = 0$でも
 	問題が起きない. よってこの{\tt dqp}を用いている{\tt Dqp}および{\tt Dqp'}については
-	$q = 0$かどうかにかかわらず高階の操作を定義できる. 
+	$q = 0$かどうかにかかわらず高階$q$-微分を定義できる. 
 \end{enumerate}
 %\brmk
 %この{\tt Lemma}で注意すべき点は, {\tt 'X \%/ 'X = 1\%:P}という計算をする際に特に条件が必要ないことである. Coqで約分の計算を行う際には分母が$0$でないという条件が必要だが, {\tt 'X}は単項式であるため, ゼロ多項式とは異なる. よって自動的に条件がみたされることになる. 
@@ -1242,101 +1260,6 @@ $f(x)$を, $N$次の実数係数多項式とする. 任意の$c\in\R$に対し,
 \bpf
 $\frac{(x-a)^n_q}{[n]!}$が, $a$, $D_q$に対してTheorem \ref{general_Taylor}の三条件をみたすことを確かめればよい. (i), (ii)は$(x-a)^n_q$の定義から, (iii)はProposition\ref{Dq_qbinom_nonneg}から分かる. 
 \epf
-%この定理を形式化したいが, 型が合わないという問題が発生する. 実際, {\tt general\_Taylor}の型を調べてみると, 
-%\begin{lstlisting}{Coq}
-%general_Taylor
-%     : forall (D : {poly R} -> {poly R}) (n : nat) (P : nat -> {poly R}) (f : {poly R}) (a : R), ...\end{lstlisting}
-%となっているが, ${\tt D}_{\tt q}$, {\tt q\_binom}の型は
-%\begin{lstlisting}{Coq}
-%Dq : (R -> R) -> R -> R
-%
-%qbinom_pos : R -> nat -> R -> R \end{lstlisting}
-%であり, 型が合わず代入できない. そこで, この問題を回避するため, 多項式に対しての$q$-微分と
-%多項式としての$(x - a)^n_q$を改めて定義する. まず, $q$-微分について, 
-%\begin{lstlisting}{Coq}
-%Definition scale_var (p : {poly R}):= \poly_(i < size p) (q ^ i * p`_i).
-%Definition dqp p := scale_var p - p.
-%Definition Dqp p := dqp p %/ dqp 'X.
-%\end{lstlisting}
-%と定義する. 
-%\begin{itemize}
-%  \item {\tt p`\_i}は多項式{\tt p}の{\tt i}次の係数を表すため, {\tt scale\_var}は多項式{\tt p}
-%    を受け取り, $i$次の係数を$q^i$倍した多項式を返す操作である.
-%  \item もとの$d_q$の定義は$f(qx) - f(x)$であるが, 多項式を入力して多項式を返す型で定義
-%    したいため, 値を入力することができないので, この形で定義した. 多項式に対しては$d_q$と同じ
-%    結果になることが確認できる(正確には, {\tt dqp}を適用した多項式での{\tt x}での値と, 
-%    ${\tt x} \mapsto {\tt p.[x]}$という関数に${\tt d}_{\tt q}$を適用した関数の{\tt x}での値が
-%    等しいということである). 
-%    \begin{lstlisting}{Coq}
-%Definition polyderiv (D : (R -> R) -> (R -> R)) (p : {poly R}) :=
-%  D (fun (x : R) => p.[x]).
-%Notation "D # p" := (polyderiv D p) (at level 49).
-%Lemma dqp_dqE p x : (dqp p).[x] = (dq # p) x.
-%    \end{lstlisting}
-%  \item {\tt Dqp}の定義について, {\tt p \%/ p'}は多項式{\tt p}を多項式{\tt p'}で割った商を
-%    表しており, {\tt 'X}は$x$のみからなる単項式である. 実際に多項式に対して{\tt Dqp}を計算
-%    すると, {\tt dqp}の定義から, {\tt dqp p}は定数項が打ち消しあい, また{\tt dqp 'X}は
-%    {\tt (q - 1) * 'X}となるので割り切れるはずである. 実際, 
-%    \begin{lstlisting}{Coq}
-%Lemma Dqp_ok p : dqp 'X %| dqp p.
-%    \end{lstlisting}
-%    が示せる({\tt p' \%| p}で{\tt p}が{\tt p'}で割り切れることを表す). 
-%\end{itemize}
-%今後は扱いやすさのため, {\tt `X}で約分した形
-%\begin{lstlisting}{Coq}
-%Definition Dqp' (p : {poly R}) := \poly_(i < size p) (qnat (i.+1) * p`_i.+1).
-%\end{lstlisting}
-%を用いる. このとき, {\tt Dqp}と{\tt Dqp'}が等しいことも示せる. 
-%\begin{lstlisting}{Coq}
-%Lemma Dqp_Dqp'E p : Dqp p = Dqp' p.
-%\end{lstlisting}
-%\brmk
-%この{\tt Lemma}で注意すべき点は, {\tt 'X \%/ 'X = 1\%:P}という計算をする際に特に条件が必要ないことである. Coqで約分の計算を行う際には分母が$0$でないという条件が必要だが, {\tt 'X}は単項式であるため, ゼロ多項式とは異なる. よって自動的に条件がみたされることになる. 
-%一方, {\tt Dqp}と{\tt Dq}が等しいことを示そうとすると, 
-%\begin{lstlisting}{Coq}
-%Lemma Dqp'_DqE p x : x != 0 -> (Dqp' p).[x] = (Dq # p) x.
-%\end{lstlisting}
-%というように$x \neq 0$という条件が必要になる. これは多項式の割り算ではなく実数の値の割り算での約分を計算する必要があるからである.
-%\ermk
-%次に, $(x - a)^n_q$を多項式として以下のように定義しなおす. 
-%\begin{lstlisting}{Coq}
-%Fixpoint qbinom_pos_poly a n := match n with
-%  | 0 => 1
-%  | n.+1 => (qbinom_pos_poly a n) * ('X - (q ^ n * a)%:P)
-%  end. \end{lstlisting}
-%この多項式の{\tt x}での値は元の定義の{\tt qbinom\_pos}と等しくなる. 
-%\begin{lstlisting}{Coq}
-%Lemma qbinom_posE a n x :
-%  qbinom_pos a n x = (qbinom_pos_poly a n).[x].
-%\end{lstlisting}
-%この{\tt Dqp}と{\tt qbinom\_pos\_poly}に対してもProposition \ref{Dq_qbinom_nonneg}と同じことが成り立つ. 
-%\begin{lstlisting}{Coq}
-%Lemma Dqp'_qbinom_poly a n :
-%  Dqp' (qbinom_pos_poly a n.+1) = (qnat n.+1) *: (qbinom_pos_poly a n).
-%\end{lstlisting}
-%\brmk
-%  基本的な証明の方針は\cite{Kac}と同じだが, {\tt Dq\_prod'}に対応する補題の証明のため, 
-%  {\tt scale\_var}が積について分解できること, つまり
-%  \begin{lstlisting}{Coq}
-%Lemma scale_var_prod (p p' : {poly R}) : scale_var (p * p') = scale_var p * scale_var p'. \end{lstlisting}
-%  を示しているが, 証明は
-%  \begin{lstlisting}{Coq}
-%Proof.
-%  pose n := size p.
-%  have : (size p <= n)%N by [].
-%  clearbody n.
-%  have Hp0 : forall (p : {poly R}), size p = 0%N ->
-%    scale_var (p * p') = scale_var p * scale_var p'.
-%    move=> p0 /eqP.
-%    rewrite size_poly_eq0.
-%    move/eqP ->.
-%    by rewrite mul0r scale_varC mul0r.
-%  elim: n p => [|n IH] p Hsize.
-%  ...
-%  Qed. \end{lstlisting}
-%  というように, 多項式の{\tt size}に関する帰納法を使いたいため, {\tt (size p <= n)\%N}
-%  という仮定を加えている. 
-%\ermk
 前節で準備した{\tt Dqp}, {\tt qbinom\_pos\_poly}を用いて Theorem \ref{q_Taylor}を形式化する. 
 \begin{lstlisting}{Coq}
 Fixpoint qfact n := match n with
@@ -1435,13 +1358,9 @@ Lemma q_Taylorp_pow n : (forall n, qfact n != 0) ->
   'X^n = \sum_(0 <= i < n.+1) (qbicoef n i *: qbinom_pos_poly 1 i).
 
 Definition qbicoef n j := qfact n / (qfact j * qfact (n - j)).
-Theorem Gauss_binomial' a n : (forall n, qfact n != 0) ->
-  qbinom_pos_poly (-a) n =
-  \sum_(0 <= i < n.+1) (qbicoef n i * q ^+ ((n - i) * (n - i - 1))./2 * a ^+ (n - i)) *: 'X^i.
 Theorem Gauss_binomial a n : (forall n, qfact n != 0) ->
   qbinom_pos_poly (-a) n =
   \sum_(0 <= i < n.+1) (qbicoef n i * q ^+ (i * (i - 1))./2 * a ^+ i) *: 'X^(n - i). \end{lstlisting}
-{\tt Gauss\_binomial'}は{\tt j}を{\tt n - j}に置き換える前の等式である. 
 \brmk
 {\tt Gauss\_binomial'}は{\tt q\_Taylorp}において{\tt c = 0}として証明している. {\tt q\_Taylorp}では約分の計算をしているが, 多項式を用いて定義しているため$0$での値を計算できる. 
 %\begin{lstlisting}{Coq}
@@ -1466,6 +1385,470 @@ Theorem Gauss_binomial a n : (forall n, qfact n != 0) ->
 %{\tt q\_Taylor}には$c \neq 0$という前提があるため, この証明には使えない. 
 \ermk
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{少人数クラスまとめ} \label{chap hott}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{はじめに}
+本章では, \cite{hott}を教科書にして修士2年次に少人数クラスで学習した Homotopy Type Theory (HoTT) についてまとめる. HoTT とは, 
+\begin{align*}
+  \text{$a$が型$A$の要素である} &\leftrightarrow \text{$a$が空間$A$の点である} \\
+  \text{$a = b$である} &\leftrightarrow \text{点$a$と点$b$の間にパスが存在する}
+\end{align*}
+というように, 型理論に対してホモトピー的解釈を与えたものである. \ref{sec ua}節で HoTT の大きな特徴の一つである, univalence axiom について説明する. 大雑把にいえば, univalence axiom は「型$A$と型$B$が同型ならば, $A$と$B$は等しい」という公理である. この意味を正確にとらえるため, 型同士の等しさや同型を定義していく. また, いくつかの定義や補題を準備した後, univalence axiom から関数の外延性がしたがうことを\ref{sec funext}節で確認する. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{型から型を作る} \label{sec inductive}
+$A$と$B$の2つの型が与えられたとき, そこから関数型$A \to B$が構成できる. このとき, 
+\begin{align*}
+  f : A \to B,\ a : A &\Lra f(a) : B \\
+  a : A,\ b(x) : B &\Lra \lambda a. b : A \to B 
+\end{align*}
+である. より一般に, 型$A$と$A$上の型族$B \to \U$が与えられれば($\U$はユニバース), 依存関数型$\prod_{a : A} B(a)$が構成でき, 
+\begin{align*}
+  f :\prod_{a : A} B(a),\ a : A &\Lra f(a) : B(a) \\
+  a : A,\ b(x) : B(x) &\Lra \lambda a. b : \prod_{a : A} B(a) 
+\end{align*}
+である. さらに, 既存の型から新たな型を作るやり方として, 構成規則, 導入規則, 除去規則, 計算規則の4つを与える帰納的な方法がある. 例えば, 依存和型$\sum_{x : A} B(x)$は, 
+\begin{itemize}
+  \item 構成規則：$A : \U$, $B : A \to \U \Lra \sum_{x : A} B(x)$
+  \item 導入規則：$a : A$, $b : B(a) \Lra (a, b) : \sum_{x : A} B(x)$
+  \item 除去規則：ind$_{\sum_{x : A} B(x)} : \prod_{C : (\sum_{x : A} B(x)) \to \U} 
+                               \left(\prod_{a : A} \prod_{b : B(a)} C((a, b)) \right) \to 
+                                      \prod_{w : \sum_{x : A} B(x)} C(w)$
+  \item 計算規則：ind$_{\sum_{x : A} B(x)} (C, g, (a, b)) :\equiv g(a)(b)$
+\end{itemize}
+で定義できる. 除去規則は, 「任意の$w : \sum_{x : A} B(x)$について$C(w)$を示したければ, 任意の$a : A$, $b : B(a)$について$C((a, b))$を示せばよい」と読むことができる. 
+ここで, Curry-Howard 同型に基づいて考えると, 「ある要素$a$とある要素$b$が等しい」という命題は, なにかしらの型と対応するはずである. よってその型 identity type を, 
+\begin{itemize}
+  \item 構成規則：$A : \U \Lra \_ =_A \_ : \U$
+  \item 導入規則：refl$_a : \prod_{a : A} (a =_A a)$
+  \item 除去規則：ind$_{=_A} : \prod_{\left( C : \prod_{(x, y : A)} (x =_A y) \to \U \right)} 
+                                       \left( \prod_{(x : A)} C(x, x, {\rm refl}_x) \right) \to
+                                       \prod_{(x, y : A)} \prod_{(p : x =_A y)} C(x, y, p)$
+  \item 計算規則：ind$_{=_A} (C, c, x, x, {\rm refl}_x) : \equiv c(x)$
+\end{itemize}
+と定義する. 除去規則は, 依存和型のときと同様に考えると, 「任意の$x$, $y : A$, $x = y$について$C(x, y, p)$を示したければ, 任意の$x : A$について$C(x, x, \refl{x})$を示せばよい」となる. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{型の同型}
+ここで, 型と型の間の同型を定義したい. まず, 関数の間のホモトピーを定義する. 
+\bdf[\cite{hott} Definition 2.4.1]
+  $A : \U$, $P : A \to \U$とする. $f$, $g : \prod_{x : A} P(x)$に対して, 
+  \[
+    (f \sim g) :\equiv \prod_{x : A} (f(x) = g(x))
+  \]
+  と定める. 
+\edf
+次に, 「逆写像」を定義する. 
+\bdf[\cite{hott} Definition 2.4.6]
+  $A$, $B : \U$, $f : A \to B$とする. このとき, $f$の quasi-inverse qinv($f$)を, 
+  \[
+    \qinv(f) :\equiv \sum_{g : B \to A} ((f \circ g \sim \id_B) \times
+                                                   (g \circ f \sim \id_A))
+  \]
+\edf
+例えば, id$_A$の quasi-inverse はid$_A$自身である. さらに, この qinv を用いて, isequiv を, 
+\begin{itemize}
+  \item qinv($f$) $\to$ isequiv($f$)
+  \item isequiv($f$) $\to$ qinv($f$)
+  \item $e_1$, $e_2 :$isequiv($f$) ならば $e_1 = e_2$
+\end{itemize}
+をみたすものとして定義したい. ここでは, 
+\[
+  \iseq(f) :\equiv \left( \sum_{g : B \to A} (f \circ g \sim \id_B) \right) \times
+                           \left( \sum_{h : B \to A} (h \circ f \sim \id_A) \right) \quad
+                           \text{(\cite{hott} p73 (2.4.10))}
+\]
+と定めることにする. isequiv を使って型同士の同型を定義する. 
+\bdf[\cite{hott} p73 (2.4.11)]
+  $A$, $B : \U$について, 
+  \[
+    A \simeq B :\equiv \sum_{f : A \to B} \iseq(f)
+  \]
+  と定める. 
+\edf
+型の同型については, 例えば以下のような例がある. 
+\bex[\cite{hott} Lemma 2.4.12]
+$A$, $B$, $C : \U$について, 
+\begin{itemize}
+  \item $A \simeq A$
+  \item $A \simeq B \to B \simeq A$
+  \item $A \simeq B \to B \simeq C \to A \simeq C$
+\end{itemize}
+が成り立つ. 
+\eex
+\bex[\cite{hott} Exercise 2.10] \label{ex sigA}
+  $\sum$型は「結合的」である. つまり任意の型$A$, 型族$B : A \to \U$, 
+  型族上の型族$C : (\sum_{x : A} B(x)) \to \U$に対して, 
+  \[
+    \left( \sum_{x : A} \sum_{y : B(x)} C((x, y))\right) \simeq
+    \left( \sum_{p : \sum_{x : A} B(x)} C(p) \right)
+  \]
+  が成り立つ. 
+\eex
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Univalence axiom} \label{sec ua}
+これまでに定義した$=$と$\simeq$を用いて, univalence axiom の主張を正しく述べる. まず, 
+\[
+  \textrm{idtoeqv} : \prod_{A, B : \U} (A =_{\U} B) \to (A \simeq B)
+    \quad (\text{\cite{hott} p89 (2.10.2)})
+\]
+を定める. この関数が存在することは, path induction よりわかる(\cite{hott} Lemma 2.10.1). このidtoeqvに対して, 
+\begin{shadebox}
+\begin{axi}[\cite{hott} Axiom 2.10.3]
+  \[
+    \textrm{ua} : \prod_{A, B : \U} \iseq(\textrm{idtoeqv}(A, B))
+  \]
+\end{axi}
+\end{shadebox}
+が univalence axiom である. とくに, この公理を仮定すれば, 
+\[
+  (A =_{\U} B) \simeq (A \simeq B)
+\]
+が成り立つ. \ref{sec inductive}章のときのように, $\ua$や$\ide$を$A =_{\U} B$という型を構成する規則だと考えれば, 
+\begin{itemize}
+  \item 導入規則：$A : \U,\ B: \U \Lra \ua : (A \simeq B) \to (A =_{\U} B)$
+  \item 除去規則：$\ide \equiv \tp^{X \mapsto X} : (A =_{\U} B) \to (A \simeq B)$
+  \item (propositional)計算規則：$\ide (\ua (f), x) = f(x)$
+  \item (propositional)一意性：任意の$p : A = B$について, $p = \ua (\ide (p))$
+\end{itemize}
+となる($\tp$の定義は\cite{hott} p72 Lemma 2.3.1). univalence axiom をみたすようなユニバース$\U$を univalent であるという.  
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{関数の外延性} \label{sec funext}
+関数$f$, $g$について, 
+\[
+  f = g \lra \text{任意の$f$, $g$の定義域の要素$x$に対して, $f(x) = g(x)$}
+\]
+という関数の外延性の公理について述べる. 正確には, まず path induction から, 
+依存関数$f$, $g : \prod_{x : A} B(x)$に対して
+\[
+  \happ : (f = g) \to (f \sim g) \left( \prod_{x : A} (f(x) = g(x))\right)
+    \quad (\text{\cite{hott} p86 (2.9.2)})
+\]
+という関数を定義できる. このとき, 
+\baxi[\cite{hott} Axiom 2.9.3]
+  任意の$A$, $B$, $f$, $g$について, $\happ$は equivalence である
+\eaxi
+を関数の外延性と呼ぶ. この公理から$\happ$の quasi-inverse
+\[
+  \textrm{funext} : \left( \prod_{x : A} (f(x) = g(x)) \right) \to (f = g)
+\]
+の存在が従う. この関数のことを関数の外延性と呼ぶこともある. univalence axiom のときと同じように考えると,
+\begin{itemize}
+  \item 導入規則：$\fune$
+  \item 除去規則：$\happ$
+  \item (propositional)計算規則：$\happ (\fune (h), x) = h(x)
+    \quad \left(h : \prod_{x : A} (f(x) = g(x)) \right)$
+  \item (propositional)一意性：$p = \fune (x \mapsto \happ(p, x)) \quad (p : f = g)$
+\end{itemize}
+となる. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{可縮, ファイバー}
+この章と次の章では, univalence axiom から関数の外延性が従うことを示すために必要な定義や補題の準備をする. まずは, 型が可縮であるということを定義する. 
+\bdf[\cite{hott} Definition 3.11.1]
+  $A$を型とする. 中心と呼ばれる$a : A$が存在して, 任意の$x : A$に対して$a = x$をみたす
+  とき, $A$は可縮(contractible)であるという. このことを表す型$\iscont (A)$を, 
+  \[
+    \iscont (A) :\equiv \sum_{a : A} \prod_{x : A} (a = x)
+  \]
+  と定める. 
+\edf
+次に, ホモトピー論ではホモトピーファイバーに対応する概念を定める. 
+\bdf[\cite{hott} Definition 4.2.4]
+  関数$f : A \to B$の点$y : B$の上でのファイバーを
+  \[
+    \fib_f(y) :\equiv \sum_{x : A} (f(x) = y)
+  \]
+  と定める. 
+\edf
+このファイバーを用いて, 関数の可縮性を定義する. 
+\bdf[\cite{hott} Definition4.4.1]
+  関数$f : A \to B$が可縮であるとは, 任意の$y : B$に対して$\fib_f{y}$が可縮であることである. 
+  このことを表す型$\iscont (f)$を, 
+  \[
+    \iscont (f) :\equiv \prod_{y : B} \iscont (\fib_{f}(y))
+  \]
+  と定める. 
+\edf
+このように定義した$\iscont (f)$について, 
+\[
+  \iscont (f) \simeq \iseq (f)
+\]
+が成り立つ(\cite{hott} p138 4.5節参照). よって, ある関数が equivalence であることを示すには, 可縮であることを示せば十分である. 可縮性に関するものでよく使う補題として, 以下のようなものがある. 
+\blem[\cite{hott} Lemma 3.11.8] \label{lem sigeq_cont}
+  任意の$A$, $a : A$について, $\sum_{x : A} (a = x)$は可縮である
+\elem
+\blem[\cite{hott} Lemma 3.11.9] \label{lem sig_eq}
+  $P : A \to \U$を型族とする. このとき, 以下の2つが成り立つ. 
+  \begin{enumerate}
+    \item 各$P(x)$が可縮である, $\sum_{x : A} P(x) \simeq A$
+    \item $A$が$a$を中心として可縮であるとき, $\sum_{x : A} P(x) \simeq P(a)$
+  \end{enumerate}
+\elem
+この2つの補題と univalence axiom から示せることとして,  
+\blem[\cite{hott} Lemma 4.8.1] \label{lem fib_pr_eq}
+  任意の型族$B : A \to \U$について, $\pr_1 : \sum_{x : A} B(x) \to A$の$a : A$上での
+  ファイバーは$B(a)$と同型である, つまり, 
+  \[
+    \fib_{\pr_1} (a) \simeq B(a)
+  \]
+  が成り立つ. 
+\elem
+\bpf
+  \begin{align*}
+    \fib_{\pr_1} (a) &\equiv \sum_{u : \sum_{x : A} B(x)} \pr_1 (u) a \\
+                        &\simeq \sum_{x : A} \sum_{b : B(x)} (x = a)
+                          \quad \text{(by Example \ref{ex sigA})} \\
+                        &\simeq \sum_{x : A} \sum_{b : B(x)} \sum_{p : x = a} \1 \\
+                        &\simeq \sum_{x : A} \sum_{p : x = a} \sum_{b : B(x)} \1 \\ 
+                        &\simeq \sum_{x : A} \sum_{p : x = a} B(x) \\
+                        &\simeq B(a)
+                    \quad \text{(by Example \ref{ex sigA}, Lemma \ref{lem sigeq_cont}, 
+                                          Lemma \ref{lem sig_eq})}
+  \end{align*}
+\epf
+がある. この補題は, 写像はファイブレーションと同型であるというホモトピー論での基本的な結果に対応している.  
+最後に, ファイバーごとの equivalence は全空間(total space)の equivalence という言葉で特徴付けられることを示す. 
+%最後に、ファイバーワイズ同値が全空間の同値で特徴付けられることを示す。
+%2.3 節で、型族 P : A → U は全空間 ∑(x:A) P(x) を持つ A 上の fibration と見なすことができ、その fibration は射影 pr1 : ∑(x:A) P(x) → A であることを説明する。この観点から、二つの型族 P, Q : A → U が与えられたとき、関数 f : ∏(P(x) → Q(x)) をファイバーワイズ写像またはファイバーワイズ変換と呼ぶことがある。
+%このような写像は全空間上の関数を誘導する。
+\bdf[\cite{hott} Definition 4.7.5]
+  型族$P$, $Q : A \to \U$と依存関数$f : \prod_{x : A} P(x) \to Q(x)$
+  (このような関数を fiberwise map または fiberwise transformation と呼ぶ)が与えられたとき, 
+  \[
+    \total (f) :\equiv \lambda w.\ (\pr_1 w, f(\pr_1 w, \pr_2 w)) :
+      \sum_{x : A} P(x) \to \sum_{x : A} Q(x)
+  \]
+  と定める. 
+\edf
+\bthm[\cite{hott} Theorem 4.7.6] \label{thm_total}
+  $f$が$A$上の型族$P$と$Q$の間の fiberwise transformation 
+  (つまり$f : \prod_{x : A} P(x) \to Q(x)$)であり, $x : A$と$v : Q(x)$が与えられたとする. このとき, 
+  \[
+    \fib_{\total(f)} ((x, v)) \simeq \fib_{f(x)} (v)
+  \]
+  である. 
+\ethm
+\bpf
+  \begin{align*}
+    \fib_{\total(f)} ((x, v))
+    &\equiv \sum_{w : \sum_{x : A} P(x)} (\pr_1 w, f(\pr_1 w, \pr_2 w)) = (x, v)\\
+    &\simeq \sum_{a : A} \sum_{u : P(a)} (a, f(a, u)) = (x, v)
+      \quad \text{(by Example \ref{ex sigA})}\\
+    &\simeq \sum_{a : A} \sum_{u : P(a)} \sum_{p : a = x} p_* (f(a, u)) = v
+      \quad \text{(by \cite{hott} Theorem 2.7.2)}\\
+    &\simeq \sum_{a : A} \sum_{p : a = x} \sum_{u : P(a)} p_* (f(a, u)) = v\\
+    &\simeq \sum_{g : \sum_{a : A} a = x}
+                  \left( \sum_{u : P(\pr_1 (q))} (\pr_2 (q))_* (f (pr_1(q), u) = v \right)
+      \quad \text{(by Example \ref{ex sigA})}\\
+    &\simeq \sum_{u : P(x)} (\refl_x)_* (f(x, u) = v)
+     \quad \text{(by Lemma \ref{lem sigeq_cont} and
+       Lemma \ref{lem sig_eq} (ii) as center $\equiv (x, \refl_x)$)}\\
+    &\simeq \sum_{u : P(x)} f (x, u) = v
+  \end{align*}
+\epf
+fiberwise transformation $f : \prod_{x : A} P(x) \to Q(x)$が fiberwise equivalence であるということを, 任意の$x : A$について$f(x) : P(x) \to Q(x)$が equivalence であることと定めると, 以下が成り立つ. 
+\bthm[\cite{hott} Theorem 4.7.7] \label{thm fibeq_totaleq}
+  $f$を$A$上の型族$P$と$Q$の間の fiberwise transformation とする. このとき, 
+  $f$が fiberwise equivalence であることと$\total (f)$が equivalence であることは同値である
+\ethm
+\bpf
+  \begin{align*}
+    f \text{が fiberwise equivalence} &\equiv \prod_{x : A} \iseq (f(x)) \\
+                                                &\lra \prod_{x : A} \iscont (f(x)) \\
+                                     &\equiv \prod_{x : A} \prod_{v : Q(x)} \iscont (\fib_{f(x)} (v)) \\
+                           &\simeq \prod_{x : A} \prod_{v : Q(x)} \iscont (\fib_{\total(f)} ((x, v)))
+                             \quad \text{(by Theorem \ref{thm_total})} \\
+                           &\lra \prod_{w : \sum_{x : A} Q(x)} \iscont (\fib_{\total(f)} (w)) \\
+                           &\equiv \iscont (\total(f)) \\
+                           &\lra \iseq (\total(f))
+  \end{align*}
+\epf
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{レトラクト} \label{sec retract}
+この章では, 型のレトラクトと関数のレトラクトをそれぞれ定義し, 後の章で使う補題を紹介する. 
+まず, 型のレトラクトと定義は以下のとおりである. 
+\bdf[\cite{hott} p125]
+  型$A$, $B$について, 2つの関数レトラクション$r : A \to B$とセクション$s : B \to A$が存在し, 
+  更にホモトピー
+  \[
+    \epsilon : \prod_{y : B} (r(s(y)) = y)
+  \]
+  が存在するとき, $B$は$A$のレトラクトであるという. 
+\edf
+このレトラクトに対して, 次の補題が成り立つ. 
+\blem[\cite{hott} Lemma 3.11.7] \label{lem ret_cont}
+  $B$が$A$のレトラクトであり, かつ$A$が可縮であるとき, $B$も可縮である. 
+\elem
+次に, 関数のレトラクトを定義する. 
+\bdf[\cite{hott} Definition 4.7.2] \label{def_retract}
+  関数$g : A \to B$が関数$f : X \to Y$のレトラクトであるとは, 4つのホモトピー
+  \begin{align*}
+    &R : r \circ s \sim \id_{A} \\
+    &R' : r' \circ s' \sim \id_{b} \\
+    &L : f \circ s \sim s' \circ g \\
+    &K : g \circ r \sim r' \circ f
+  \end{align*}
+  が存在するような$r : X \to A$, $s : A \to X$, $r' : Y \to B$, $s' : B \to Y$が存在し, 更に
+  任意の$a : A$に対して, パス
+  \[
+    H(a) : K(s(a)) \cdot r'(L(a)) = g(R(a)) \cdot R'(g(a)) ^ {-1}
+  \]
+  が存在することをいう. 
+\edf
+この定義において, ホモトピー$R$, $R'$はそれぞれ$A$が$X$のレトラクト, $B$が$Y$のレトラクトであるという条件である. 
+また, 型についてのレトラクションは, 上の定義において$B \equiv Y \equiv \1$としたときの特別な場合である. 関数のレトラクトについて, まず次のことが成り立つ. 
+\blem[\cite{hott} Lemma 4.7.3] \label{lem_close_retract}
+  関数$g : A \to B$が関数$f : X \to Y$のレトラクトであるならば, $\fib_g(b)$は$\fib_f(s'(b))$の
+  レトラクトである. ただし, $s'$は Definition \ref{def_retract}のものとする. 
+\elem
+\bpf
+  証明の概略を述べる. 
+  Definition \ref{def_retract} のとおりに記号を定める. 任意の$b : B$に対して, 
+  \begin{align*}
+    &\varphi_b : \fib_g (b) \to \fib_f (s'(b)), \quad
+      \varphi (a, p) :\equiv (s(a), L(a) \cdot s'(p)) \\
+    &\psi_b : \fib_f(s'(b)) \to \fib_g (b), \quad
+      \psi (x, q) :\equiv (r(x), K(x) \cdot r'(q) \cdot R'(b))
+  \end{align*}
+  と定義したとき, ($\sum$の induction から)任意の$(a, p) : \fib_g (b)$に対して
+  $\psi_b \varphi (a, p) = (a, p)$が成り立つ, つまり
+  \[
+    \prod_{b : B} \prod_{a : A} \prod_{p : g(a) = b} \psi_b \varphi (a, p) = (a, p)
+  \]
+  を示せば良い. 詳細は\cite{hott} p140 参照のこと. 
+%  初めの2つの$\prod$を入れ替え, $p$についての path induction から
+%  \[
+%    \prod_{a :A} \psi_{g(a)} (\varphi_{g(a)} (a, \refl_{g(a)})) = (a, \refl_{g(a)})
+%  \]
+%  となる. ここで, \cite{hott} Theorem 2.7.2 を用いると, $r(s(a)) = a$のパスとして$R(a)$がとれることから, 
+%  \[
+%    R(a)_* (K(s(a)) \cdot r'(L(a)) \cdot R'(g(a))) = \refl_{g(a)}
+%  \] 
+%  を示せばよいことになる. このとき, $R(a)_* \equiv \tp^{x \mapsto g(x) = g(a)} (R(a), -)$
+%  であるので, Theorem 2.11.3 より, 定数関数の ap は $\refl$になることに注意すれば, 
+%  \[
+%    R(a)_* (K(s(a)) \cdot r'(L(a)) \cdot R'(g(a))) =
+%    g(R(a))^{-1} \cdot K(s(a)) \cdot r'(L(a)) \cdot R'(g(a))
+%  \]
+%  となる. 
+\epf
+この補題から, equivalence とレトラクトに関する補題が従う. 
+\bthm[\cite{hott} Theorem 4.7.4]
+  $g$が equivalence な$f$のレトラクトであれば, $g$も equivalence である. 
+\ethm
+\bpf
+  Lemma \ref{lem_close_retract} より, $g$の任意のファイバーは$f$のファイバーのレトラクトで
+  あり, $\iseq (f) \lra \iscont (f)$と Lemma \ref{lem ret_cont} から$\iseq (g)$が分かる. 
+\epf
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Univalence implies function extensionality} \label{sec funext}
+最後に, univalence axiom から関数の外延性が導けることを示す.
+%よって, この節では関数の外延性を仮定しない. 
+証明は, まず univalence axiom から弱い関数の外延性が導けることを示し, 次に弱い関数の外延性から通常の関数の外延性が従うことを示すという2段階で行われる. 
+$\U$をユニバースとし, どこで univalent を仮定しているかを明記することにする. 
+\bdf[\cite{hott} Lemma 4.9.1]
+  弱い関数の外延性の公理を, 任意の$A$上の型族$B : A \to \U$に対して
+  \[
+    \left( \prod_{x : A} \iscont(B(x)) \right) \to \iscont \left( \prod_{x :A} B(x) \right)
+  \]
+  が成り立つことと定義する. 
+\edf
+次の補題は関数の外延性を仮定すればすぐに証明できるが, 関数の外延性を仮定しなくても univalence axiom から証明できるのがポイントである. 
+\blem[\cite{hott} Lemma 4.9.2] \label{lem XA_eq_XB}
+  $\U$が univalent であると仮定する. 任意の$A$, $B$, $X : \U$と任意の$e : A \equiv B$
+  に対して, 
+  \[
+    (X \to A) \simeq (X \to B)
+  \]
+  の同型射は, $(e(\text{の同型射}) \circ -)$で与えられる. 
+\elem
+\bpf
+  ある$p : A = B$について$e = \idtoeqv (p)$と仮定してよい. 
+  よって, path induction より $B \equiv A$, $p \equiv \refl_{A}$とすれば, 
+  $e = \idtoeqv(\refl_A) = \id_A$となる. このとき, $(e \circ -)$は$(\id_A \circ -)$となり, これは
+  $X \to A$上の$\id$であるので, equivalence である. 
+\epf
+\bcor[\cite{hott} Corollary 4.9.3] 
+  $P : A \to \U$を可縮な型の族, つまり$\prod_{x : A} \iscont(P(x))$とする. このとき, 
+  射影$\pr_1 : (\sum_{x : A} P (x)) \to A$は equivalence である.
+  更に, $\U$が univalent であれば, 
+  \[
+    (\pr_1 \circ -) : \left( A \to \sum_{x : A} P(x) \right) \simeq (A \to A)
+  \]
+  である. 
+\ecor
+\bpf
+  前半について, Lemma {\ref{lem fib_pr_eq}} から, $x : A$について, $\fib_{\pr_1} (x) \equiv P(x)$である. 
+  $P$が可縮な型の族なので, $\iscont(\pr_1)$が成り立つ.
+  後半については, Lemma \ref{lem XA_eq_XB} よりわかる. 
+\epf
+上記の$\alpha \equiv (\pr_1 \circ -)$のホモトピーファイバーは可縮であるため, 特に$\id_A$上でも可縮, つまり$\iscont(\fib_{\alpha} (\id_A))$である. よって, $\prod_{x : A} P(x)$が
+$\fib_{\alpha} (\id_A)$のレトラクトであることを示せば, 弱い関数の外延性が univalence axiom から従うことになる. 
+\bthm[\cite{hott} Theorem 4.9.4]
+  $\U$が univalent であるとし, $P : A \to \U$を可縮な型の族とする. 
+  $\alpha : \left( A \to \sum_{x : A} P(x) \right) \equiv (A \to A)$とすると, 
+  $\prod_{x : A} P(x)$は$\fib_{\alpha} (\id_A)$のレトラクトである. つまり, $\prod_{x : A} P(x)$
+  は可縮となるので, univalence axiom から弱い関数の外延性の公理が従う. 
+\ethm
+\bpf
+  関数$\varphi : (\prod_{x : A} P(x)) \to \fib_{\alpha} (\id_A)$, 
+  $\psi : \fib_{\alpha} (\id_A) \to \prod_{x : A} P(x)$をそれぞれ, 
+  \begin{align*}
+    \varphi (f) :\equiv (\lambda x.\ (x, f(x)), \refl_{id_A}) \\
+    \psi (g, p) :\equiv \lambda x.\ \happ (p, x)_* (\pr_2(g(x)))
+  \end{align*}
+  と定める. このとき, 
+  \begin{align*}
+    \psi (\varphi (f)) &\equiv \lambda x.\ \happ (\refl_{id_A}, y)_* (\pr_2(x, f(x))) \\
+                           &\equiv \lambda x.\ \refl_* (f(x)) \\
+                           &\equiv \lambda x.\ f(x) \\
+                           &= f
+  \end{align*}
+  より成り立つ. 
+\epf
+\bthm[\cite{hott} Theorem 4.9.5] \label{thm weakfe_to_fe}
+  弱い関数の外延性から通常の関数の外延性が従う. 
+\ethm
+\bpf
+示したいことは
+  \[
+    \prod_{A : \U} \prod_{P : A \to P} \prod_{f, g : \prod_{x : A} P(x)} \iseq (\happ (f, g))
+  \]
+  である. このとき, 
+  \[
+    \prod_{g : \prod_{x : A} P (x)} \iseq (\happ(f, g))
+  \]
+  は, $\lambda g.\ \happ (f, g)$が fiberwise equivalence であるということなので, 
+  Theorem \ref{thm fibeq_totaleq} から, 
+  \[
+    \total (\lambda g.\ \happ (f, g)) : \sum_{g : \prod_{x : A} P (x)} (f = g) \to
+                                                 \sum_{g : \prod_{x : A} P (x)} (f \sim g)
+  \]
+  が equivalence であればよい. ここで, Lemma \ref{lem sigeq_cont} より
+  送り元の型は可縮なので, 送り先の型
+  \[
+    \sum_{g : \prod_{x : A} P (x)} \prod_{x : A} (f(x) = g(x))
+  \]
+  が可縮であれば十分である. \cite{hott} Theorem 2.15.7 の証明のうち, 関数の外延性を
+  仮定しなければ, 
+  \[
+    \sum_{g : \prod_{x : A} P (x)} \prod_{x : A} (f(x) = g(x))
+  \]
+  は
+  \[
+    \prod_{x : A} \sum_{u : P(x)} f(x) = u
+  \]
+  のレトラクトであることが示せる(逆向きの合成が$\id$とホモトピックであることにのみ
+  関数の外延性を使っている).さらに, $\sum_{u : P(x)} f(x) = u$は Lemma \ref{lem sigeq_cont}
+  から可縮であるため, 弱い関数の外延性から$\prod_{x : A} \sum_{u : P(x)} f(x) = u$も
+  可縮になる. したがって, 
+  \[
+    \sum_{g : \prod_{x : A} P (x)} \prod_{x : A} (f(x) = g(x))
+  \]
+  も可縮である.  
+\epf
+\brmk
+  Theorem \ref{thm weakfe_to_fe} の証明には univalent axiom は用いていない. 
+\ermk
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{thebibliography}{9}
   \bibitem{Kac} Victor Kac, Pokman Cheung, {\it{Quantum Calculus}}, Springer, 2001.
   \bibitem{coq qana} \url{https://github.com/nakamurakaoru/q-analogue}
@@ -1480,5 +1863,8 @@ Theorem Gauss_binomial a n : (forall n, qfact n != 0) ->
   \bibitem{coq ana} \url{https://github.com/math-comp/analysis}
   \bibitem{Ume} 梅村 浩, 『楕円関数論  楕円曲線の解析学』, 東京大学出版会, 2000.
   \bibitem{Bar} H.P.Barendregt, {\it{Lambda Calculi with Types}}
+  \bibitem{hott} The Univalent Foundations Program, 
+                      {\it{Homotopy Type Theory: Univalent Foundations of Mathematics}}
+
 \end{thebibliography}
 \end{document}
