@@ -1,24 +1,27 @@
 \contentsline {chapter}{\numberline {第1章}修士論文}{4}
 \contentsline {section}{\numberline {1.1}$q$-類似}{4}
-\contentsline {section}{\numberline {1.2}型付き$\lambda $計算}{5}
-\contentsline {subsection}{\numberline {1.2.1}$\lambda $計算}{5}
-\contentsline {subsection}{\numberline {1.2.2}$\lambda \tmspace -\thinmuskip {.1667em} \tmspace -\thinmuskip {.1667em} \to $と$\lambda $2}{5}
-\contentsline {section}{\numberline {1.3}Coq}{5}
-\contentsline {subsection}{\numberline {1.3.1}$\lambda $-cube と CIC}{5}
-\contentsline {subsection}{\numberline {1.3.2}Coqの使い方}{5}
-\contentsline {subsection}{\numberline {1.3.3}mathcomp の型}{10}
-\contentsline {section}{\numberline {1.4}形式化}{10}
-\contentsline {subsection}{\numberline {1.4.1}$q$-微分の定義}{11}
-\contentsline {subsection}{\numberline {1.4.2}$(x - a)^n$の$q$-類似}{12}
-\contentsline {subsection}{\numberline {1.4.3}関数から多項式へ}{19}
-\contentsline {subsection}{\numberline {1.4.4}$q$-Taylor展開}{22}
-\contentsline {chapter}{\numberline {第2章}少人数クラスまとめ}{26}
-\contentsline {section}{\numberline {2.1}はじめに}{26}
-\contentsline {section}{\numberline {2.2}型から型を作る}{26}
-\contentsline {section}{\numberline {2.3}型の同型}{27}
-\contentsline {section}{\numberline {2.4}Univalence axiom}{28}
-\contentsline {section}{\numberline {2.5}関数の外延性}{28}
-\contentsline {section}{\numberline {2.6}可縮, ファイバー}{29}
-\contentsline {section}{\numberline {2.7}レトラクト}{31}
-\contentsline {section}{\numberline {2.8}Univalence implies function extensionality}{32}
-\contentsline {chapter}{参考文献}{35}
+\contentsline {subsection}{\numberline {1.1.1}$q$-微分について成り立つ諸性質}{4}
+\contentsline {subsection}{\numberline {1.1.2}無限和に関する話題}{6}
+\contentsline {subsection}{\numberline {1.1.3}$q$-類似を考える利点}{6}
+\contentsline {section}{\numberline {1.2}型付き$\lambda $計算}{6}
+\contentsline {subsection}{\numberline {1.2.1}$\lambda $計算}{6}
+\contentsline {subsection}{\numberline {1.2.2}$\lambda \tmspace -\thinmuskip {.1667em} \tmspace -\thinmuskip {.1667em} \to $と$\lambda $2}{7}
+\contentsline {section}{\numberline {1.3}Coq}{7}
+\contentsline {subsection}{\numberline {1.3.1}$\lambda $-cube と CIC}{7}
+\contentsline {subsection}{\numberline {1.3.2}Coqの使い方}{7}
+\contentsline {subsection}{\numberline {1.3.3}mathcomp の型}{12}
+\contentsline {section}{\numberline {1.4}形式化}{12}
+\contentsline {subsection}{\numberline {1.4.1}$q$-微分の定義}{12}
+\contentsline {subsection}{\numberline {1.4.2}$(x - a)^n$の$q$-類似}{14}
+\contentsline {subsection}{\numberline {1.4.3}関数から多項式へ}{21}
+\contentsline {subsection}{\numberline {1.4.4}$q$-Taylor展開}{23}
+\contentsline {chapter}{\numberline {第2章}少人数クラスまとめ}{28}
+\contentsline {section}{\numberline {2.1}はじめに}{28}
+\contentsline {section}{\numberline {2.2}型から型を作る}{28}
+\contentsline {section}{\numberline {2.3}型の同型}{29}
+\contentsline {section}{\numberline {2.4}Univalence axiom}{30}
+\contentsline {section}{\numberline {2.5}関数の外延性}{30}
+\contentsline {section}{\numberline {2.6}可縮, ファイバー}{31}
+\contentsline {section}{\numberline {2.7}レトラクト}{33}
+\contentsline {section}{\numberline {2.8}Univalence implies function extensionality}{34}
+\contentsline {chapter}{参考文献}{37}

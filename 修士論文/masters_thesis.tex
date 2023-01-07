@@ -116,7 +116,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection*{序文}
 本論文の主結果は, $q$-類似の初等的な結果をCoqによって形式化するものである. 具体的にはVictor Kac, Pokman Cheungの{\it Quantum Calculus}\cite{Kac}の4章(4.1)式の$q$-Taylor 展開, 及びその系として得られる Gauss's binomial formula の形式化を目標としている. 
-本論文での$q$-類似に関する定義や定理, 証明は\cite{Kac}によるものだが, その形式化を行ったという点において独自性がある. 形式化したコード全体は\url{https://github.com/nakamurakaoru/q-analogue}\cite{coq qana}にある.
+本論文での$q$-類似に関する定義や定理, 証明は\cite{Kac}によるものだが, その形式化を行ったという点において独自性がある. 形式化したコード全体は\url{https://github.com/nakamurakaoru/q-analogue}\cite{coq qana}にある. q\_analogue.v が\cite{Kac}の形式化をしたファイルであり, q\_tool.v は直接$q$-類似に関係はしないが, 形式化をするために自分で用意した補題をまとめたファイルである. 
 
 $q$-類似は, 学部4年次に卒業研究のテーマとして扱ったものである. 実数パラメータ$q$, 実数上の関数$f$に対して
 \[
@@ -187,23 +187,97 @@ Coqは型付き$\lambda$計算という理論に基づいている. この$\lamb
 \chapter{修士論文} \label{chap thesis}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{$q$-類似} \label{sec qana}
-本節では, まだ形式化はできていない$q$-Taylor展開以降の\cite{Kac}の内容について, 特に$q$-類似を考える利点の1つであるJacobiの三重積について説明する. 
-$q$-類似とは, $q \to 1$とすると通常の数学に一致するような拡張のことである. 例えば, 自然数$n$の$q$-類似$[n]$は
+本節では, 形式化について説明する\ref{sec form}節では詳細には立ち入らない$q$-類似の性質や, $q$-Taylor展開以降で\cite{Kac}で取り上げられている内容について述べる. \ref{ssec infsum}, \ref{ssec jacobi}節は無限和に関するものであるため形式化はできていない. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{$q$-微分について成り立つ諸性質} \label{ssec qprops}
+通常の微分は線形作用素であり, また積の微分法や商の微分法などの性質が成り立つ. これらの性質は$q$-微分でもどうなるのであろうか. まずは線形性について見ていく. $a$, $b \in \R$, 実数上の関数$f$, $g$について, 
+\begin{align*}
+  D_q (af(x) + bg(x)) &= \frac{(af(qx) + bf(qx)) - (af(x) + bf(x))}{(q - 1)x}\\
+                           &= \frac{af(qx) - af(x)}{(q - 1)x} + \frac{bg(qx) - bg(x)}{(q - 1)x}\\
+                           &= a \frac{f(qx) - f(x)}{(q - 1)x} + b \frac{g(qx) - g(x)}{(q - 1)x}\\
+                           &= a D_q f(x) + b D_q g(x)
+\end{align*}
+と計算できるので, 通常の微分と変わらない形で成り立つ(\cite{Kac} p2). 一方で積の微分法はそのままの形では成り立たない. このことを確認するために, まず$q$-差分
 \[
-  [n] = 1 + q + q^2 + \cdots q ^ {n -1} 
+  d_q f(x) = f(qx) - f(x)
 \]
-であり, $(x-a)^n$の$q$-類似$(x-a)^n_q$は
+が積についてどう振る舞うかを観察する. 実数上の関数$f$, $g$について, 実際に計算してみると, 以下のように計算できる. 
+\begin{align*}
+  d_q (f(x)g(x)) &= f(qx)g(qx) - f(x)g(x) \\
+                    &= f(qx)g(qx) - f(qx)g(x) + f(qx)g(x) - f(x)g(x)\\
+                    &= f(qx) d_q g(x) + g(x) d_q f(x)
+\end{align*}
+ここで, $q$-微分は$q$-差分を用いて
 \[
-  (x-a)^n_q \coloneqq \begin{cases}
-                                  1 & (n=0)\\
-                                  (x-a)(x-qa)\cdots(x-q^{n-1}a) & (n\ge1)
-                                \end{cases}
+  D_q f(x) = \frac{d_q f(x)}{d_q x}
 \]
-である. 本論文では, この$(x - a)^n_q$に対して, 
+と表せることを用いると(\cite{Kac}では順番が逆で, 先に$q$-微分を定義している), 
+\begin{align*}
+  D_q(f(x)g(x)) &= \frac{d_q(f(x)g(x))}{(q - 1)x}\\
+                   &= \frac{f(qx) d_q g(x) + g(x) d_q f(x)}{(q - 1)x}\\
+                   &= f(qx) \frac{d_q g(x)}{(q - 1)x} + g(x) \frac{d_q f(x)}{(q - 1)x}
+\end{align*}
+となるので, 積の$q$-微分法は
 \[
-  (x+a)^n_q = \sum_{j=0}^n \qcoe{n}{j} q^{\frac{j(j-1)}{2}} a^j x^{n-j}
+  D_q (f(x) g(x)) = f(qx) D_q g(x) + g(x) D_q f(x) \quad \text{(\cite{Kac} p3 (1.11))}
 \]
-が成り立つことの形式化を目標としている. 
+となる. また, $f(x)g(x) = g(x)f(x)$から, $f$と$g$を入れ替えることで
+\[
+  D_q (f(x) g(x)) = f(x) D_q g(x) + g(qx) D_q f(x) \quad \text{(\cite{Kac} p3 (1.12))}
+\]
+も得られる. 次に, 商の微分法については, 
+\[
+  g(x) \cdot \frac{f(x)}{g(x)} = f(x)
+\]
+という等式の両辺を$q$-微分し, 左辺について1つ目の積の$q$-微分法を適用することで
+\[
+  g(qx) D_q \left( \frac{f(x)}{g(x)} \right) + \frac{f(x)}{g(x)} D_q g(x) = D_qf (x)
+\]
+となるので, 式変形することで商の$q$-微分法
+\[
+  D_q \left( \frac{f(x)}{g(x)} \right) = \frac{g(x) D_q f(x) - f(x) D_q g(x)}{g(x) g(qx)}
+  \quad \text{\cite{Kac} p3 (1.13)}
+\]
+が得られる. 2つ目の積の$q$-微分法を適用すれば, もう一つの商の微分法
+\[
+  D_q \left( \frac{f(x)}{g(x)} \right) = \frac{g(qx) D_q f(x) - f(qx) D_q g(x)}{g(x) g(qx)}
+  \quad \text{\cite{Kac} p3 (1.14)}
+\]
+が得られる. 更に, 合成関数の$q$-微分法については一般的なルールは存在せず, $u = u(x) = \alpha x^{\beta}$
+のときについてのみ
+\[
+  D_q f (u (x)) = (D_q^{\beta} f)(u(x)) \cdot D_q u(x) \quad \text{(\cite{Kac} p4 (1.15))}
+\]
+が成り立つことが知られている(証明は\cite{Kac} p3, p4を参照). 
+
+これらの性質はすべて形式化できており, $D_q$の線形性, 積の$q$-微分法の1つ目・2つ目, 商の$q$-微分法の1つ目・2つ目, 合成関数の$q$-微分法はそれぞれこの順に{\tt Dq\_is\_linear}, {\tt Dq\_prod}, {\tt Dq\_prod'}, {\tt Dq\_quot}, {\tt Dq\_quot'}, {\tt qchain}という補題名で\cite{coq ana}のq\_analogue.vに登録してある. 
+
+また, 今回の主目的である$q$-Taylor展開には利用しないが, 二項係数の$q$-類似について, 通常の二項係数において Pascal の法則が成り立つことの$q$-類似版として, $n > j$をみたす$1$以上の整数$n$, $j$について
+\[
+  \qcoe{n}{j} = \qcoe{n - 1}{j - 1} + q^j \qcoe{n - 1}{j} \quad \text{(\cite{Kac} p17 (6.2))}
+\]
+が成り立つことが証明されている(\cite{Kac} p18参照). この補題も形式化できており, \cite{coq qana}のq\_analogue.vの{\tt q\_pascal}という補題である.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{無限和に関する話題} \label{ssec infsum}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{$q$-類似を考える利点} \label{ssec jacobi}
+%本節では, まだ形式化はできていない$q$-Taylor展開以降の\cite{Kac}の内容について, 特に$q$-類似を考える利点の1つであるJacobiの三重積について説明する. 
+%$q$-類似とは, $q \to 1$とすると通常の数学に一致するような拡張のことである. 例えば, 自然数$n$の$q$-類似$[n]$は
+%\[
+%  [n] = 1 + q + q^2 + \cdots q ^ {n -1} 
+%\]
+%であり, $(x-a)^n$の$q$-類似$(x-a)^n_q$は
+%\[
+%  (x-a)^n_q \coloneqq \begin{cases}
+%                                  1 & (n=0)\\
+%                                  (x-a)(x-qa)\cdots(x-q^{n-1}a) & (n\ge1)
+%                                \end{cases}
+%\]
+%である. 本論文では, この$(x - a)^n_q$に対して, 
+%\[
+%  (x+a)^n_q = \sum_{j=0}^n \qcoe{n}{j} q^{\frac{j(j-1)}{2}} a^j x^{n-j}
+%\]
+%が成り立つことの形式化を目標としている. 
 あえてパラメータを増やす$q$-類似を考える利点の一つとしては, 証明が複雑な定理に対してより簡単な別証明を与えられる場合があることである. 例えば, Jacobiの三重積(\cite{Kac} p35 Theorem 11.1)
 \begin{screen}
 $z$, $q \in \R$, $|q| < 1$として, 
@@ -540,7 +614,6 @@ forall x : nat, addn x 0 = x \end{lstlisting}
   \]
   と定める. 
 \edf
-%この定義を形式化するためまずは実数の形式化を考える. 今回は mathcomp の ssrnum にある{\tt rcfType}(real closed field：実閉体)の要素を実数として用いることにする. mathcomp はある型を構成するために他の型を用いているため, ヒエラルキー(階層構造)がある. 通常の数学において体が環の性質を, 環が群の性質を引き継ぐように, mathcomp でもより一般の型の性質を引き継いでいる. {\tt rcfType}も多くの性質を引き継いでおり, 特に環の性質, {\tt ringType}を持っていることが重要である. 実際, 形式化で利用するライブラリの補題の多くは{\tt ringType}に対するものである. 
 {\tt rcfType}を使って$q$-微分の形式化を以下のように行う. 
 \begin{lstlisting}{Coq}
 From mathcomp Require Import all_ssreflect all_algebra.
@@ -628,7 +701,7 @@ forall R : ringType, right_id 1  *%R
 また{\tt red\_frac\_r}は, 
 \begin{lstlisting}{Coq}
 forall x y z : R, z != 0 -> (x * z) / (y * z) = x / y \end{lstlisting}
-という自分で用意した補題である(このように直接$q$-類似に関係はしないが, 形式化をするために用意した補題は\cite{coq qana}に q\_tool.v というファイルにまとめている). この補題の本質は$z / z = 1$という約分計算であり, mathcomp の ssralg の補題
+という自分で用意した補題である. この補題の本質は$z / z = 1$という約分計算であり, mathcomp の ssralg の補題
 \begin{lstlisting}{Coq}
 divff : forall (F : fieldType) (x : F), x != 0 -> x / x = 1 \end{lstlisting}
 を用いているため{\tt z $\neq$ 0}という仮定が必要になる. よって, {\tt Dq\_pow}にも{\tt $x \ne 0$}という前提を加えている. 今後も補題を形式化するにあたって, その証明の中で約分を行う際には$0$でないという前提を付け加えることになる. 
