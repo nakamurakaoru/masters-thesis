@@ -78,6 +78,9 @@
 \newcommand{\data}[1]{{\tt{#1}}\text{-データ集合}}
 \newcommand{\rtf}[3]{time^{\tt{#1}}_{\tt{#2}}({\tt{#3}})}
 %% Barendiregt %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\T}{\mathbb{T}}
+\newcommand{\V}{\mathbb{V}}
+\newcommand{\uhr}{\upharpoonright}
 \newcommand{\thra}{\twoheadrightarrow}
 \newcommand{\lama}{\lambda \! \! \to}
 %% HoTT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -104,6 +107,8 @@
 \newcommand{\iscont}{\textrm{isContr}}
 \newcommand{\total}{\textrm{total}}
 \newcommand{\idtoeqv}{\textrm{idtoeqv}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\setcounter{tocdepth}{2}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
 \title{$q$-類似のCoqによる形式化}
@@ -320,7 +325,8 @@ $z$, $q \in \R$, $|q| < 1$として,
 \section{型付き$\lambda$計算} \label{sec lambda}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{$\lambda$計算} \label{ssec lambdacal}
-まず型のない$\lambda$計算を定義する. 初めに, $\lambda$計算がどのようなものなのかについての概要を説明し, その後厳密な定義に移る. \\
+まず型のない$\lambda$計算を定義する. 初めに, $\lambda$計算がどのようなものなのかについての概要を説明し, その後厳密な定義に移る.
+
 \subsection*{$\lambda$計算の概要}
 $\lambda$計算には, 抽象と適用の2つの基本的な操作がある. まず, 抽象については, 「式から関数を作る操作」と捉えることができる. $M$を$\lambda$計算における式($\lambda$計算においてはこれを$\lambda$項と呼ぶ)だとすると, 
 \[
@@ -335,7 +341,8 @@ $\lambda$計算には, 抽象と適用の2つの基本的な操作がある. ま
 \end{itemize}
 はそれぞれ, 1つ目は$x \mapsto (x^2 + 3xy + 4)$という$x$についての2次関数, 
 2つ目は$(x, y) \mapsto (x^2 + 3xy + 4)$という$x, y$についての2変数関数を表す. 
-3つ目は, $(x^2 + 3xy + 4)$は変数$z$を含まないので, 定数関数を表すことになる. \\
+3つ目は, $(x^2 + 3xy + 4)$は変数$z$を含まないので, 定数関数を表すことになる.
+
 もう1つの操作である適用は, 2つの$\lambda$項$M$と$N$を並べて, 
 \[
   MN
@@ -349,11 +356,12 @@ $\lambda$計算には, 抽象と適用の2つの基本的な操作がある. ま
 \[
   (\lambda x. M)\ N = M[x\coloneqq N]
 \]
-と書く. \\
+と書く. 
+
 \subsection*{$\lambda$計算の定義}
 ここから実際の$\lambda$計算の定義に入る. 
 \begin{shadebox}
-  \begin{df}{(\cite{bib1} Definition 2.1.1)}
+  \begin{df}{(\cite{Bar} Definition 2.1.1)}
     $V = \{ v, v', v'', \ldots \}$を無限個の変数の集合とする. 
     $\lambda$項全体の集合$\Lambda$を, 以下のように帰納的に定義する. 
     \begin{alignat*}{3}
@@ -382,7 +390,7 @@ $\lambda$計算には, 抽象と適用の2つの基本的な操作がある. ま
   \item 最も外側の()は書かない. 
 \end{enumerate}
 \end{rmk}
-%\begin{rmk}{(\cite{bib1} Notation 2.1.4)}
+%\begin{rmk}{(\cite{Bar} Notation 2.1.4)}
 %$M, N$を$\lambda$項とする. このとき, $M$と$N$が等しいか, 束縛変数の名前をつけかえることで互いにうつりあうとき, $M \equiv N$と書く. 例えば, 
 %\begin{align*}
 %  (\lambda x .x) z \equiv (\lambda x .x) z \\ 
@@ -392,7 +400,7 @@ $\lambda$計算には, 抽象と適用の2つの基本的な操作がある. ま
 %となる. 
 %\end{rmk}
 \begin{shadebox}
-  \begin{df}{(\cite{bib1} Notation 2.1.4, Definition 2.1.5)}
+  \begin{df}{(\cite{Bar} Notation 2.1.4, Definition 2.1.5)}
     $M, N, P, Q \in \Lambda$, $x, y \in V$とする. 
     \begin{enumerate}
       \item $M$の自由変数の集合$FV(M)$を, 以下のように帰納的に定義する. 
@@ -420,7 +428,7 @@ $\lambda$計算には, 抽象と適用の2つの基本的な操作がある. ま
     \end{enumerate}
   \end{df}
 \end{shadebox}
-\begin{rmk}{(\cite{bib1} Notation 2.1.4)}
+\begin{rmk}{(\cite{Bar} Notation 2.1.4)}
 2.について, 例えば, 
 \begin{align*}
   (\lambda x .x) z \equiv (\lambda x .x) z \\ 
@@ -435,7 +443,7 @@ $\lambda$計算には, 抽象と適用の2つの基本的な操作がある. ま
 \end{rmk}
 %$\lambda$計算を, $\lambda$項同士の等式による形式体系として考えるために, 次のように定義する. 
 %\begin{shadebox}
-%  \begin{df}{(\cite{bib1} Definition 2.1.7)}
+%  \begin{df}{(\cite{Bar} Definition 2.1.7)}
 %    $M, M', N, L, Z \in \Lambda$とする. 
 %    \begin{enumerate}
 %      \item $\lambda$計算の主公理スキームを, 
@@ -459,7 +467,7 @@ $\lambda$計算には, 抽象と適用の2つの基本的な操作がある. ま
 %\end{shadebox}
 最後に, $\beta$-簡約を定義する. 
 \begin{shadebox}
-  \begin{df}{(\cite{bib1} Definition 2.3.2)}
+  \begin{df}{(\cite{Bar} Definition 2.3.2)}
     $\Lambda$上の二項関係$\to_{\beta}$(1ステップ$\beta$-簡約), 
     $\thra_{\beta}$($\beta$-簡約)を, 
     %$=_{\beta}$を, 
@@ -492,6 +500,561 @@ $\lambda$計算には, 抽象と適用の2つの基本的な操作がある. ま
 \end{ex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{$\lama$と$\lambda$2}
+このセクションでは, 単純型付きラムダ計算である$\lama$と, その拡張である$\lambda 2$を導入する. $\lama$の定義の仕方には, Curry流とChurch流の2通りがあるが, 本稿においてはCurry流を採用する. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% label prop1, 2 %%
+%% ref prop1, 2 %%
+\subsection*{$\lama$}
+\begin{shadebox}
+  \begin{df}{(\cite{Bar} Definition 3.1.1)}
+    $\lama$の型の集合Type($\lama$)は, 以下のように帰納的に定義される. 
+    $\T$ = Type($\lama$)と書くことにする. 
+    \begin{alignat*}{2}
+      &\alpha, \alpha',\ldots \in \T& &\text{(型変数)}\\
+      &\sigma, \tau \in \T \Rightarrow (\sigma \to \tau) \in \T&  \quad &\text{(関数型)}
+    \end{alignat*}
+    抽象構文を用いれば, 
+    \[
+      \T ::= \V \ |\ \V \to \V
+    \]
+    と書ける. ここで, $\V$は, 
+    \[
+      \V ::= \alpha \ | \ \V'
+    \]
+    である.
+  \end{df}
+\end{shadebox}
+\begin{rmk}{(\cite{Bar} Notation 3.1.2)}
+  \begin{enumerate}
+    \item $\sigma_{1}, \ldots \sigma_{n} \in \T$のとき, 
+      \[
+        \sigma_1 \to \sigma_2 \to \cdots \to \sigma_n
+      \]
+      と書いた場合, 
+      \[
+        (\sigma_1 \to (\sigma_2 \to \cdots \to (\sigma_{n-1} \to \sigma_n) \cdots ))
+      \]
+      を表すものとする(右結合).
+    \item $\alpha$, $\beta$, $\gamma$, $\ldots$で型変数を表す. 
+  \end{enumerate}
+\end{rmk}
+\begin{shadebox}
+  \begin{df}{(\cite{Bar} Definition 3.1.3)}($\lama$-Curry)
+    \begin{enumerate}
+      \item $M \in \Lambda$, $\sigma \in \T$のとき, $M \colon \sigma$の形を
+        statement(文)という. このとき, 型$\sigma$を文の predicate (述語), 項$M$を
+        文の subject (主語)という. 
+      \item 変数(項)を主語とする文を declaration (宣言)という.
+      \item 異なる変数を主語とする宣言の集合を basis (基底)という.
+    \end{enumerate}
+  \end{df}
+\end{shadebox}
+\begin{shadebox}
+  \begin{df}{(\cite{Bar} Definition3.1.4)}
+    文$M \colon \sigma$が基底$\Gamma$から導出される
+    ($\Gamma \vdash_{\lama\text{-Curry}} M \colon \sigma$ or 
+    $\Gamma \vdash_{\lama} M \colon \sigma$ or 
+    $\Gamma \vdash M \colon \sigma$と書く)のは, $\Gamma \vdash M \colon \sigma$が
+    以下のルールから導かれるときである. 
+    \begin{itembox}[c]{導出規則0}
+      \begin{alignat*}{3}
+  (x \colon \sigma) \in \Gamma &\quad& &\Rightarrow& \quad
+    &\Gamma \vdash x \colon \sigma \\
+  \Gamma \vdash M \colon (\sigma \to \tau),\ \Gamma \vdash N \colon \sigma &&
+    &\Rightarrow& &\Gamma \vdash (MN) \colon \tau \\
+  \Gamma,\ x \colon \sigma \vdash M \colon \tau && &\Rightarrow& 
+    &\Gamma \vdash (\lambda x . M) \colon (\sigma \to \tau) 
+      \end{alignat*}
+    \end{itembox}
+    ここで$\Gamma ,\ x \colon \sigma$は$\Gamma \cup x \colon \sigma$のことである.
+  \end{df}
+\end{shadebox}
+$\Gamma = \{ x_1 \colon \sigma_1 , \ldots , x_n \colon \sigma_n\}$
+(または$\Gamma = \emptyset$)のとき, $\Gamma \vdash M \colon \sigma$を
+$x_1 \colon \sigma_1 , \ldots , x_n \colon \sigma_n \vdash M \colon \sigma$
+(または$\vdash M \colon \sigma$)と書く. 
+導入規則は以下のようにも表される.
+\begin{itembox}[c]{導出規則1}
+  \begin{alignat*}{3}
+    &(\text{公理})& \quad &\Gamma \vdash x \colon \sigma& 
+      &(x \colon \sigma) \in \Gamma \text{のとき}\\
+    &(\text{$\to$除去})& 
+      &\frac{\Gamma \vdash M \colon (\sigma \to \tau) \quad
+        \Gamma \vdash N \colon \sigma}{\Gamma \vdash (MN) \colon \tau}& & \\
+    &(\text{$\to$導入})& &\frac{\Gamma,\ x \colon \sigma \vdash M \colon \tau}
+      {\Gamma \vdash (\lambda x . M) \colon (\sigma \to \tau)}& &
+  \end{alignat*}
+\end{itembox}
+以下, 本稿においては, 導出規則1を用いる.
+\begin{ex}%{(\cite{Bar} Example 3.1.5)}
+  \begin{enumerate}
+    \item $\lambda$項に対してある型が付くことを示すには, 
+      導出規則を逆向きに使って辿る方法, つまり, 
+      
+        「示したい型付けから始めて, その導出のために必要となる前提を順に上に書き加えていく
+        ことを繰り返し, 変数のみとなった時点で, その変数に対して矛盾なく型がついているかを
+        確認する」
+        
+      という手順が便利である. この手順を用いて, 任意の$\sigma, \tau \in \T$について, 
+      $\vdash (\lambda x y . x) \colon (\sigma \to \tau \to \sigma)$であることを確認する. 
+      まず, $\lambda x y . x$の最も大きな構造は抽象である. 
+      抽象に対して型を割り当てる規則は$\to$導入なので, 
+      \[
+        \frac{x \colon \sigma \vdash (\lambda y . x) \colon (\tau \to \sigma)}
+          {\vdash (\lambda x y . x) \colon (\sigma \to \tau \to \sigma)}
+      \]
+        というように, 必要となる前提を書き加える. ここで, この書き加えた前提を見てみると, 
+        これも抽象の形をしているため, 
+      \[
+        \frac{x \colon \sigma,\ y \colon \tau \vdash x \colon \sigma}
+       {\displaystyle{\frac{x \colon \sigma \vdash (\lambda y . x) \colon (\tau \to \sigma)}
+          {\vdash (\lambda x y . x) \colon (\sigma \to \tau \to \sigma)}}}
+      \]
+      というように, さらに前提を書き加える. すると, 一番上の行が変数のみとなり, 
+      $x$に対してともに$\sigma$が型付けられており, 矛盾なく型がついていることがわかるので, 
+      $\vdash (\lambda x y . x) \colon (\sigma \to \tau \to \sigma)$が示せたことになる. 
+      このように, 必要な前提を書き加え続けることで得られたものを導出木と呼ぶ. 
+      \item 任意の$\sigma$, $\tau \in \T$について, 
+        $\lambda xy . xy \colon (\sigma \to \tau) \to (\sigma \to \tau)$であることは, 
+        \[
+      \dfrac{x \colon (\sigma \to \tau), y \colon \sigma \vdash x \colon (\sigma \to \tau)
+      \quad x \colon (\sigma \to \tau), y \colon \sigma \vdash y \colon \sigma}
+          {\dfrac{x \colon (\sigma \to \tau), y \colon \sigma \vdash xy \colon \tau}
+          {\dfrac{x \colon (\sigma \to \tau) \vdash \lambda y . xy \colon (\sigma \to \tau)}
+          {\vdash \lambda xy . xy \colon (\sigma \to \tau) \to (\sigma \to \tau)}}}
+        \]
+        という導出木により確認できる. 
+%    \item 任意の$\sigma, \tau, \rho \in \T$について, 
+%      $\vdash \lambda x . ((\lambda y . z) y) \colon (\sigma \to \tau)$であることは, 
+%      \[
+%        \frac{\displaystyle{\frac{x \colon \sigma, y \colon \rho \vdash z \colon \tau}
+%          {x \colon \sigma \vdash \lambda y . z \colon \rho \to \tau}} 
+%          \quad \displaystyle{\frac{}{x \colon \sigma \vdash y \colon \rho}}}
+%        {\displaystyle{\frac{x \colon \sigma \vdash (\lambda y . z) y \colon \tau}
+%        {\vdash \lambda x . ((\lambda y . z) y) \colon \sigma \to \tau}}}
+%      \]
+%      という導出木により確認できる. 
+    \item $\lama$においては, $\lambda x . xx$には型が付かない. 実際, 
+    \[
+      \Gamma \vdash \lambda x. xx \colon \sigma
+    \]
+    と仮定すると, 抽象の形であるから, $\sigma = (\sigma_1 \to \sigma_2)$となる
+    $\sigma_1$, $\sigma_2$が存在して, 
+    \[
+      \frac{\Gamma, x \colon \sigma_1 \vdash xx \colon \sigma_2}
+      {\Gamma \vdash \lambda x. xx \colon \sigma_1 \to \sigma_2}
+    \]
+    となるはずである. さらに, $xx$は適用の形なので, ある$\tau$が存在し, 
+    \[
+      \frac{\Gamma, x \colon \sigma_1 \vdash x \colon \tau \to \sigma_2
+      \quad \Gamma, x \colon \sigma_1 \vdash x \colon \tau}
+      {\displaystyle{\frac{\Gamma, x \colon \sigma_1 \vdash xx \colon \sigma_2}
+      {\Gamma \vdash \lambda x. xx \colon \sigma_1 \to \sigma_2}}}
+    \]
+    となるはずである. しかし, $\lama$において, 同じ$x$に対して$\tau$と$\tau \to \sigma_2$
+    の両方がつくことはありえない. よって, $\lambda x .xx$には型がつかない. 
+  \end{enumerate}
+\end{ex}
+\textbf{$\lama$の性質}
+
+$\lama$の型付けに関するいくつかの性質を述べる. 1つ目の性質は, ある型付けを導出するためには, どれだけの基底が必要かを示すものである. 
+\begin{shadebox}
+  \begin{df}{(\cite{Bar} Definition 3.1.6)}
+    $\Gamma = \{ x_1 \colon \sigma_1 , \ldots , x_n \colon \sigma_n\}$を基底とする. 
+    \begin{enumerate}
+      \item $\Gamma$を部分関数のように扱い, 
+        dom($\Gamma$) = \{$x_1, \ldots , x_n$\},  $\sigma_i = \Gamma(x_i)$とする.
+      \item $V_0$を変数の集合とする. このとき, 
+        $\Gamma \upharpoonright V_0 
+          = \{ x \colon \sigma\ |\ x \in V_0 \text{かつ} \sigma = \Gamma(x) \}$と定める.
+      \item $\sigma, \tau \in \T$に対して, $\sigma$において$\alpha$に$\tau$を代入すること
+        を$\sigma[\alpha \coloneqq \tau]$と表す.
+    \end{enumerate}
+  \end{df}
+\end{shadebox}
+\begin{shadebox}
+  \begin{prop}{(\cite{Bar} Proposition 3.1.7)}(Basis lemma for $\lama$)\label{prop_gen}
+    $\Gamma$を基底とする. 
+    \begin{enumerate}
+      \item $\Gamma' \supset \Gamma$が基底のとき, 
+        \[
+          \Gamma \vdash M \colon \sigma \Rightarrow \Gamma' \vdash M \colon \sigma.
+        \]
+      \item $\Gamma \vdash M \colon \sigma 
+        \Rightarrow FV(M) \subset \text{dom}(\Gamma)$.
+      \item $\Gamma \vdash M \colon \sigma 
+        \Rightarrow \Gamma \upharpoonright FV(M) \vdash M \colon \sigma$.
+    \end{enumerate}
+  \end{prop}
+\end{shadebox}
+\begin{proof}
+$M \colon \sigma$の導出に関する帰納法により示す. ここで, 導出に関する帰納法とは, 導出規則が帰納的に定義されてることを用いた証明法であり, 型付けに関する証明においてよく使われるやり方である. Proposition \ref{prop_gen}の証明の前に, 
+\[
+  \Gamma \vdash M \colon \sigma \Lra f(\Gamma, M, \sigma) \quad 
+ \text{(ここで, $f(\Gamma, M, \sigma)$は$\Gamma$と$M$と$\sigma$に関する何らかの主張)}
+\]
+という形の命題の, 導出に関する帰納法による証明の概略について述べておく. 
+\begin{itemize}
+  \item base case $\colon$ 前提がない場合
+  
+    $\Gamma \vdash M \colon \sigma$が前提なく導出されるのは, $M \equiv x$, 
+    つまり$M$が変数1つのみのときである. この場合は, $(x \colon \sigma \in \Gamma)$
+    のみを仮定して, $f(\Gamma, x, \sigma)$が成り立つことを示すことになる. 
+  \item inductive case $\colon$ 前提がある場合
+  
+    前提をもとにある型が付くことが導出されるのは, $M \equiv M_1 M_2$もしくは
+    $M \equiv \lambda x . M_1$のときである. このときは, 
+    前提について主張が成り立つことを仮定して証明を進める. 例えば, 
+    $M \equiv M_1 M_2$のときであれば, $\Gamma \vdash M \colon \sigma$は, 
+    ある$\tau$について, $\Gamma \vdash M_1 \colon \tau \to \sigma$と
+    $\Gamma \vdash M_2 \colon \tau$の2つの前提から導出されるので, 
+    \begin{align*}
+    &\Gamma \vdash M_1 \colon \tau \to \sigma 
+      \Lra f(\Gamma, M_1, (\tau \to \sigma)) \\
+    &\Gamma \vdash M_2 \colon \tau \Lra f(\Gamma, M_2, \tau)
+    \end{align*}
+    の2つを仮定して, 
+    $\Gamma \vdash (M_1 M_2) \colon \sigma \Lra f(\Gamma, (M_1 M_2), \sigma)$
+    を示すことになる. 
+    同様に, $M \equiv \lambda x . M_1$の場合, 
+    $\Gamma \vdash \lambda x. M_1 \colon \sigma$は, 
+    ある$\sigma_1$, $\sigma_2$について, $\sigma = (\sigma_1 \to \sigma_2)$であり, 
+    $\Gamma, x \colon \sigma_1 \vdash M_1 \colon \sigma_2$から導出されるので, 
+    \[
+      \Gamma, x \colon \sigma_1 \vdash M_1 \colon \sigma_2 
+        \Lra f((\Gamma, x \colon \sigma_1), M_1, \sigma_2)
+    \]
+    を仮定して, 
+    $\Gamma \vdash (\lambda x. M_1) \colon (\sigma_1 \to \sigma_2) 
+      \Lra f(\Gamma, (\lambda x. M_1), (\sigma_1 \to \sigma_2))$
+    を示すことになる. 
+\end{itemize}
+まとめると, $M$がどの形なのかで場合分けし, それぞれの導出の前提に対して成立を仮定して, 証明をするということである. 以下, 実際の Proposition \ref{prop_gen}の証明にうつる. 
+  \begin{enumerate}
+    \item 
+      \begin{enumerate}
+        \item $M \colon \sigma = x \colon \sigma$のとき\\
+          $x \colon \sigma \in \Gamma$より$x \colon \sigma \in \Gamma'$から
+          $\Gamma' \vdash x \colon \sigma$である. 
+        \item $M \colon \sigma = (M_1 M_2) \colon \sigma$のとき\\
+          $\Gamma \vdash (M_1 M_2) \colon \sigma$は, ある$\tau$について
+          $\Gamma \vdash M_1 \colon (\tau \to \sigma)$と
+          $\Gamma \vdash M_2 \colon \tau$から導出される. 
+          $\Gamma \vdash M_1 \colon (\tau \to \sigma) \Rightarrow
+           \Gamma' \vdash M_1 \colon (\tau \to \sigma)$かつ
+          $\Gamma \vdash M_1 \colon (\tau \to \sigma) \Rightarrow
+           \Gamma' \vdash M_2 \colon \tau$と仮定すると, $\to$除去規則より
+          $\Gamma' \vdash (M_1 M_2) \colon \sigma$となる. 
+        \item $M \colon \sigma = (\lambda x.M_1) \colon (\sigma_1 \to \sigma_2)$のとき\\
+          $\Gamma \vdash (\lambda x.M_1) \colon (\sigma_1 \to \sigma_2)$は
+          $\Gamma,\ x \colon \sigma_1 \vdash M_1 \colon \sigma_2$から導出される. 
+          $x \notin \text{dom}(\Gamma')$としてよく, このとき, 
+          $\Gamma',\ x \colon \sigma_1 \supset \Gamma,\ x \colon \sigma_1$である. 
+          $\Gamma,\ x \colon \sigma_1 \vdash M \colon \sigma_2 \Rightarrow
+           \Gamma',\ x \colon \sigma_1 \vdash M \colon \sigma_2$と仮定すると, 
+          $\to$導入規則より 
+          $\Gamma' \vdash (\lambda x.M_1) \colon (\sigma_1 \to \sigma_2)$
+          となる. 
+      \end{enumerate}
+      \item 
+        \begin{enumerate}
+          \item $M \colon \sigma = x \colon \sigma$のとき, $FV(M) = x$よりすぐにわかる. 
+          \item $M \colon \sigma = (M_1 M_2) \colon \sigma$のとき\\
+            帰納法の仮定から, $FV(M_1) \subset \text{dom}(\Gamma)$かつ
+            $FV(M_2)\subset \text{dom}(\Gamma)$が成り立つので, 
+            \[
+            (FV(M_1) \cup FV(M_2))\subset \text{dom}(\Gamma)
+            \]
+            となる. $FV(M_1 M_2) = FV(M_1) \cup FV(M_2)$より, 
+            $FV(M_1 M_2) \subset \text{dom}\Gamma$がわかる. 
+        \item $M \colon \sigma = (\lambda x. M_1) \colon (\sigma_1 \to \sigma_2)$のとき
+        
+            帰納法の仮定より, $FV(M_1) \subset \text{dom}(\Gamma, x \colon \sigma)$
+            である. また, 
+            \begin{align*}
+              \text{dom}(\Gamma, x \colon \sigma)= \text{dom}(\Gamma) \cup \{ x \}\\
+              FV(\lambda x . M_1) = FV(M_1) - \{ x \}
+            \end{align*}
+            より, $FV(\lambda x . M_1) \subset \text{dom}(\Gamma)$がわかる. 
+        \end{enumerate}
+      \item
+        \begin{enumerate}
+          \item $M \colon \sigma = x \colon \sigma$のとき\\
+            $FV(M) = x$ から, $\Gamma \upharpoonright FV(M) = x \colon \sigma$となる. 
+            $(x \colon \sigma) \vdash (x \colon \sigma)$より成り立つ. 
+          \item $M \colon \sigma = (M_1 M_2) \colon \sigma$. のとき\\ 
+             帰納法の仮定から,  ある$\tau$が存在し,
+             $\Gamma \upharpoonright FV(M_1) \vdash M_1 \colon \tau \to \sigma$, 
+             $\Gamma \upharpoonright FV(M_2) \vdash M_2 \colon \tau$となる. よって, 1.より, 
+             $\Gamma \upharpoonright FV(M_1 M_2) \vdash M_1 \colon \tau \to \sigma$, 
+             $\Gamma \upharpoonright FV(M_1 M_2) \vdash M_2 \colon \tau$がわかる. 
+             したがって, $\Gamma \upharpoonright FV(M) \vdash M \colon \sigma$となる.
+          \item $M \colon \sigma = \lambda x. M_1 \colon (\sigma_1 \to \sigma_2)$のとき
+          
+            帰納法の仮定から, $(\Gamma, x \colon \sigma_1) \upharpoonright FV(M_1) 
+              \vdash M_1 \colon \sigma_2$となる. ここで, 
+            $
+              (\Gamma, x \colon \sigma) \upharpoonright FV(M_1)
+                = \Gamma \upharpoonright FV(M_1) \cup 
+                  (x \colon \sigma) \upharpoonright FV(M_1)
+            $
+            であり, 
+            \begin{align*}
+             \Gamma \uhr (FV(M_1) - \{ x \}) &\supset \Gamma \uhr FV(M_1) \\
+             x \colon \sigma &\supset (x \colon \sigma) \uhr FV(M_1)
+            \end{align*}
+            から, 1. より
+            $x \colon \sigma, \Gamma \uhr (FV(M_1) - \{ x \}) 
+              \vdash M_1 \colon \sigma_2$
+            となる. よって, 
+            \[
+              \Gamma \uhr FV(M_1) 
+                \vdash \lambda x. M_1 \colon (\sigma_1 \to \sigma_2)
+            \]
+            がわかる. 
+        \end{enumerate} 
+    \end{enumerate}
+\end{proof}
+2つ目の性質は、特定の形の項がどのように型付けされるかを分析するものである. これは, ある種の項が型を持たないことを示すのに特に有用である. 
+\begin{shadebox}
+  \begin{prop}{(\cite{Bar} Proposition 3.1.8)}(Generation lemma for$\lama$)
+  \label{prop1}%% prop1%%
+    以下が成り立つ. 
+    \begin{enumerate}
+      \item $\Gamma \vdash x \colon \sigma \Rightarrow (x \colon \sigma) \in \Gamma$
+      \item $\Gamma \vdash MN \colon \tau \Rightarrow
+        \exists \sigma\ [\Gamma \vdash M \colon (\sigma \to \tau) \text{かつ}\ 
+        \Gamma \vdash N \colon \sigma]$
+      \item $\Gamma \vdash (\lambda x . M) \colon \rho \Rightarrow
+        \exists \sigma, \tau\ [\Gamma,\ x \colon \sigma \vdash M \colon \tau
+        \ \text{かつ}\ \rho \equiv (\sigma \to \tau)]$
+    \end{enumerate}
+  \end{prop}
+\end{shadebox}
+\begin{proof}
+  導出規則より従う. 
+\end{proof}
+\begin{shadebox}
+  \begin{prop}{(\cite{Bar} Proposition 3.1.9)} (Subterm lemma for $\lama$)
+    $M'$を$M$の部分項とする. このとき, ある$\Gamma'$と$\sigma'$が存在して, 
+    \[
+      \Gamma \vdash M \colon \sigma \Rightarrow \Gamma' \vdash M' \colon \sigma'
+    \]
+    をみたす. つまり. $M$が型を持つとき, その任意の部分項も型を持つ. 
+  \end{prop}
+\end{shadebox}
+\begin{proof}
+  $\Gamma \vdash M \colon \sigma$の導出木を考えれば, 各部分項についての導出木も
+  得られることからわかる. 
+\end{proof}
+\begin{rmk}
+この命題の対偶から, 部分項に型が付かなければ, 全体にも型が付かないことがわかる. このことを用いれば, 例えば, $\lama$において$\lambda x .xx$に型が付かないことから, 
+$(\lambda x . xx)(yz)$や, $\lambda y . (\lambda x. xx)$には型がつかない. 
+\end{rmk}
+\begin{shadebox}
+  \begin{prop}{(\cite{Bar} Proposition 3.1.10)} (Substitution lemma for $\lama$)
+  \label{prop2}%% prop 2%%
+    以下が成り立つ. 
+    \begin{enumerate}
+      \item $\Gamma \vdash M \colon \sigma \Rightarrow 
+        \Gamma[\alpha \coloneqq \tau] \vdash M \colon \sigma[\alpha \coloneqq \tau]$.
+      \item $\Gamma,\ x \colon \sigma \vdash M \colon \tau$かつ
+        $\Gamma \vdash N \colon \sigma$とする. このとき, 
+        $\Gamma \vdash M[x \coloneqq N] : \tau$.
+    \end{enumerate}
+  \end{prop}
+\end{shadebox}
+\begin{proof}
+  \begin{enumerate}
+    \item $M \colon \sigma$の導出に関する帰納法により示される. 
+    \item $\Gamma,\ x \colon \sigma \vdash M \colon \tau$
+      の導出のステップ数に関する帰納法により示される. 
+  \end{enumerate}
+\end{proof}
+次の結果は, ラムダ項がある型を持つということが, 簡約について閉じていることを示す. 
+\begin{shadebox}
+  \begin{prop}{\cite{Bar} Proposition 3.1.11} (Subject reduction theorem for $\lama$)
+  \label{thm_srt}
+    $M \twoheadrightarrow_{\beta} M'$とする. このとき, 
+    \[
+      \Gamma \vdash M \colon \sigma \Rightarrow \Gamma \vdash M' \colon \sigma.
+    \]
+  \end{prop}
+\end{shadebox}
+\begin{proof}
+Prop \ref{prop1}, Prop \ref{prop2}を用いて, 簡約のステップ数に関する帰納法により示される.
+\begin{itemize}
+  \item ステップ数が0, つまり$M = M'$のとき, 
+    $\Gamma \vdash M \colon \sigma$からすぐにわかる
+  \item ステップ数が$n$以下のとき成立すると仮定し, $n+1$のとき成立することを示す. 
+    \[
+      \underbrace{M \thra_{\beta} M''}_{n\text{ステップ}} \to_{\beta} M'
+    \]
+    をみたす$M''$について, 
+    $\Gamma \vdash M \colon \sigma \Lra \Gamma \vdash M'' \colon \sigma$
+    を仮定して, 
+    $\Gamma \vdash M'' \colon \sigma \Lra \Gamma \vdash M' \colon \sigma$
+    を示す. $M'' \to_{\beta} M'$の簡約がどのようにされるかで場合分けする. 
+    \begin{enumerate}
+      \item $M'' \equiv (\lambda x . P) Q$かつ$M' \equiv P[x \coloneqq Q]$のとき,  
+        \[
+          \Gamma \vdash (\lambda x . P) Q \colon \sigma
+        \]
+        とすると, Proposition \ref{prop1}より, ある$\tau$が存在して, 
+        \[
+          \Gamma \vdash (\lambda x . P)  \colon (\tau \to \sigma) \text{かつ}\ 
+            \Gamma \vdash Q \colon \tau
+        \]
+        をみたす. 更に, もう一度 Proposition \ref{prop1}から, 
+        \[
+          \Gamma,\ x \colon \tau \vdash P \colon \sigma\ \text{かつ}\ 
+            \Gamma \vdash Q \colon \tau
+        \]
+        となる. ここで, Proposition \ref{prop2}を用いれば, 
+        \[
+          \Gamma \vdash P[x \coloneqq Q] \colon \sigma
+        \]
+        がわかる. 
+      \item $M'' \equiv ZP$, $M' \equiv ZQ$のとき, 
+        \[
+          \Gamma \vdash ZP \colon \sigma 
+        \]
+        とすると, Proposition \ref{prop1} より, ある$\tau$が存在して, 
+        \[
+          \Gamma \vdash Z \colon \tau \to \sigma \text{かつ}
+           \Gamma \vdash P \colon \tau
+        \]
+        をみたす. ここで, $\to_{\beta}$の定義から, $P \to_{\beta} Q$でなくてはならず, この簡約は
+        1ステップであるから, 帰納法の仮定から$\Gamma \vdash Q \colon \tau$となる. よって, 
+        \[
+          \Gamma \vdash ZQ \colon \sigma
+        \]
+        がわかる. 
+      \item $M'' \equiv PZ$, $M' \equiv QZ$のとき, 
+        2のときと同様, Proposition 3.1.8 と帰納法の仮定から
+        $\Gamma \vdash P \colon \tau \to \sigma \text{かつ}
+           \Gamma \vdash Z \colon \tau$および
+        $\Gamma \vdash Q \colon \tau \to \sigma$が得られることからわかる. 
+      \item $M'' \equiv \lambda x . P$, $M' \equiv \lambda x . Q$のとき, 2, 3のときと同様, 
+        Proposition 3.1.8 と帰納法の仮定から, ある$\tau$, $\rho$が存在して, 
+        $\Gamma, x \colon \tau \vdash P \colon \rho$かつ$\sigma = (\tau \to \rho)$
+        および$\Gamma, x \colon \tau \vdash Q \colon \rho$が得られる. よって, 
+        \[
+          \Gamma \vdash \lambda x . Q \colon (\tau \to \rho) (= \sigma)
+        \]
+        が得られる. 
+    \end{enumerate}
+  \end{itemize}
+\end{proof}
+\subsection*{$\lambda 2$}
+$\lama$の拡張の1つとして, $\lambda 2$を考える. こちらもCurry流とChurch流の2通りがあるが, 本稿では$\lama$と同じくCurry流の定義を採用する. 
+\begin{shadebox}
+  \begin{df}{(\cite{Bar} Definition 4.1.5)}
+    $\lambda 2$の型の集合Type($\lambda 2$)を$\T$と書く. 
+    このとき, $\T$は以下のように帰納的に定義される. 
+    \[
+      \T = \V \ |\ \T \to \T \ |\ \forall \V \T
+    \]
+  \end{df}
+\end{shadebox}
+\begin{rmk}{(\cite{Bar} Notation 4.1.6)}
+  \begin{enumerate}
+    \item $\forall \alpha_1 \cdots \alpha_n . \sigma$は, 
+             $(\forall \alpha_1(\forall \alpha_2 \cdots (\forall \alpha_n (\sigma))\cdots))$
+             を表す. 
+    \item $\forall$の方が$\to$よりも結合が強い, すなわち, 
+             $\forall \alpha \sigma \to \tau$は$(\forall \alpha \sigma) \to \tau$のことであり, 
+             $\forall \alpha . \sigma \to \tau$は$\forall \alpha (\sigma \to \tau)$のことである.
+  \end{enumerate}
+\end{rmk}
+\begin{shadebox}
+  \begin{df}
+    $\lambda 2$の型導出規則を, 以下のように定める.
+    \begin{alignat*}{3}
+      &(\text{公理})& \quad &\Gamma \vdash x \colon \sigma& 
+        &(x \colon \sigma)\text{のとき}\\
+      &(\text{$\to$除去})& 
+        &\frac{\Gamma \vdash M \colon (\sigma \to \tau) \quad
+          \Gamma \vdash N \colon \sigma}{\Gamma \vdash (MN) \colon \tau}& & \\
+      &(\text{$\to$導入})& &\frac{\Gamma,\ x \colon \sigma \vdash M \colon \tau}
+        {\Gamma \vdash (\lambda x . M) \colon (\sigma \to \tau)}& & \\
+      &(\text{$\forall$除去})& &\frac{\Gamma, \vdash M \colon (\forall \alpha . \sigma)}
+        {\Gamma \vdash M \colon (\sigma[\alpha \coloneqq \tau])}& & \\
+      &(\text{$\forall$導入})& &\frac{\Gamma \vdash M \colon \sigma}
+        {\Gamma \vdash M \colon (\forall \alpha . \sigma)}& &(\alpha \notin FV(\Gamma))
+    \end{alignat*}
+  \end{df}
+\end{shadebox}
+\begin{ex}{(\cite{Bar} Example 4.1.8)}
+$\lambda 2$での型付けの例として, 以下のようなものがある. 
+  \begin{align*}
+    &\vdash (\lambda x . x) \colon (\forall \alpha . \alpha \to \alpha) \\
+    &\vdash (\lambda x y . y) \colon (\forall \alpha \beta . \alpha \to \beta \to \beta) \\
+    &\vdash (\lambda x . x x) \colon (\forall \alpha \alpha) \to (\forall \alpha \alpha) \\
+  \end{align*}
+ここで, 3つ目の例については, 
+ \[
+    \frac{\displaystyle
+             {\frac{x \colon \forall \alpha \alpha \vdash x \colon \forall \alpha \alpha}
+          {x \colon \forall \alpha \alpha \vdash x \colon \beta \to \alpha}} 
+    \quad \displaystyle{\frac{x \colon \forall \alpha \alpha \vdash 
+                                                                       x \colon \forall \alpha \alpha}
+          {x \colon \forall \alpha \alpha \vdash x \colon \beta}}}
+  {\displaystyle{\frac{x \colon \forall \alpha \alpha \vdash xx \colon \alpha}
+  {\displaystyle{\frac{x \colon \forall \alpha \alpha \vdash xx \colon \forall \alpha \alpha}
+        {\vdash (\lambda x. xx) \colon (\forall \alpha \alpha) \to (\forall \alpha \alpha)}}}}}
+  \]
+という導出木により確認できる. 型に$\forall$があることにより, $\lama$では型が付けられないような項についても, $\lambda 2$では型が付けられる場合がある. 
+\end{ex}
+$\lambda 2$についても, Basis lemma, Subterm lemma, Substitution lemmaが成り立つことが知られている(\cite{Bar} Proposition 4.1.17, Proposition 4.1.18, Proposition 4.1.19 参照). 一方で, Generation lemma は成り立たない. では, Subject reduction lemma はどうであろうか?
+%\begin{shadebox}
+%  \begin{prop}[Basis lemma for the Curry system]
+%    $\Gamma$を基底とする. 以下の3つが成り立つ.
+%    \begin{enumerate}
+%      \item $\Gamma ' \supset \Gamma$も基底ならば, 
+%        $\Gamma \vdash M \colon \sigma \Lra \Gamma ' \vdash M \colon \sigma$.
+%      \item 
+%        $\Gamma \vdash M \colon \sigma \Lra FV(M) \subset \text{dom} (\Gamma)$.
+%      \item
+%        $\Gamma \vdash M \colon \sigma 
+%          \Lra \Gamma \upharpoonright FV(M) \vdash M \colon \sigma$.
+%    \end{enumerate}
+%  \end{prop}
+%\end{shadebox}
+%\begin{shadebox}
+%  \begin{prop}[Subterm lemma for the Curry system]
+%    $M'$を$M$の部分項とする. このとき, ある$\Gamma'$と$\sigma'$が存在して, 
+%    \[
+%      \Gamma \vdash M \colon \sigma \Rightarrow \Gamma' \vdash M' \colon \sigma'
+%    \]
+%    をみたす. つまり. $M$が型を持つとき, その任意の部分項も型を持つ.
+%  \end{prop}
+%\end{shadebox}
+%\begin{proof}
+%略
+%\end{proof}
+%\begin{shadebox}
+%  \begin{prop}[Substitution lemma for the Curry system] \label{prop10.1}
+%    以下が成り立つ. 
+%    \begin{enumerate}
+%      \item $\Gamma \vdash M \colon \sigma \Rightarrow 
+%        \Gamma[\alpha \coloneqq \tau] \vdash M \colon \sigma[\alpha \coloneqq \tau]$.
+%      \item $\Gamma,\ x \colon \sigma \vdash M \colon \tau$かつ
+%        $\Gamma \vdash N \colon \sigma$とする. このとき, 
+%        $\Gamma \vdash M[x \coloneqq N] : \tau$.
+%    \end{enumerate}
+%  \end{prop}
+%\end{shadebox}
+%\begin{proof}
+%略
+%\end{proof}
+%\begin{ex}
+%  $\lambda \rightarrow$, $\lambda2$, $\lambda \mu$, $\lambda \cap$それぞれについて, 
+%  \[
+%    \nvdash \bold{K} \colon (\alpha \to \alpha) 
+%  \]
+%  を示せ. 
+%\end{ex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Coq} \label{sec coq}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -510,21 +1073,27 @@ $\lambda$計算には, 抽象と適用の2つの基本的な操作がある. ま
     {\tt Section [セクション名]}, {\tt End [セクション名]}でセクションを作ることができ, 
     そのセクション内共通のコンテキストを宣言できる. 
   \item[\tt Variable]
-    {\tt Variable [変数]$\colon$[型]}で, 特定の型を持つ変数を宣言できる. 例えば\\
-    {\tt Variable n$\colon$nat}\\
+    {\tt Variable [変数]$\colon$[型]}で, 特定の型を持つ変数を宣言できる. 例えば
+    
+    {\tt Variable n$\colon$nat}
+    
     で, 変数{\tt n}が自然数型{\tt nat}の要素であることを表している. 
     {\tt Section/End}コマンドと組み合わせることで, {\tt End}まで同じ意味で扱われ, 
     {\tt End}以降は効力を失う. 
-    同時に複数の変数を宣言することもできる. その場合は\\
-    {\tt Variables [変数] [変数] $\cdots$ [変数]$\colon$[型]}\\
+    同時に複数の変数を宣言することもできる. その場合は
+    
+    {\tt Variables [変数] [変数] $\cdots$ [変数]$\colon$[型]}
+    
     と書く(ただし, Coq にとっては{Variable}と{Variables}に違いは無い).    
   \item[\tt Hypothesis]
     {\tt Hypothesis [仮定名]$\colon$[仮定]}で仮定を置くことができる. {\tt Variable}同様, 
     {\tt Section/End}と組み合わせることで, セクション内共通の仮定を置くことができる. 
   \item[\tt Definition]
-    新たに関数を定義するためのコマンドで, \\
+    新たに関数を定義するためのコマンドで,
+    
     {\tt Definition [関数名] ([引数]$\colon$[引数の型])$\colon$[関数の型] := 
-    [関数の定義式]}\\
+    [関数の定義式]}
+    
     という形で用いる. 
     \begin{lstlisting}{Coq}
 Definition dq (f : R -> R) x := f (q * x) - f x. \end{lstlisting}
@@ -532,18 +1101,23 @@ Definition dq (f : R -> R) x := f (q * x) - f x. \end{lstlisting}
     {\tt f (q * x) - f x}が{\tt dq}を定義する式である. また, {\tt x}と{\tt dq}そのものの型は
     推論できるため省略できる. 
   \item[\tt Fixpoint]
-    再起関数を定義するためのコマンドで, \\
+    再起関数を定義するためのコマンドで, 
+    
     {\tt Fixpoint [関数名] ([引数]$\colon$[引数の型])$\colon$[関数の型] := 
-    [定義中の関数を含む定義式]}\\
+    [定義中の関数を含む定義式]}
+    
     と書く. 停止しない関数を認めてしまうと矛盾が生じるため, 停止性が保証されていない
     関数を定義することはできない. 
   \item[\tt Lemma]
-    補題を宣言するためのコマンドで, \\
+    補題を宣言するためのコマンドで,
+    
     {\tt Lemma [補題名] ([引数]$\colon$[引数の型])$\colon$[補題の主張]}
+    
     という形である. 
     \begin{lstlisting}{Coq}
 Lemma Dq_pow n x : x != 0 -> Dq (fun x => x ^ n) x = qnat n * x ^ (n - 1). \end{lstlisting}
-    であれば, {\tt Dq\_pow}が補題名, {\tt n}, {\tt x}が引数, {\tt :}以降が補題の主張である. \\
+    であれば, {\tt Dq\_pow}が補題名, {\tt n}, {\tt x}が引数, {\tt :}以降が補題の主張である. 
+    
     {\tt Lemma}の代わりに{\tt Theorem}, {\tt Corollary}等でも同じ機能をもつ. 
   \item[\tt Proof/Qed]
     {\tt Proof}は{\tt Lemma}の後に書いて補題の主張と証明を分ける(実際には省略可能で, 
@@ -562,22 +1136,39 @@ Lemma Dq_pow n x : x != 0 -> Dq (fun x => x ^ n) x = qnat n * x ^ (n - 1). \end{
     {\tt apply {\it lem}}でゴールを{\tt P1}に変える. 
     コンテクストの仮定{\tt H}が{\tt P1 $\to P2$}であれば{\tt apply H}で同じことができる. 
   \item[\tt rewrite]
-    {\it def}が定義のとき, {\tt rewrite /{\it def}}でゴールに出現している{\it def}を展開する. \\
+    {\it def}が定義のとき, {\tt rewrite /{\it def}}でゴールに出現している{\it def}を展開する. 
+    
     また, 補題{\it lem}が{\tt A = B}という形のとき, {\tt rewrite {\it lem}}でゴールに出現する
     {\tt A}を{\tt B}に書き換える(ただし, {\it lem}が{\tt H $\to$ (A = B)}という形であるとき, 
     {\tt H}がゴールに追加される). 更に, {\tt rewrite {\it lem} in H}で, コンテクストの{\tt H}に
     出現する{\tt A}を{\tt B}に書き換える. {\tt apply}と同じく, 使いたい等式が仮定にある場合も
-    同じように使える. 
+    同じように使える. 更に, {\tt rewrite}は繰り返し回数や適用箇所を指定できる. 
+    \begin{description}
+      \item[\tt rewrite !{\it lem}] {\it lem}による書き換えを可能な限り繰り返す. 
+        ただし場合によっては繰り返しが終わらない場合があることに注意
+        ($x + y$を$y + x$に書き換える補題を使う場合など).
+      \item[\tt rewrite n!{\it lem}] {\it lem}による書き換えを$n$回限り繰り返す.
+      \item[\tt rewrite ?{\it lem}] {\it lem}による書き換えを$0$回または$1$回行う. 
+        直前のタクティックでゴールが増える場合に特に有効. 
+      \item[\tt rewrite -{\it lem}] 逆向きに{\it lem}による書き換えを行う. 
+        つまり, {\it lem}が{\tt A = B}のとき, ゴールの{\tt B}を{\tt A}に書き換える. 
+      \item[\tt rewrite \{n\}{\it lem}] {\it lem}で書き換えられる場所のうち
+        $n$番目のみを書き換える. 
+      \item[\tt rewrite (\_ : A = B)] ゴールの{\tt A}を{\tt B}に書き換える. 
+        {\tt A = B}がゴールに追加される. この書き方の場合は補題を引数にとらない. 
+    \end{description}
 \end{description}
 以下, 2つの具体例を用いて{\tt Proof}内でのタクティックの使い方を説明する. 
-\bex{モーダスポーネンス}\\
+\bex{モーダスポーネンス}
+
 命題$P$, $Q$について, $P \Lra Q$かつ$P$であれば, $Q$が成り立つということをCoqで証明する. 
 まずこの主張を形式化すると以下の通り. 
 \begin{lstlisting}{Coq}
 From mathcomp Require Import ssreflect.
 
 Lemma modus_ponens (P Q : Prop) : (P -> Q) /\ P -> Q. \end{lstlisting}
-{\tt Prop}とは Coq において命題全体を表す型であり, {\tt /\textbackslash}は「かつ」を表している \\
+{\tt Prop}とは Coq において命題全体を表す型であり, {\tt /\textbackslash}は「かつ」を表している. 
+
 このとき, Coqのゴールエリア(コンテクストとゴールが表示される画面)は以下の通りである. 
 \begin{screen}
   \begin{lstlisting}{Coq}
@@ -629,7 +1220,8 @@ Lemma modus_ponens (P Q : Prop) : (P -> Q) /\ P -> Q. \end{lstlisting}
   \begin{lstlisting}{Coq}
   No more subgoals. \end{lstlisting}
 \end{screen}
-ゴールエリアに{\tt No more subgoals.}と表示されれば証明は終了であり, {\tt Qed}を書くことで補題として登録されることになる. \\
+ゴールエリアに{\tt No more subgoals.}と表示されれば証明は終了であり, {\tt Qed}を書くことで補題として登録されることになる. 
+
 以上をまとめると次のようになる. 
 \begin{lstlisting}{Coq}
 Lemma modus_ponens (P Q : Prop) : (P -> Q) /\ P -> Q.
@@ -658,11 +1250,13 @@ Coq による証明は, Curry-Howard 同型と呼ばれる,
   P \text{かつ} Q &\quad P \times Q \\
   P \text{または} Q &\quad  P + Q
 \end{align*}
-この同型をもとに上記の証明をもう一度考えてみると, $P \ra Q$と$P$という型に要素が存在することから, $Q$という型の要素を構成すればよいということである. \\
+この同型をもとに上記の証明をもう一度考えてみると, $P \ra Q$と$P$という型に要素が存在することから, $Q$という型の要素を構成すればよいということである. 
+
 まず, 前提の要素それぞれに$pq$, $p$と名前をつける. これがプログラム中の{\tt move$\Rightarrow$ [] pq p}のことである. 
 ここで, $P \to Q$という型は, 入力する値の型が$P$, 出力する値の型が$Q$であるような関数の型であるため, $P$の要素$p$に$pq$を適用することで, $Q$の要素を構成することができる. この関数適用がプログラム中の{\tt apply pq}のことである. 
 \eex
-\bex{代入計算}\\
+\bex{代入計算}
+
 自然数$m$, $n$について, 
 \[
   m = 0 \Lra n + m = n
@@ -696,8 +1290,10 @@ Lemma substitution m n : m = 0 -> n + m = n. \end{lstlisting}
     -------------------------------
     n + 0 = n \end{lstlisting}
 \end{screen}
-次に, {\tt n + 0}を{\tt n}に書き換えたい. mathcomp の ssrnat に{\tt addn0}という, \\
-{\tt forall n : nat, n + 0 = n}\\
+次に, {\tt n + 0}を{\tt n}に書き換えたい. mathcomp の ssrnat に{\tt addn0}という, 
+
+{\tt forall n : nat, n + 0 = n}
+
 に対応する補題があるため, {\tt rewrite addn0}を実行する. 
 \begin{screen}
   \begin{lstlisting}{Coq}
@@ -857,7 +1453,8 @@ Qed.
 \begin{lstlisting}{Coq}
 forall R : ringType, right_id 1  *%R
 \end{lstlisting}
-という補題であり, 任意の{\tt ringType}を型にもつ{\tt R}について, {\tt R}上の単位元の性質を表している. ここで, 補題の{\tt R}の型は{\tt rcfType}ではなく{\tt ringType}であるが, 前述の通り{\tt rcfType}は{\tt ringType}の性質を持っているため, 今回の形式化に用いている{\tt rcfType}型の{\tt R}についてもこの補題を使うことができる. 補題名{\tt mul1r}の{\tt r}は{\tt ringType}に対する補題であることを表しており, {\tt mulrBl}, {\tt subrK}, {\tt mulrC}なども同じである. \\
+という補題であり, 任意の{\tt ringType}を型にもつ{\tt R}について, {\tt R}上の単位元の性質を表している. ここで, 補題の{\tt R}の型は{\tt rcfType}ではなく{\tt ringType}であるが, 前述の通り{\tt rcfType}は{\tt ringType}の性質を持っているため, 今回の形式化に用いている{\tt rcfType}型の{\tt R}についてもこの補題を使うことができる. 補題名{\tt mul1r}の{\tt r}は{\tt ringType}に対する補題であることを表しており, {\tt mulrBl}, {\tt subrK}, {\tt mulrC}なども同じである. 
+
 また{\tt red\_frac\_r}は, 
 \begin{lstlisting}{Coq}
 forall x y z : R, z != 0 -> (x * z) / (y * z) = x / y \end{lstlisting}
@@ -943,7 +1540,8 @@ Proof.
     by rewrite -mulrDl -qnat_cat1.
 Qed.
 \end{lstlisting}
-ここで{\tt elim:\,n}は{\tt n}の帰納法に対応している. \\
+ここで{\tt elim:\,n}は{\tt n}の帰納法に対応している. 
+
 指数法則については, 一般には$(x - a)^{m + n} \neq (x - a)^m_q(x - a)^n_q$であり, 以下のようになる. 
 \bprop[\cite{Kac} p8 (3.6)] \label{q_exp_low}
   $x,a\in\R$, $m,n\in\Z_{>0}$について, 
@@ -1136,7 +1734,8 @@ Qed.
   \item Coqでは$A = B$という等式はどの型の上でのものなのかが区別されている. 
            {\tt eq\_int\_to\_nat}という補題は{\tt int}上の等式を{\tt nat}上の等式に写している. 
 \end{itemize}
-などが挙げられる. \\
+などが挙げられる. 
+
 次に$q$-微分について見ていく.  
 \bprop[\cite{Kac} p10 Proposition 3.3]
   $n \in \Z$について, 
@@ -1254,7 +1853,8 @@ Qed.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{関数から多項式へ} \label{ssec poly}
 ここまでは\cite{Kac}の定義に沿って関数に対して$q$-微分を定義し, また関数として
-$(x - a)^n_q$を定義してきたが, $q$-Taylor展開やGauss's binomial formulaを形式化するに当たって多項式に対する$q$-微分と多項式としての$(x - a)^n_q$を改めて定義する. \\
+$(x - a)^n_q$を定義してきたが, $q$-Taylor展開やGauss's binomial formulaを形式化するに当たって多項式に対する$q$-微分と多項式としての$(x - a)^n_q$を改めて定義する. 
+
 ここで, Coqにおける多項式の扱いについて説明する. 
 \begin{itemize}
   \item {\tt \{poly T\}}で{\tt T}係数多項式を表す型となる. {\tt T}は{\tt ringType}で
@@ -1274,7 +1874,8 @@ $(x - a)^n_q$を定義してきたが, $q$-Taylor展開やGauss's binomial formu
     {\tt size}が$1$である多項式は定数項のみからなる式である. 
   \item {\tt p.[x]}で多項式$p$の$x$での値を表す. 
 \end{itemize}
-より詳細な内容については mathcomp の poly.v を参照のこと. \\
+より詳細な内容については mathcomp の poly.v を参照のこと. 
+
 この{\tt \{poly R\}}を用いて{\tt Dq}や{\tt qbinom}を定義し直していく. 
 まず, $q$-微分について, 多項式に対する$d_q$を以下のように定義し直す. 
 \begin{lstlisting}{Coq}
@@ -1356,7 +1957,8 @@ Qed. \end{lstlisting}
 \ermk
 多項式で考える理由は, $q$-Taylor展開が多項式に対する定理であることに加え, 以下の2つの目的がある. 
 \begin{enumerate}
-\item \textbf{$x / x = 1$の計算に$x \neq 0$という条件が必要ない}\\
+\item \textbf{$x / x = 1$の計算に$x \neq 0$という条件が必要ない}
+
   先に見たように, Coqで約分の計算, つまり$x / x = 1$を行う際には$x \ne 0$という条件が
   必要である. よって, 実数$x$対して$x / x = 1$を計算する場合, 後から$x = 0$を代入することは
   できない.   しかし, 多項式で考える場合, {\tt 'X}は単項式であるためゼロ多項式とは
@@ -1374,7 +1976,8 @@ Qed. \end{lstlisting}
 %  D_q = \frac{f(qx) - f(x)}{(q - 1)x}
 %\]
 %であった. 分母に$x$が出現するため, $x = 0$は定義域から除かれる. また, 先に見たように, 形式化の際にも計算過程で約分をする場合$x \neq 0$という条件が必要になっていた. しかし, 本論文の目的である Gauss's binomial formula の証明中において, $D_q^j f (0)$の値を計算する必要がある. 任意の点において$D_q$が定義できるように修正する必要がある. \\
-\item \textbf{$q = 0$のとき高階$D_q$が定義できる}\\
+\item \textbf{$q = 0$のとき高階$D_q$が定義できる}
+
 	$q = 0$のときに2階$D_q$を計算してみると
 	\begin{align*}
 	  (D_q ^2 f) (x) = (D_0 ^2 f) (x) &= (D_0 (D_0 f)) (x) \\
