@@ -120,7 +120,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \tableofcontents
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection*{序文}
+\section*{序文}
 本論文の主結果は, $q$-類似の初等的な結果をCoqによって形式化するものである. 具体的にはVictor Kac, Pokman Cheungの{\it Quantum Calculus}\cite{Kac}の4章(4.1)式の$q$-Taylor 展開, 及びその系として得られる Gauss's binomial formula の形式化を目標としている. 
 本論文での$q$-類似に関する定義や定理, 証明は\cite{Kac}によるものだが, その形式化を行ったという点において独自性がある. 形式化したコード全体は\url{https://github.com/nakamurakaoru/q-analogue}\cite{coq qana}にある. q\_analogue.v が\cite{Kac}の形式化をしたファイルであり, q\_tool.v は直接$q$-類似に関係はしないが, 形式化をするために自分で用意した補題をまとめたファイルである. 
 
@@ -175,7 +175,7 @@ $q$-類似は, 学部4年次に卒業研究のテーマとして扱ったもの�
 
 Coqとは, 定理証明支援系の1つであり, 数学的な証明が論理学の推論規則に沿って正しく書かれているかどうか判定するプログラムである.
 人間がチェックすることが難しい複雑な証明でも正しさが保証され, また証明付きプログラミングにも応用される. Mizar, Isabelle/HOL等他にも定理証明支援系は存在するが, 修士1年次後期に履修した授業でCoqの使い方を学んだため, 今回の形式化に利用した. 
-Coqは型付き$\lambda$計算という理論に基づいている. この$\lambda$計算については修士1年次に少人数クラスで学習した内容であるため, Coq との関係にも触れつつ本論文でも説明を加える. 今回の証明に関しては, Coqの標準ライブラリ \cite{coq sl}に加えて, 数学の証明のために整備されたライブラリ群である mathcomp \cite{coq mc}も用いている. 
+Coqは型付き$\lambda$計算という理論に基づいている. この$\lambda$計算については修士1年次に少人数クラスで学習した内容であるため, Coq との関係にも触れつつ本論文でも説明を加える. 更に, 型と形式化に関する数学の理論として, Homotopy Type Theory がある. これについては修士2年次に少人数クラスで学んだため, $q$-類似の形式化とは章を分け, 少人数クラスのまとめとして概要を述べる. 今回の証明に関しては, Coqの標準ライブラリ \cite{coq sl}に加えて, 数学の証明のために整備されたライブラリ群である mathcomp \cite{coq mc}も用いている. 
 実際にCoqが用いられた有名な例として, 四色定理や Feit-Thompson の定理(奇数位数定理)などがある. 
 %ssreflect は四色定理は形式化するため, mathcomp は Feit-Thompson の定理(奇数位定理)の形式化のために整備されたライブラリである. 
 
@@ -187,43 +187,55 @@ Coqは型付き$\lambda$計算という理論に基づいている. この$\lamb
 \ref{sec lambda}節で修士1年次に少人数クラスで学習したH.P.Barendregtの{\it Lambda Calculi with Types}\cite{Bar}に沿って, 型付き$\lambda$計算について述べる. 
 \ref{sec coq}節は Coq の概要についてで, 特に\ref{ssec coq_use}節でCoq や mathcompの使い方を具体例を交えて説明するが, より詳細な情報については萩原 学/アフェルト・レナルドの{\it Coq/SSReflect/Mathcomp}\cite{Hag}等を参照のこと. 
 これらの準備のもと, \ref{sec form}節から本題の形式化に入る. \cite{Kac}での定義, 定理を述べた後, その形式化を与え, 必要であれば形式化をするにあたっての注意点を述べることを繰り返すという流れである. 
-証明の方針等は基本的に\cite{Kac}の通りであるが, \ref{ssec poly}節では一部\cite{Kac}から離れ, 多項式として$q$-微分や$q$-二項式を定義しなおして形式化を行っている. これらの新たな定義が多項式に対してのもとの定義を適用したものと一致していることの証明も行っている. また, \ref{chap hott}章で少人数クラスで学習した内容についてまとめている. 
+証明の方針等は基本的に\cite{Kac}の通りであるが, \ref{ssec poly}節では一部\cite{Kac}から離れ, 多項式として$q$-微分や$q$-二項式を定義しなおして形式化を行っている. これらの新たな定義が多項式に対してのもとの定義を適用したものと一致していることの証明も行っている. また, \ref{chap hott}章で修士2年次に少人数クラスで学習した内容についてまとめている. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{謝辞}
+形式化の方針やCoq の使い方等, 本論文の作成において終始熱心に指導してくださった, アドバイザーである Jacques Garrigue 教授に心からの感謝を申し上げます. 
 
+今回の形式化の題材に選んだ$q$-類似について指導してくださった学部4年次の指導教員である古庄英和教授に感謝の意を表します. 
+
+多元数理科学研究科研究員の才川隆文氏から数多くの的確な助言をいただきました. 感謝申し上げます. 
+
+最後に, 研究室の皆様には常に刺激的な議論とアドバイスを頂き, 精神的にも絶えず支えられていました. 本当にありがとうございます. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{修士論文} \label{chap thesis}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{$q$-類似} \label{sec qana}
-本節では, 形式化について説明する\ref{sec form}節では詳細には立ち入らない$q$-類似の性質や, $q$-Taylor展開以降で\cite{Kac}で取り上げられている内容について述べる. \ref{ssec infsum}, \ref{ssec jacobi}節は無限和に関するものであるため形式化はできていない. 
+本節では, 形式化について説明する\ref{sec form}節では詳細には立ち入らない$q$-類似の性質や, $q$-Taylor展開以降で\cite{Kac}で取り上げられている内容について述べる. 
+%\ref{ssec infsum}, 
+\ref{ssec jacobi}節は極限や無限和に関するものであるため形式化はできていない. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{$q$-微分について成り立つ諸性質} \label{ssec qprops}
-通常の微分は線形作用素であり, また積の微分法や商の微分法などの性質が成り立つ. これらの性質は$q$-微分でもどうなるのであろうか. まずは線形性について見ていく. $a$, $b \in \R$, 実数上の関数$f$, $g$について, 
+$q$-微分は\cite{Kac}において, まず$q$-差分
+\[
+  d_q f(x) = f(qx) - f(x)
+\]
+を定義し, この$d_q$を用いて
+\[
+  D_q f(x) = \frac{d_q f(x)}{d_q x}
+\]
+と定めている. 
+
+さて, 通常の微分は線形作用素であり, また積の微分法や商の微分法などの性質が成り立つのであった. これらの性質は$q$-微分でもどうなるのであろうか. まずは線形性について見ていく. $a$, $b \in \R$, 実数上の関数$f$, $g$について, $D_q$を直接計算すると以下のようになる. 
 \begin{align*}
   D_q (af(x) + bg(x)) &= \frac{(af(qx) + bf(qx)) - (af(x) + bf(x))}{(q - 1)x}\\
                            &= \frac{af(qx) - af(x)}{(q - 1)x} + \frac{bg(qx) - bg(x)}{(q - 1)x}\\
                            &= a \frac{f(qx) - f(x)}{(q - 1)x} + b \frac{g(qx) - g(x)}{(q - 1)x}\\
                            &= a D_q f(x) + b D_q g(x)
 \end{align*}
-と計算できるので, 通常の微分と変わらない形で成り立つ(\cite{Kac} p2). 一方で積の微分法はそのままの形では成り立たない. このことを確認するために, まず$q$-差分
-\[
-  d_q f(x) = f(qx) - f(x)
-\]
-が積についてどう振る舞うかを観察する. 実数上の関数$f$, $g$について, 実際に計算してみると, 以下のように計算できる. 
+よって, 通常の微分と変わらない形で成り立つ(\cite{Kac} p2). 一方で積の微分法はそのままの形では成り立たない. このことを確認するために, まず$q$-差分が積についてどう振る舞うかを観察する. 実数上の関数$f$, $g$について計算してみると 
 \begin{align*}
   d_q (f(x)g(x)) &= f(qx)g(qx) - f(x)g(x) \\
                     &= f(qx)g(qx) - f(qx)g(x) + f(qx)g(x) - f(x)g(x)\\
                     &= f(qx) d_q g(x) + g(x) d_q f(x)
 \end{align*}
-ここで, $q$-微分は$q$-差分を用いて
-\[
-  D_q f(x) = \frac{d_q f(x)}{d_q x}
-\]
-と表せることを用いると(\cite{Kac}では順番が逆で, 先に$q$-微分を定義している), 
+となるため, $D_q$は
 \begin{align*}
   D_q(f(x)g(x)) &= \frac{d_q(f(x)g(x))}{(q - 1)x}\\
                    &= \frac{f(qx) d_q g(x) + g(x) d_q f(x)}{(q - 1)x}\\
                    &= f(qx) \frac{d_q g(x)}{(q - 1)x} + g(x) \frac{d_q f(x)}{(q - 1)x}
 \end{align*}
-となるので, 積の$q$-微分法は
+となり, 積の$q$-微分法は
 \[
   D_q (f(x) g(x)) = f(qx) D_q g(x) + g(x) D_q f(x) \quad \text{(\cite{Kac} p3 (1.11))}
 \]
@@ -264,25 +276,25 @@ Coqは型付き$\lambda$計算という理論に基づいている. この$\lamb
 \]
 が成り立つことが証明されている(\cite{Kac} p18参照). この補題も形式化できており, \cite{coq qana}のq\_analogue.vの{\tt q\_pascal}という補題である.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{無限和に関する話題} \label{ssec infsum}
-本節と次節の内容は形式化できていない. 
-Gauss's binomial formula において, $x = 1$, $a = x$とすれば
-\[
-  (1 + x)^n_q = \sum_{j = 0}^n q^{j (j - 1) / 2} \qcoe{n}{j} x^j
-\]
-となる. ここで$|q| < 1$とすると, 
-\[
-  \lim_{n \to \infty} \qcoe{n}{j} =
-  \lim_{n \to \infty} \frac{(1 - q^n)(1 - q^{n - 1}) \cdots (1 - q^{n - j + 1})}
-                                  {(1 - q) (1 - q^2) \cdots (1 - q^j)} =
-  \frac{1}{(1 - q) (1 - q^2) \cdots (1 - q^j)}
-\]
-となるので,  
-\[
-  (1 + x)^{\infty}_q = \sum_{j = 0}^{\infty} q^{j (j - 1)/2}
-  \frac{x^j}{(1 - q) (1 - q^2) \cdots (1 - q^j)}
-\]
-無限積を無限和に書き換える式が得られる. この式は Euler により見つけられたため, Euler's first identity の意で\cite{Kac}では E1 と呼ばれている. 
+%\subsection{無限和に関する話題} \label{ssec infsum}
+%本節と次節の内容は形式化できていない. 
+%Gauss's binomial formula において, $x = 1$, $a = x$とすれば
+%\[
+%  (1 + x)^n_q = \sum_{j = 0}^n q^{j (j - 1) / 2} \qcoe{n}{j} x^j
+%\]
+%となる. ここで$|q| < 1$とすると, 
+%\[
+%  \lim_{n \to \infty} \qcoe{n}{j} =
+%  \lim_{n \to \infty} \frac{(1 - q^n)(1 - q^{n - 1}) \cdots (1 - q^{n - j + 1})}
+%                                  {(1 - q) (1 - q^2) \cdots (1 - q^j)} =
+%  \frac{1}{(1 - q) (1 - q^2) \cdots (1 - q^j)}
+%\]
+%となるので,  
+%\[
+%  (1 + x)^{\infty}_q = \sum_{j = 0}^{\infty} q^{j (j - 1)/2}
+%  \frac{x^j}{(1 - q) (1 - q^2) \cdots (1 - q^j)}
+%\]
+%無限積を無限和に書き換える式が得られる. この式は Euler により見つけられたため, Euler's first identity の意で\cite{Kac}では E1 と呼ばれている. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{$q$-類似を考える利点} \label{ssec jacobi}
 %本節では, まだ形式化はできていない$q$-Taylor展開以降の\cite{Kac}の内容について, 特に$q$-類似を考える利点の1つであるJacobiの三重積について説明する. 
@@ -302,7 +314,7 @@ Gauss's binomial formula において, $x = 1$, $a = x$とすれば
 %  (x+a)^n_q = \sum_{j=0}^n \qcoe{n}{j} q^{\frac{j(j-1)}{2}} a^j x^{n-j}
 %\]
 %が成り立つことの形式化を目標としている. 
-あえてパラメータを増やす$q$-類似を考える利点の一つとしては, 証明が複雑な定理に対してより簡単な別証明を与えられる場合があることである. 例えば, Jacobiの三重積(\cite{Kac} p35 Theorem 11.1)
+あえてパラメータを増やす$q$-類似を考える利点の一つとしては, 証明が複雑な定理に対してより簡単な別証明を与えられる場合があることである. 例えば, 以下のJacobiの三重積(\cite{Kac} p35 Theorem 11.1)はその一例である. 
 \begin{screen}
 $z$, $q \in \R$, $|q| < 1$として, 
 \[
@@ -311,7 +323,7 @@ $z$, $q \in \R$, $|q| < 1$として,
 \]
 が成り立つ. 
 \end{screen}
-はその一例である. 楕円関数論の文脈で登場する恒等式であるが(\cite{Ume} p144 (3.47)等を参照), $q$-類似で得られる式
+これは楕円関数論の文脈で登場する恒等式であるが(\cite{Ume} p144 (3.47)等を参照), $q$-類似で得られる式
 \begin{align*}
   (1 + x)^{\infty}_q &=
     \sum_{j = 0}^{\infty} q^{j(j - 1)/2} \frac{x^j}{(1 - q) (1 - q^2) \cdots (1 - q^j)}
@@ -320,7 +332,31 @@ $z$, $q \in \R$, $|q| < 1$として,
     \sum_{j = 0}^{\infty} \frac{x^j}{(1 - q) (1 - q^2) \cdots (1 - q^j)}
       \quad(\text{\cite{Kac} p30 (9.4)式})
 \end{align*}
-を用いることで簡単に証明できる. 
+を用いることで簡単に証明できる. これらの等式は Euler によって発見されたことから, \cite{Kac}ではそれぞれ Euler's first and second identities の意で E1, E2 と呼んでいる. 
+
+E1については, Gauss's binomial formula を無限に拡張することで得られる. 
+まず, Gauss's binomial formula において, $x = 1$, $a = x$とすれば
+\[
+  (1 + x)^n_q = \sum_{j = 0}^n q^{j (j - 1) / 2} \qcoe{n}{j} x^j
+\]
+となる. ここで$|q| < 1$とすると, 
+\[
+  \lim_{n \to \infty} \qcoe{n}{j} =
+  \lim_{n \to \infty} \frac{(1 - q^n)(1 - q^{n - 1}) \cdots (1 - q^{n - j + 1})}
+                                  {(1 - q) (1 - q^2) \cdots (1 - q^j)} =
+  \frac{1}{(1 - q) (1 - q^2) \cdots (1 - q^j)}
+\]
+となるので,  
+\[
+  (1 + x)^{\infty}_q = \sum_{j = 0}^{\infty} q^{j (j - 1)/2}
+  \frac{x^j}{(1 - q) (1 - q^2) \cdots (1 - q^j)}
+\]
+が得られる. また, E2 については, 任意の形式的冪級数に対して, 無限和に拡張した$x = 0$まわりでの$q$-Taylor展開が成り立つこと, $|q| < 1$のとき$\lim_{n \to \infty} [n] = \frac{1}{1 - q}$となることから証明できる. 
+
+更に, E1, E2をもとにして指数関数$e^x$の$q$-類似$e^x_q$, $E^x_q$を考えることができ(\cite{Kac} p30 (9.7), p31 (9.10)), 
+また$e^x_q$, $E^x_q$を用いて$q$-三角関数を定義したり(\cite{Kac} p33)と, E1, E2 は\cite{Kac}の中でも重要な式である. 
+
+有限の範囲で扱うことができ,  E1, E2 の基礎となる等式であることが今回の形式化の目標としてGauss's binomial formula と$q$-Taylor展開を選んだ理由である. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{型付き$\lambda$計算} \label{sec lambda}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1061,7 +1097,6 @@ $\lambda 2$についても, Basis lemma, Subterm lemma, Substitution lemmaが成
 \subsection{$\lambda$-cube と CIC}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Coqの使い方} \label{ssec coq_use}
-%Coq とは, 定理証明支援系の1つであり, 数学的な証明が正しいかどうか判定するプログラムである. 人間がチェックすることが難しい複雑な証明でも正しさが保証され, また証明付きプログラミングにも応用される. 例えば, 
 この節ではCoqのコマンドとタクティックの使い方について述べる. ここでは, タクティックは証明の中でコンテクスト(変数や仮定)やゴール(証明すべき主張)を変形させるもの, コマンドはタクティック以外のものとして扱う. 
 まず, よく使うコマンドについて説明する. 
 \begin{description}
@@ -1142,7 +1177,7 @@ Lemma Dq_pow n x : x != 0 -> Dq (fun x => x ^ n) x = qnat n * x ^ (n - 1). \end{
     {\tt A}を{\tt B}に書き換える(ただし, {\it lem}が{\tt H $\to$ (A = B)}という形であるとき, 
     {\tt H}がゴールに追加される). 更に, {\tt rewrite {\it lem} in H}で, コンテクストの{\tt H}に
     出現する{\tt A}を{\tt B}に書き換える. {\tt apply}と同じく, 使いたい等式が仮定にある場合も
-    同じように使える. 更に, {\tt rewrite}は繰り返し回数や適用箇所を指定できる. 
+    同じように使える. 更に, {\tt rewrite}は繰り返し回数や適用箇所を指定できる.
     \begin{description}
       \item[\tt rewrite !{\it lem}] {\it lem}による書き換えを可能な限り繰り返す. 
         ただし場合によっては繰り返しが終わらない場合があることに注意
@@ -1154,9 +1189,12 @@ Lemma Dq_pow n x : x != 0 -> Dq (fun x => x ^ n) x = qnat n * x ^ (n - 1). \end{
         つまり, {\it lem}が{\tt A = B}のとき, ゴールの{\tt B}を{\tt A}に書き換える. 
       \item[\tt rewrite \{n\}{\it lem}] {\it lem}で書き換えられる場所のうち
         $n$番目のみを書き換える. 
+      \item[\tt rewrite [条件]{\it lem}] 条件に一致する場所を{\it lem}で書き換える.
       \item[\tt rewrite (\_ : A = B)] ゴールの{\tt A}を{\tt B}に書き換える. 
         {\tt A = B}がゴールに追加される. この書き方の場合は補題を引数にとらない. 
     \end{description}
+    このような, タクティックの前後に書いてその機能を拡張するものをタクティカルと言う. 
+    {\tt move=>}の{\tt =>}や{\tt move$\colon$}の{\tt $\colon$}もタクティカルである. 
 \end{description}
 以下, 2つの具体例を用いて{\tt Proof}内でのタクティックの使い方を説明する. 
 \bex{モーダスポーネンス}
@@ -1355,7 +1393,7 @@ forall x : nat, addn x 0 = x \end{lstlisting}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{形式化}\label{sec form}
-この定義を形式化するためまずは実数の形式化を考える. 
+本節から実際に$q$-類似の形式化を行っていく. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{$q$-微分の定義}
 様々な$q$-類似を考えるにあたって, まずは微分の$q$-類似から始める. 以下, $q$を$1$でない実数とする. 
@@ -1434,7 +1472,7 @@ Definition Dq f := dq f // dq id. \end{lstlisting}
                  = [n] x ^ {n - 1}
   \] 
 \epf
-この定義と補題の形式化は以下のとおりである. 
+この定義と補題の形式化は以下の通りである. 
 \begin{lstlisting}{Coq}
 Definition qnat n : R := (q ^ n - 1) / (q - 1).
 
@@ -1449,6 +1487,10 @@ Proof.
   by rewrite [in (q - 1)^-1 * (q ^ n - 1)] mulrC.
 Qed.
 \end{lstlisting}
+この証明で用いているタクティックを見てみると, まず{\tt x $\neq$ 0}という前提があるため, 
+{\tt move=> Hx}で名前をつけてコンテクストに読み込んでいる. その後は基本的に{\tt rewrite}しか用いていないため, 式変形を行っているだけである. また, 証明中3, 4行目の{\tt last}は証明するゴールの順番を入れ替えるタクティックであり, 5行目最後の{\tt //}は{\tt rewrite}の後や
+{\tt move}, {\tt apply}の後で{\tt => //}という形で用いるタクティカルで, すべてのゴールに対して{\tt done}を試みる機能を持つ({\tt done}が適用できないゴールがあってもエラーにならない). 同じような形で用いるタクティカルに{\tt /=}があり, こちらは定義を開く程度の簡単な計算を試みるものである. この二つを合わせて{\tt //=}とすることもできる. 
+
 証明で用いている補題について, 例えば{\tt mul1r}は
 \begin{lstlisting}{Coq}
 forall R : ringType, right_id 1  *%R
@@ -1508,7 +1550,8 @@ divff : forall (F : fieldType) (x : F), x != 0 -> x / x = 1 \end{lstlisting}
 \epf
 まず, $(x - a)^n_q$の定義を形式化する. 
 \begin{lstlisting}{Coq}
-Fixpoint qbinom_pos a n x := match n with
+Fixpoint qbinom_pos a n x :=
+  match n with
   | 0 => 1
   | n0.+1 => (qbinom_pos a n0 x) * (x - q ^ n0 * a)
   end. \end{lstlisting}
@@ -1560,7 +1603,7 @@ Qed.
   \end{align*}
   より成立する.
 \epf
-この形式化は次のとおりである. 
+この形式化は次の通りである. 
 \begin{lstlisting}{Coq}
 Lemma qbinom_pos_explaw x a m n :
   qbinom_pos a (m + n) x =
@@ -1730,7 +1773,17 @@ Qed.
            \begin{lstlisting}{Coq}
   case Hmn : (Posz m + Negz n) => [l|l]  /=. \end{lstlisting}
            として, {\tt m $-$ n'}の値を{\tt l}とおき, {\tt l}が{\tt 0}以上かどうかで
-           場合分けをしている
+           場合分けをしている. 
+  \item {\tt have}は仮定を追加するためのタクティックで, 
+  
+    {\tt have H$\colon$P}
+    
+    と書くことで{\tt P}がゴールに追加され, その証明が終わればコンテクストに{\tt P}が追加される. 
+    また, 
+    
+    {\tt have $\to \colon$ A = B}
+    
+    と書くと{\tt rewrite (\_ : A = B)}とほとんど同じ働きをする. 
   \item Coqでは$A = B$という等式はどの型の上でのものなのかが区別されている. 
            {\tt eq\_int\_to\_nat}という補題は{\tt int}上の等式を{\tt nat}上の等式に写している. 
 \end{itemize}
@@ -1852,28 +1905,69 @@ Qed.
 {\tt case:\,n}で{\tt n}が$0$以上か負かで場合分けを, {\tt destruct n}で$0$か$1$以上かの場合分けをしており, それぞれの場合で{\tt Dq\_qbinom\_0}, {\tt Dq\_qbinom\_pos}, {\tt Dq\_qbinom\_neg}を使っていることが見て取れる. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{関数から多項式へ} \label{ssec poly}
-ここまでは\cite{Kac}の定義に沿って関数に対して$q$-微分を定義し, また関数として
-$(x - a)^n_q$を定義してきたが, $q$-Taylor展開やGauss's binomial formulaを形式化するに当たって多項式に対する$q$-微分と多項式としての$(x - a)^n_q$を改めて定義する. 
+本節では, 今まで関数として形式化していた$q$-微分や$(x - a)^n_q$を多項式として定義しなおしていく. 多項式として捉えなおす理由は, $q$-Taylor展開が多項式に関する定理であることに加え, 次の2つのメリットがあるからである. 
+\begin{description}
+\item[$x / x = 1$の計算に$x \neq 0$という条件が必要ない]
 
+  先に見たように, Coqで約分の計算, つまり$x / x = 1$を行う際には$x \ne 0$という条件が
+  必要である. よって, 実数$x$対して$x / x = 1$を計算する場合, 後から$x = 0$を代入することは
+  できない.   しかし, 多項式で考える場合, $x$は単項式であるためゼロ多項式とは
+  異なるので, $x \neq 0$という条件は自動的にみたされることになり, $x / x = 1$
+  の計算には特に条件が必要ない. よって, $x$で約分した後でも$0$での値を計算できる.  
+  例えば$D_q (x + a)^n_q = [n](x + a)^{n - 1}_q$という計算には$x$での約分が必要であるが, 
+  多項式として考える場合には上の計算をした後でも$0$での値を求めることができる. 
+  この値は本論文の目的であるGauss's binomial formulaの証明に必要である. 
+\item[$q = 0$のとき高階$D_q$が定義できる]
+
+	$q = 0$のときに2階$D_q$を計算してみると
+	\begin{align*}
+	  (D_q ^2 f) (x) = (D_0 ^2 f) (x) &= (D_0 (D_0 f)) (x) \\
+	                    &= D_0 \left( \lambda x.\ \frac{f (0 x) - f(x)}{(0 - 1)x} \right) (x) \\
+	                    &= D_0 \left( \lambda x.\ \frac{f(x) - f(0)}{x} \right) (x) \\
+	                    &= (D_0 F) (x)
+	                      \quad (\text{ここで}F \coloneqq \lambda x.\ \frac{f(x) - f(0)}{x}
+	                                \text{とおいた})\\
+	                    &= \lambda x.\ \frac{F(x) - F(0)}{x} (x) \\
+	                    &= \frac{F(x) - F(0)}{x}
+	\end{align*}
+	となるが, 
+	\[
+	  F(0) = \frac{f(0) - f(0)}{0} = \frac{0}{0}
+	\]
+	となってしまう
+	(Coq では$0/0$は$0$と定義されているが, これでも正しい計算結果とはならない).
+	この問題が起きるのはもともとの$dq$を関数の引数に対して各点ごとに定義しているから
+	であり, 多項式の係数を変化させることで定義すれば$q = 0$でも問題が起きない. 
+	よって多項式に対して定義しなおした$q$-微分は$q = 0$かどうかにかかわらず
+	高階$q$-微分を定義できる. 
+\end{description}
+%前節までで$q$-微分と$(x - a)^n_q$の形式化ができたため, 主目的である$q$-Taylor展開の形式化に移りたいが, その前に関数と多項式の違いについて述べる. 
+
+%・$q$-Taylor展開は多項式に関しての定理である. 
+通常の数学では関数と多項式の違いをあまり意識しないことも多く, $(x - a)^n_q$は, \cite{Kac}の定義から多項式になることは当たり前に思えるかもしれないが, Coq では関数と多項式は明確に区別されている. 前節での$(x - a)^n_q$の形式化{\tt qbinom\_pos}は, {\tt R}の要素を受け取って{\tt R}の要素を返す関数として定義されており, Coq では一度関数として定義したものを多項式として扱うことはできない. そのため$(x - a)^n_q$の形式化を多項式として改めて定義し, 前節での定義と一致することを確認するという方法をとることにする. 
+
+また, これまでの$q$-微分の形式化{\tt Dq}は関数の各点での値として定義していたため, 多項式として定義しなおした{qbinom\_pos\_poly}に適用することはできない. そのため$q$-微分の形式化も多項式に対する定義に変えなくてはならない. 
+\brmk
+  実際には, 多項式$p$に対して$x \mapsto \text{($p$の$x$での値)}$という関数を考えれば
+  これまでの{\tt Dq}に適用できる. しかし, 各点での定義のままでは前述のとおり約分を行うために
+  $0$でないという条件が必要となり不都合が生じるので, 多項式を受け取り多項式を返す操作
+  として定義し直すことにする. 
+\ermk
 ここで, Coqにおける多項式の扱いについて説明する. 
-\begin{itemize}
-  \item {\tt \{poly T\}}で{\tt T}係数多項式を表す型となる. {\tt T}は{\tt ringType}で
-    なくてはならないが, {\tt rcfType}は{\tt ringType}の構造を引き継いでいるため, 
-    今回用いている{\tt R}に対して{\tt \{poly R\}}が定義できる. 
-  \item {\tt \{poly R\}}は{\tt ringType}と{\tt lmodType}の構造を持っている. 
-    よって, 前者の性質から今まで使ってきた{\tt ringType}に対する補題がそのまま使え, 後者から
-    スカラー倍{\tt a *$\colon$p}(ここで{\tt a$\colon$R}, {\tt p$\colon$ \{poly R\}}である)
-    も定義される. 
-  \item {\tt \textbackslash poly\_(i < n) E(i)}で, 次数が$n - 1$次以下, $i$次の係数が$E(i)$
-    である多項式表す. 
-  \item {\tt c\%:P}で定数$c$のみからなる単項式を表す. 
-  \item {\tt 'X}で変数$x$のみからなる単項式を表す. 
-  \item {\tt p`\_i}で多項式$p$の$i$次の係数を表す. 
-  \item {\tt size p}で多項式$p$の次数$+1$を表す. 
+{\tt \{poly T\}}で{\tt T}係数多項式全体を表す型となる. {\tt T}は{\tt ringType}でなくてはならないが, {\tt rcfType}は{\tt ringType}の構造を引き継いでいるため, 今回用いている{\tt R}に対して{\tt \{poly R\}}が定義できる. 
+また, もともと通常の数学において環を係数にもつ多項式全体の集合は環を成し, また加群の構造を持っているが, Coq において多項式全体を表す型{\tt \{poly T\}}も{\tt ringType}と{\tt lmodType}の構造を持っている. よって, 前者の性質から今まで使ってきた{\tt ringType}に対する補題がそのまま使え, 後者からスカラー倍{\tt a *$\colon$p} (ここで{\tt a$\colon$T}, 
+{\tt p$\colon$\{poly T\}}である)に関する補題が利用できる. {\tt \{poly\}}に関する記号や操作については以下の通り. 
+\begin{description}
+  \item[\tt \textbackslash poly\_(i < n) E(i)] 次数が$n - 1$次以下, $i$次の係数が$E(i)$
+    である多項式
+  \item[\tt c\%:P] 定数$c$のみからなる単項式
+  \item[\tt 'X] 変数$x$のみからなる単項式
+  \item[\tt p`\_i] 多項式$p$の$i$次の係数 
+  \item[\tt size p] 多項式$p$の次数$+1$
     {\tt size}が$0$である多項式はゼロ多項式のみであり, 
     {\tt size}が$1$である多項式は定数項のみからなる式である. 
-  \item {\tt p.[x]}で多項式$p$の$x$での値を表す. 
-\end{itemize}
+  \item[\tt p.[x]] 多項式$p$の$x$での値 
+\end{description}
 より詳細な内容については mathcomp の poly.v を参照のこと. 
 
 この{\tt \{poly R\}}を用いて{\tt Dq}や{\tt qbinom}を定義し直していく. 
@@ -1910,12 +2004,13 @@ Lemma Dqp'_DqE p x : x != 0 -> (Dqp' p).[x] = (Dq # p) x. \end{lstlisting}
 \brmk
   {\tt Dqp\_Dqp'E}には特に条件がなく, {\tt Dqp'\_DqE}には$x \neq 0$という条件がついている. 
   この違いは, 前者は{\tt 'X / 'X = 1\%:P}という多項式での約分を, 後者は{\tt x / x = 1}という
-  実数での約分を行っているということから生じている. 後で詳しく述べるが, 約分の際に条件が
+  実数での約分を行っているということから生じている. 前述の通り, 約分の際に条件が
   必要なくなることが多項式で考える利点の一つである. 
 \ermk
 次に, $(x - a)^n_q$を多項式として以下のように定義しなおす. 
 \begin{lstlisting}{Coq}
-Fixpoint qbinom_pos_poly a n := match n with
+Fixpoint qbinom_pos_poly a n :=
+  match n with
   | 0 => 1
   | n.+1 => (qbinom_pos_poly a n) * ('X - (q ^ n * a)%:P)
   end. \end{lstlisting}
@@ -1955,62 +2050,9 @@ Qed. \end{lstlisting}
   このように, 当たり前の内容を明示的に書かなければならないことに加え, 
   形式化するための証明の構造を工夫しなければならない場合もある. 
 \ermk
-多項式で考える理由は, $q$-Taylor展開が多項式に対する定理であることに加え, 以下の2つの目的がある. 
-\begin{enumerate}
-\item \textbf{$x / x = 1$の計算に$x \neq 0$という条件が必要ない}
-
-  先に見たように, Coqで約分の計算, つまり$x / x = 1$を行う際には$x \ne 0$という条件が
-  必要である. よって, 実数$x$対して$x / x = 1$を計算する場合, 後から$x = 0$を代入することは
-  できない.   しかし, 多項式で考える場合, {\tt 'X}は単項式であるためゼロ多項式とは
-  異なるので, {\tt 'X $\neq$ 0}という条件は自動的にみたされることになり, {\tt 'X / 'X = 1\%:P}
-  の計算には特に条件が必要ない. よって, {\tt 'X}で約分した後でも$0$での値を計算できる.  
-  例えば$D_q (x + a)^n_q = [n](x + a)^{n - 1}_q$という計算には$x$での約分が必要であるが, 
-  多項式として考える場合には上の計算をした後でも$0$での値を求めることができる. 
-  この値は本論文の目的であるGauss's binomial formulaの証明に必要である. 
-%本論文の目的であるGauss's binomial formula は$q$-Taylor展開の系として導かれるので, $q$-Taylor展開に必要な条件はGauss's binomial formulaにも必要となる. ここで, $q$-Taylor展開の証明には$D_q (x - a)^n_q = [n] (x - a)^{n-1}_q$を用いており, 先に見たとおりこの証明の形式化には$x \neq 0$という条件が必要である($x$で約分する計算があるため). よって, Gauss's binomial formulaの証明の形式化には$x \neq 0$という条件が必要である. 一方, Gauss's binormal formulaの証明では, $f (x) = (x + a)^n_q$として, $(Dq^j f) (0)$の値を計算する必要がある. このため, 
-%
-%本論文の目的であるGauss's binomial formula の証明中では, $f (x) = (x + a)^n_q$として, $(Dq^j f) (0)$の値を計算する必要がある. 一方で, $q$-Taylor展開の結果も利用しなければならないが, $q$-Taylor展開の証明のためには$D_q (x - a)^n_q = [n] (x - a)^{n-1}_q$を用いており, 先に見たとおりこの証明の形式化には$x \neq 0$という条件が必要である($x$で約分する計算があるため). したがって, $D_q^j f$に$x = 0$を代入することができない. 
-%
-%$D_q$の定義を思い出すと, 
-%\[
-%  D_q = \frac{f(qx) - f(x)}{(q - 1)x}
-%\]
-%であった. 分母に$x$が出現するため, $x = 0$は定義域から除かれる. また, 先に見たように, 形式化の際にも計算過程で約分をする場合$x \neq 0$という条件が必要になっていた. しかし, 本論文の目的である Gauss's binomial formula の証明中において, $D_q^j f (0)$の値を計算する必要がある. 任意の点において$D_q$が定義できるように修正する必要がある. \\
-\item \textbf{$q = 0$のとき高階$D_q$が定義できる}
-
-	$q = 0$のときに2階$D_q$を計算してみると
-	\begin{align*}
-	  (D_q ^2 f) (x) = (D_0 ^2 f) (x) &= (D_0 (D_0 f)) (x) \\
-	                    &= D_0 \left( \lambda x.\ \frac{f (0 x) - f(x)}{(0 - 1)x} \right) (x) \\
-	                    &= D_0 \left( \lambda x.\ \frac{f(x) - f(0)}{x} \right) (x) \\
-	                    &= (D_0 F) (x)
-	                      \quad (\text{ここで}F \coloneqq \lambda x.\ \frac{f(x) - f(0)}{x}
-	                                \text{とおいた})\\
-	                    &= \lambda x.\ \frac{F(x) - F(0)}{x} (x) \\
-	                    &= \frac{F(x) - F(0)}{x}
-	\end{align*}
-	となるが, 
-	\[
-	  F(0) = \frac{f(0) - f(0)}{0} = \frac{0}{0}
-	\]
-	となってしまう
-	(Coq では$0/0$は$0$と定義されているが, これでも正しい計算結果とはならない).
-	この問題が起きるのはもともとの{\tt dq}を関数の引数に対して各点ごとに定義しているから
-	であり, 多項式の係数を変化させることで定義している{\tt dqp}では$q = 0$でも
-	問題が起きない. よってこの{\tt dqp}を用いている{\tt Dqp}および{\tt Dqp'}については
-	$q = 0$かどうかにかかわらず高階$q$-微分を定義できる. 
-\end{enumerate}
-%\brmk
-%この{\tt Lemma}で注意すべき点は, {\tt 'X \%/ 'X = 1\%:P}という計算をする際に特に条件が必要ないことである. Coqで約分の計算を行う際には分母が$0$でないという条件が必要だが, {\tt 'X}は単項式であるため, ゼロ多項式とは異なる. よって自動的に条件がみたされることになる. 
-%一方, {\tt Dqp}と{\tt Dq}が等しいことを示そうとすると, 
-%\begin{lstlisting}{Coq}
-%Lemma Dqp'_DqE p x : x != 0 -> (Dqp' p).[x] = (Dq # p) x.
-%\end{lstlisting}
-%というように$x \neq 0$という条件が必要になる. これは多項式の割り算ではなく実数の値の割り算での約分を計算する必要があるからである.
-%\ermk
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{$q$-Taylor展開} \label{ssec q_Taylor}
-この節では, 有限次Taylor展開の$q$-類似が成り立つこと, そしてその系として Gauss's binomial formula が成り立つことを示し, 形式化する. 
+この節では, 本論文の主目的である有限次Taylor展開の$q$-類似が成り立つこと, そしてその系として Gauss's binomial formula が成り立つことを示し, 形式化する. 
 まず, 一般に以下のことが成り立つことを確認しておく. 
 \bthm[\cite{Kac} p5 Theorem 2.1] \label{general_Taylor}
 $\K\coloneqq\R$または$\C$, $V\coloneqq\K[x]$とし, $D$を$V$上の線型作用素とする. また, 
@@ -2055,9 +2097,6 @@ Theorem general_Taylor D n P (f : {poly R}) a :
           ((D \^ i) f).[a] *: P i. \end{lstlisting}
 記号の意味などは以下の通りである. 
 \begin{itemize}
-%  \item {\tt \{poly R\}}は{\tt R}係数多項式を表す型であり, {\tt p : {poly R}, a : R}に対して
-%  {\tt p.[a]}で多項式{\tt p}の{\tt a}での値を, {\tt a *: p}でスカラー倍を表す. また, {\tt size p}は
-%  {\tt p}の次数$+ 1$で定義されている. 
   \item {\tt islinear}, {\tt isfderiv}はそれぞれ
     \begin{lstlisting}{Coq}
 Definition islinear (D : {poly R} -> {poly R}) :=
@@ -2077,7 +2116,7 @@ Lemma poly_basis n (P : nat -> {poly R}) (f : {poly R}) :
   (size f <= n.+1)%N ->
   exists (c : nat -> R), f = \sum_(0 <= i < n.+1) c i *: P i. \end{lstlisting}
     この主張には係数列{\tt c}の一意性は含まれていないため, 実際には生成系であることを
-    示している. 
+    示しているが, それでも問題なく証明は完成する. 
 \end{itemize}
 この定理において, 
 \[
@@ -2103,7 +2142,8 @@ $\frac{(x-a)^n_q}{[n]!}$が, $a$, $D_q$に対してTheorem \ref{general_Taylor}�
 \epf
 前節で準備した{\tt Dqp}, {\tt qbinom\_pos\_poly}を用いて Theorem \ref{q_Taylor}を形式化する. 
 \begin{lstlisting}{Coq}
-Fixpoint qfact n := match n with
+Fixpoint qfact n :=
+  match n with
   | 0 => 1
   | n.+1 => qfact n * qnat n.+1
   end.
@@ -2505,7 +2545,7 @@ fiberwise transformation $f : \prod_{x : A} P(x) \to Q(x)$が fiberwise equivale
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{レトラクト} \label{sec retract}
 この章では, 型のレトラクトと関数のレトラクトをそれぞれ定義し, 後の章で使う補題を紹介する. 
-まず, 型のレトラクトと定義は以下のとおりである. 
+まず, 型のレトラクトと定義は以下の通りである. 
 \bdf[\cite{hott} p125]
   型$A$, $B$について, 2つの関数レトラクション$r : A \to B$とセクション$s : B \to A$が存在し, 
   更にホモトピー
@@ -2542,7 +2582,7 @@ fiberwise transformation $f : \prod_{x : A} P(x) \to Q(x)$が fiberwise equivale
 \elem
 \bpf
   証明の概略を述べる. 
-  Definition \ref{def_retract} のとおりに記号を定める. 任意の$b : B$に対して, 
+  Definition \ref{def_retract} の通りに記号を定める. 任意の$b : B$に対して, 
   \begin{align*}
     &\varphi_b : \fib_g (b) \to \fib_f (s'(b)), \quad
       \varphi (a, p) :\equiv (s(a), L(a) \cdot s'(p)) \\
