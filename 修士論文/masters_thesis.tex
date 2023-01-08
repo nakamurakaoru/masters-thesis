@@ -78,6 +78,7 @@
 \newcommand{\data}[1]{{\tt{#1}}\text{-データ集合}}
 \newcommand{\rtf}[3]{time^{\tt{#1}}_{\tt{#2}}({\tt{#3}})}
 %% Barendiregt %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\thra}{\twoheadrightarrow}
 \newcommand{\lama}{\lambda \! \! \to}
 %% HoTT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newcommand{\U}{\mathcal{U}}
@@ -259,6 +260,24 @@ Coqは型付き$\lambda$計算という理論に基づいている. この$\lamb
 が成り立つことが証明されている(\cite{Kac} p18参照). この補題も形式化できており, \cite{coq qana}のq\_analogue.vの{\tt q\_pascal}という補題である.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{無限和に関する話題} \label{ssec infsum}
+本節と次節の内容は形式化できていない. 
+Gauss's binomial formula において, $x = 1$, $a = x$とすれば
+\[
+  (1 + x)^n_q = \sum_{j = 0}^n q^{j (j - 1) / 2} \qcoe{n}{j} x^j
+\]
+となる. ここで$|q| < 1$とすると, 
+\[
+  \lim_{n \to \infty} \qcoe{n}{j} =
+  \lim_{n \to \infty} \frac{(1 - q^n)(1 - q^{n - 1}) \cdots (1 - q^{n - j + 1})}
+                                  {(1 - q) (1 - q^2) \cdots (1 - q^j)} =
+  \frac{1}{(1 - q) (1 - q^2) \cdots (1 - q^j)}
+\]
+となるので,  
+\[
+  (1 + x)^{\infty}_q = \sum_{j = 0}^{\infty} q^{j (j - 1)/2}
+  \frac{x^j}{(1 - q) (1 - q^2) \cdots (1 - q^j)}
+\]
+無限積を無限和に書き換える式が得られる. この式は Euler により見つけられたため, Euler's first identity の意で\cite{Kac}では E1 と呼ばれている. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{$q$-類似を考える利点} \label{ssec jacobi}
 %本節では, まだ形式化はできていない$q$-Taylor展開以降の\cite{Kac}の内容について, 特に$q$-類似を考える利点の1つであるJacobiの三重積について説明する. 
@@ -302,7 +321,7 @@ $z$, $q \in \R$, $|q| < 1$として,
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{$\lambda$計算} \label{ssec lambdacal}
 まず型のない$\lambda$計算を定義する. 初めに, $\lambda$計算がどのようなものなのかについての概要を説明し, その後厳密な定義に移る. \\
-\textbf{$\lambda$計算の概要}\\
+\subsection*{$\lambda$計算の概要}
 $\lambda$計算には, 抽象と適用の2つの基本的な操作がある. まず, 抽象については, 「式から関数を作る操作」と捉えることができる. $M$を$\lambda$計算における式($\lambda$計算においてはこれを$\lambda$項と呼ぶ)だとすると, 
 \[
   \lambda x . M
@@ -331,7 +350,146 @@ $\lambda$計算には, 抽象と適用の2つの基本的な操作がある. ま
   (\lambda x. M)\ N = M[x\coloneqq N]
 \]
 と書く. \\
-\textbf{$\lambda$計算の定義}
+\subsection*{$\lambda$計算の定義}
+ここから実際の$\lambda$計算の定義に入る. 
+\begin{shadebox}
+  \begin{df}{(\cite{bib1} Definition 2.1.1)}
+    $V = \{ v, v', v'', \ldots \}$を無限個の変数の集合とする. 
+    $\lambda$項全体の集合$\Lambda$を, 以下のように帰納的に定義する. 
+    \begin{alignat*}{3}
+      &x \in V& \quad &\Lra& \quad &x \in \Lambda \\
+      &M, N \in \Lambda& &\Lra& &(MN) \in \Lambda \\
+      &M \in \Lambda, x \in V& &\Lra& &(\lambda x . M) \in \Lambda
+    \end{alignat*}
+    抽象構文を用いると, 以下のようにも書ける. 
+    \begin{align*}
+      &V ::= v\ |\ V' \\
+      &\Lambda ::= V\ |\ (\Lambda \Lambda)\ |\ (\lambda V \Lambda)
+    \end{align*}
+  \end{df}
+\end{shadebox}
+\begin{ex}
+  $v$, $(v v')$, $\lambda v (v v')$, $((\lambda v (vv''))v')$などが$\lambda$項の例である. 
+\end{ex}
+\begin{rmk}
+表記上のルールや省略を以下のように約束する. 
+\begin{enumerate}
+  \item $x, y, z, \ldots$ で任意の変数を, $M, N, L, \ldots$で任意の$\lambda$項を表す. 
+  \item $F M_1 \cdots M_n$で$(\cdots ((F M_1) M_2)\cdots M_n)$を, 
+           $\lambda x_1 \cdots x_n .M$で
+           $(\lambda x_1 (\lambda x_2 (\cdots (\lambda x_n(M))\cdots)))$
+            を表す. 
+  \item 最も外側の()は書かない. 
+\end{enumerate}
+\end{rmk}
+%\begin{rmk}{(\cite{bib1} Notation 2.1.4)}
+%$M, N$を$\lambda$項とする. このとき, $M$と$N$が等しいか, 束縛変数の名前をつけかえることで互いにうつりあうとき, $M \equiv N$と書く. 例えば, 
+%\begin{align*}
+%  (\lambda x .x) z \equiv (\lambda x .x) z \\ 
+%  (\lambda x .x) z \equiv (\lambda y .y) z \\
+%  (\lambda x .x) z \nequiv (\lambda x .y) z
+%\end{align*}
+%となる. 
+%\end{rmk}
+\begin{shadebox}
+  \begin{df}{(\cite{bib1} Notation 2.1.4, Definition 2.1.5)}
+    $M, N, P, Q \in \Lambda$, $x, y \in V$とする. 
+    \begin{enumerate}
+      \item $M$の自由変数の集合$FV(M)$を, 以下のように帰納的に定義する. 
+        \begin{alignat*}{3}
+          &FV(x)& \quad &=& \quad &\{ x \} \\
+          &FV(MN)& &=& &FV(M) \cup FV(N) \\
+          &FV(\lambda x. M)& &=& &FV(M) - \{ x \}
+        \end{alignat*}
+      \item $M$に現れる変数のうち, 自由変数でないものを束縛変数と呼ぶ. 
+               また, $M$と$N$が等しいか, 束縛変数の名前をつけかえることで互いにうつりあうとき,
+               $M \equiv N$と書く.
+      \item $M$において$x$に$N$を代入した結果$M[x \coloneqq N]$を, 
+               以下のように帰納的に定義する. 
+        \begin{alignat*}{3}
+        &y\ [x \coloneqq N]& \quad &\equiv& \quad &\begin{cases}
+                                                                          N & x = y \\
+                                                                          y & x \neq y
+                                                                       \end{cases} \\
+        &(PQ)\ [x \coloneqq N]& &\equiv& &(P [x \coloneqq N])\ (Q [x \coloneqq N]) \\
+        &(\lambda y.M)\ [x \coloneqq N]& &\equiv& &\begin{cases}
+                                                \lambda y .(M [x \coloneqq N]) & x \neq y \\
+                                                \lambda y .M & x = y
+                                                                       \end{cases}
+        \end{alignat*}
+    \end{enumerate}
+  \end{df}
+\end{shadebox}
+\begin{rmk}{(\cite{bib1} Notation 2.1.4)}
+2.について, 例えば, 
+\begin{align*}
+  (\lambda x .x) z \equiv (\lambda x .x) z \\ 
+  (\lambda x .x) z \equiv (\lambda y .y) z \\
+  (\lambda x .x) z \nequiv (\lambda x .y) z
+\end{align*}
+となる. 
+\end{rmk}
+\begin{rmk}
+  束縛変数は, 自由変数とは異なる名前とする. 例えば, $y\ (\lambda y . xy)$は
+  $y\ (\lambda y' . xy')$などに書き換える. 
+\end{rmk}
+%$\lambda$計算を, $\lambda$項同士の等式による形式体系として考えるために, 次のように定義する. 
+%\begin{shadebox}
+%  \begin{df}{(\cite{bib1} Definition 2.1.7)}
+%    $M, M', N, L, Z \in \Lambda$とする. 
+%    \begin{enumerate}
+%      \item $\lambda$計算の主公理スキームを, 
+%        \[
+%          (\lambda x.M)\ N = M\ [x \coloneqq N]
+%        \]
+%        で定める. これを, $\beta$-変換という. 
+%      \item $\beta$-変換の他の公理を以下のように定める.  
+%        \begin{alignat*}{3}
+%          &M = M& \\
+%          &M = N& \quad &\Lra& \quad &N = M \\
+%          &M = N, N = L& &\Lra& &M = L \\
+%          &M = M'& &\Lra& &MZ = M'Z \\
+%          &M = M'& &\Lra& &ZM = ZM' \\
+%          &M = M'& &\Lra& &\lambda x. M = \lambda x. M' 
+%        \end{alignat*}
+%      \item $\lambda$計算において$M = N$が証明可能であることを, 
+%        $\lambda \vdash M = N$もしくは単に$M = N$と書く. 
+%    \end{enumerate}
+%  \end{df}
+%\end{shadebox}
+最後に, $\beta$-簡約を定義する. 
+\begin{shadebox}
+  \begin{df}{(\cite{bib1} Definition 2.3.2)}
+    $\Lambda$上の二項関係$\to_{\beta}$(1ステップ$\beta$-簡約), 
+    $\thra_{\beta}$($\beta$-簡約)を, 
+    %$=_{\beta}$を, 
+    以下のように帰納的に定義する. 
+    \begin{enumerate}
+      \item \begin{enumerate}
+        \item $(\lambda x .M)N \to_{\beta} M\ [x \coloneqq N]$
+        \item $M \to_{\beta} N \Lra ZM \to_{\beta} ZN, MZ \to_{\beta} NZ,
+                 \lambda x .M \to_{\beta} \lambda x .N$
+               \end{enumerate}
+      \item \begin{enumerate}
+        \item $M \thra_{\beta} M$
+        \item $M \to_{\beta} N \Lra M \thra_{\beta} N$
+        \item $M \thra_{\beta} N, N \thra_{\beta} L \Lra M \thra_{\beta} L$
+               \end{enumerate}
+%      \item \begin{enumerate}
+%        \item $M \thra_{\beta} N \Lra M =_{\beta} N$
+%        \item $M =_{\beta} N \Lra N =_{\beta} M$
+%        \item $M =_{\beta} N, N =_{\beta} L \Lra M =_{\beta} L$
+%               \end{enumerate}
+    \end{enumerate}
+  \end{df}
+\end{shadebox}
+\begin{ex}
+  \begin{enumerate}
+    \item $(\lambda x . xyz)y \to_{\beta} yyz$である. 
+    \item $(\lambda x . xy)(\lambda z . z) \to_{\beta} (\lambda z . z) y \to_{\beta} y$より, 
+             $(\lambda x . xy)(\lambda z . z) \thra_{\beta} y$である. 
+  \end{enumerate}
+\end{ex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{$\lama$と$\lambda$2}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -592,14 +750,16 @@ forall x : nat, addn x 0 = x \end{lstlisting}
 このように, Coqでの証明は, ゴールを自明な形になるまで繰り返し書き変えていくやり方が基本である. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{mathcomp の型}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{形式化}\label{sec form}
-この定義を形式化するためまずは実数の形式化を考える. 今回は mathcomp の ssrnum にある{\tt rcfType}を用いる. {\tt rcfType}とは, real closed field, つまり実閉体全体からなる型であり, この型の要素を実数として用いることにする. mathcomp はある型を構成するために他の型を用いているため, ヒエラルキー(階層構造)がある. 通常の数学において体が環の性質を, 環が群の性質を引き継ぐように, mathcomp でもより一般の型の性質を引き継いでいる. {\tt rcfType}も多くの性質を引き継いでおり, 特に環の性質, {\tt ringType}を持っていることが重要である. 実際, 形式化で利用するライブラリの補題の多くは{\tt ringType}に対するものである.
+今回は mathcomp の ssrnum にある{\tt rcfType}を用いる. {\tt rcfType}とは, real closed field, つまり実閉体全体からなる型であり, この型の要素を実数として用いることにする. mathcomp はある型を構成するために他の型を用いているため, ヒエラルキー(階層構造)がある. 通常の数学において体が環の性質を, 環が群の性質を引き継ぐように, mathcomp でもより一般の型の性質を引き継いでいる. {\tt rcfType}も多くの性質を引き継いでおり, 特に環の性質, {\tt ringType}を持っていることが重要である. 実際, 形式化で利用するライブラリの補題の多くは{\tt ringType}に対するものである.
 
 自然数型{\tt nat}
 {.+1}は{\tt nat}での後続数を表す
 
 整数型{\tt int}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{形式化}\label{sec form}
+この定義を形式化するためまずは実数の形式化を考える. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{$q$-微分の定義}
 様々な$q$-類似を考えるにあたって, まずは微分の$q$-類似から始める. 以下, $q$を$1$でない実数とする. 
