@@ -80,6 +80,7 @@
 %% Barendiregt %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newcommand{\T}{\mathbb{T}}
 \newcommand{\V}{\mathbb{V}}
+\newcommand{\cT}{\mathcal{T}}
 \newcommand{\uhr}{\upharpoonright}
 \newcommand{\thra}{\twoheadrightarrow}
 \newcommand{\lama}{\lambda \! \! \to}
@@ -361,6 +362,7 @@ E1については, Gauss's binomial formula を無限に拡張することで得
 有限の範囲で扱うことができ,  E1, E2 の基礎となる等式であることが今回の形式化の目標としてGauss's binomial formula と$q$-Taylor展開を選んだ理由である. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{型付き$\lambda$計算} \label{sec lambda}
+この節では, Coq の基礎となっている理論である$\lambda$計算について\cite{Bar}を基に説明する. 初めは型無しの$\lambda$計算について述べ, その後に型付き$\lambda$計算の説明をし, 最後の節で Coq との関係について触れる. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{$\lambda$計算} \label{ssec lambdacal}
 まず型のない$\lambda$計算を定義する. 初めに, $\lambda$計算がどのようなものなのかについての概要を説明し, その後厳密な定義に移る.
@@ -417,8 +419,7 @@ $\lambda$計算には, 抽象と適用の2つの基本的な操作がある. ま
 \begin{ex}
   $v$, $(v v')$, $\lambda v (v v')$, $((\lambda v (vv''))v')$などが$\lambda$項の例である. 
 \end{ex}
-\begin{rmk}
-表記上のルールや省略を以下のように約束する. 
+今後, 表記上のルールや省略を以下のように約束する. 
 \begin{enumerate}
   \item $x, y, z, \ldots$ で任意の変数を, $M, N, L, \ldots$で任意の$\lambda$項を表す. 
   \item $F M_1 \cdots M_n$で$(\cdots ((F M_1) M_2)\cdots M_n)$を, 
@@ -427,7 +428,6 @@ $\lambda$計算には, 抽象と適用の2つの基本的な操作がある. ま
             を表す. 
   \item 最も外側の()は書かない. 
 \end{enumerate}
-\end{rmk}
 %\begin{rmk}{(\cite{Bar} Notation 2.1.4)}
 %$M, N$を$\lambda$項とする. このとき, $M$と$N$が等しいか, 束縛変数の名前をつけかえることで互いにうつりあうとき, $M \equiv N$と書く. 例えば, 
 %\begin{align*}
@@ -437,6 +437,7 @@ $\lambda$計算には, 抽象と適用の2つの基本的な操作がある. ま
 %\end{align*}
 %となる. 
 %\end{rmk}
+次に, 束縛変数と自由変数, $\lambda$項の間の$\equiv$, 代入を定義する. 
 \begin{shadebox}
   \begin{df}{(\cite{Bar} Notation 2.1.4, Definition 2.1.5)}
     $M, N, P, Q \in \Lambda$, $x, y \in V$とする. 
@@ -466,6 +467,17 @@ $\lambda$計算には, 抽象と適用の2つの基本的な操作がある. ま
     \end{enumerate}
   \end{df}
 \end{shadebox}
+\bex
+  $\lambda$に束縛されている変数が束縛変数, それ以外が自由変数である. 例えば
+  \[
+    \lambda x.\ x + y
+  \]
+  であれば束縛変数は$x$, 自由変数は$y$である. また, 
+  \[
+    \lambda x\ y.\ x(y + z) - w
+  \]
+  であれば束縛変数は$x$, $y$で, 自由変数は$z$, $w$である. 
+\eex
 \begin{rmk}{(\cite{Bar} Notation 2.1.4)}
 2.について, 例えば, 
 \begin{align*}
@@ -503,12 +515,12 @@ $\lambda$計算には, 抽象と適用の2つの基本的な操作がある. ま
 %    \end{enumerate}
 %  \end{df}
 %\end{shadebox}
-最後に, $\beta$-簡約を定義する. 
+本節の最後に, 適用である$\beta$-簡約を定義する. 
 \begin{shadebox}
   \begin{df}{(\cite{Bar} Definition 2.3.2)}
     $\Lambda$上の二項関係$\to_{\beta}$(1ステップ$\beta$-簡約), 
-    $\thra_{\beta}$($\beta$-簡約)を, 
-    %$=_{\beta}$を, 
+    $\thra_{\beta}$($\beta$-簡約), 
+    $=_{\beta}$を, 
     以下のように帰納的に定義する. 
     \begin{enumerate}
       \item \begin{enumerate}
@@ -521,11 +533,11 @@ $\lambda$計算には, 抽象と適用の2つの基本的な操作がある. ま
         \item $M \to_{\beta} N \Lra M \thra_{\beta} N$
         \item $M \thra_{\beta} N, N \thra_{\beta} L \Lra M \thra_{\beta} L$
                \end{enumerate}
-%      \item \begin{enumerate}
-%        \item $M \thra_{\beta} N \Lra M =_{\beta} N$
-%        \item $M =_{\beta} N \Lra N =_{\beta} M$
-%        \item $M =_{\beta} N, N =_{\beta} L \Lra M =_{\beta} L$
-%               \end{enumerate}
+      \item \begin{enumerate}
+        \item $M \thra_{\beta} N \Lra M =_{\beta} N$
+        \item $M =_{\beta} N \Lra N =_{\beta} M$
+        \item $M =_{\beta} N, N =_{\beta} L \Lra M =_{\beta} L$
+               \end{enumerate}
     \end{enumerate}
   \end{df}
 \end{shadebox}
@@ -537,12 +549,23 @@ $\lambda$計算には, 抽象と適用の2つの基本的な操作がある. ま
   \end{enumerate}
 \end{ex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{$\lama$と$\lambda$2}
-この節では, 単純型付きラムダ計算である$\lama$と, その拡張である$\lambda 2$を導入する. $\lama$の定義の仕方には, Curry流とChurch流の2通りがあるが, 本稿においてはCurry流を採用する. 
+\subsection{$\lama$とその拡張}
+この節では, 単純型付きラムダ計算である$\lama$と, その拡張である$\lambda 2$及び$\lambda$Pを導入する. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% label prop1, 2 %%
 %% ref prop1, 2 %%
 \subsection*{$\lama$}
+大まかに言えば, 型とはある要素が属する集合のようなものである. 
+$\lama$は最も単純な型付き$\lambda$計算であり, 関数の型を表現できる. 
+基本的なルールは, 
+\begin{itemize}
+  \item $\sigma$から$\tau$への関数に$\sigma$の値を適用すると, 
+    その結果の型は$\tau$である
+  \item
+    変数$x$の型が$\sigma$で, $\lambda$項$M$の型が$\tau$のとき, 
+    $\lambda x.\ M$の型は$\sigma \to \tau$である. 
+\end{itemize}
+以下, \cite{Bar}での定義を見ていく. 
 \begin{shadebox}
   \begin{df}{(\cite{Bar} Definition 3.1.1)}
     $\lama$の型の集合Type($\lama$)は, 以下のように帰納的に定義される. 
@@ -623,17 +646,18 @@ $x_1 \colon \sigma_1 , \ldots , x_n \colon \sigma_n \vdash M \colon \sigma$
       {\Gamma \vdash (\lambda x . M) \colon (\sigma \to \tau)}& &
   \end{alignat*}
 \end{itembox}
-以下, 本稿においては, 導出規則1を用いる.
+以下, 本論文においては, 導出規則1を用いる.
 \begin{ex}%{(\cite{Bar} Example 3.1.5)}
-  \begin{enumerate}
-    \item $\lambda$項に対してある型が付くことを示すには, 
+$\lambda$項に対してある型が付くことを示すには, 
       導出規則を逆向きに使って辿る方法, つまり, 
       
         「示したい型付けから始めて, その導出のために必要となる前提を順に上に書き加えていく
         ことを繰り返し, 変数のみとなった時点で, その変数に対して矛盾なく型がついているかを
         確認する」
         
-      という手順が便利である. この手順を用いて, 任意の$\sigma, \tau \in \T$について, 
+      という手順が便利である. いくつか例を見てみる. 
+  \begin{enumerate}
+    \item  任意の$\sigma, \tau \in \T$について, 
       $\vdash (\lambda x y . x) \colon (\sigma \to \tau \to \sigma)$であることを確認する. 
       まず, $\lambda x y . x$の最も大きな構造は抽象である. 
       抽象に対して型を割り当てる規則は$\to$導入なので, 
@@ -662,16 +686,6 @@ $x_1 \colon \sigma_1 , \ldots , x_n \colon \sigma_n \vdash M \colon \sigma$
           {\vdash \lambda xy . xy \colon (\sigma \to \tau) \to (\sigma \to \tau)}}}
         \]
         という導出木により確認できる. 
-%    \item 任意の$\sigma, \tau, \rho \in \T$について, 
-%      $\vdash \lambda x . ((\lambda y . z) y) \colon (\sigma \to \tau)$であることは, 
-%      \[
-%        \frac{\displaystyle{\frac{x \colon \sigma, y \colon \rho \vdash z \colon \tau}
-%          {x \colon \sigma \vdash \lambda y . z \colon \rho \to \tau}} 
-%          \quad \displaystyle{\frac{}{x \colon \sigma \vdash y \colon \rho}}}
-%        {\displaystyle{\frac{x \colon \sigma \vdash (\lambda y . z) y \colon \tau}
-%        {\vdash \lambda x . ((\lambda y . z) y) \colon \sigma \to \tau}}}
-%      \]
-%      という導出木により確認できる. 
     \item $\lama$においては, $\lambda x . xx$には型が付かない. 実際, 
     \[
       \Gamma \vdash \lambda x. xx \colon \sigma
@@ -985,7 +999,7 @@ $x_1 \colon \sigma_1 , \ldots , x_n \colon \sigma_n \vdash M \colon \sigma$
 %  \end{itemize}
 %\end{proof}
 \subsection*{$\lambda 2$}
-$\lama$の拡張の1つとして, $\lambda 2$を考える. こちらもCurry流とChurch流の2通りがあるが, 本稿では$\lama$と同じくCurry流の定義を採用する. 
+$\lama$の拡張の1つとして, $\lambda 2$を考える. $\lambda$2の特徴は型を$\forall$で抽象化できることである. 論理学における2階命題論理に対応し, $\lambda$2の「2」はここから来ている. 同じく論理学との関係を見ると, $\lama$は1階命題論理に対応する. 
 \begin{shadebox}
   \begin{df}{(\cite{Bar} Definition 4.1.5)}
     $\lambda 2$の型の集合Type($\lambda 2$)を$\T$と書く. 
@@ -1093,6 +1107,50 @@ $\lambda 2$での型付けの例として, 以下のようなものがある.
 %  \]
 %  を示せ. 
 %\end{ex}
+\subsubsection*{$\lambda$P}
+$\lambda$2とは別の拡張として, $\lambda$Pがある. Pは predicate のPであり, 述語論理に対応する. $\lambda$Pの特徴は依存関数型を扱えることと, 命題の証明のシュミレートを行えることである. これからは項と型を区別せず, まとめて擬式と呼ぶことにして, 以下のように定義する. 
+\bdf[\cite{Bar} Definition 5.1.8]
+  \begin{enumerate}
+    \item $\lambda$Pの擬式全体$\cT$を以下のように定める. 
+      \[
+        \cT = V \ |\ C \ |\ \cT \cT \ |\ \lambda V:\cT.\ \cT \ |
+        \ \textstyle{\prod} V:\cT.\ \cT
+      \]
+      ここで, $V$は変数全体, $C$は定数全体である. 
+    \item $C$の中から2つ要素を選んで, $\ast$, $\square$と名付ける. 
+      $\ast$は$\alpha : \ast$と書くことで$\alpha$が型であることを表す記号である. 
+      また, この$\ast$に対し, $\K$を
+      \[
+        {\mathbb K} = \ast \ |\ \K \to \K
+      \]
+      と定めたとき, $k : \square$で$k$が$\K$に属することを表す記号である. 
+  \end{enumerate}
+\edf
+型導出規則は以下の通り. ただし, $s$は$\ast$か$\square$のいずれかである. 
+\bdf[\cite{Bar} Definition 5.1.9]
+$\lambda$Pの型導出規則を, 以下のように定める. 
+    \begin{alignat*}{3}
+     &(\text{axiom})& \quad &\vdash \ast \colon \square& &\\
+     &(\text{start-rule})&
+        &\frac{\Gamma \vdash A : s}{\Gamma,\ x:A \vdash x : A}& &(x \notin \Gamma)\\
+      &(\text{weakening rule})&
+        &\frac{\Gamma \vdash A : B \quad \Gamma \vdash C : s}
+                 {\Gamma,\ x:C \vdash A : B}& &(x \notin \Gamma)\\
+      &(\text{type/kind formation})&
+        &\frac{\Gamma \vdash A : \ast \quad \Gamma,\ x : A \vdash B : s}
+                 {\Gamma \vdash (\Pi x : A.\ B) : s}& &\\
+      &(\text{application rule})&
+        &\frac{\Gamma \vdash F \colon (\Pi x : A .\ B) \quad
+          \Gamma \vdash a \colon A}{\Gamma \vdash F a \colon B[x := a]}& & \\
+      &(\text{abstraction rule})& &\frac{\Gamma,\ x \colon A \vdash b \colon B 
+          \quad \Gamma \vdash (\Pi x : A .\ B) : s}
+        {\Gamma \vdash (\lambda x : A.\ b) \colon (\Pi x : A .\ B)}& & \\
+      &(\text{conversion rule})&
+        &\frac{\Gamma \vdash A : B \quad \Gamma \vdash B' : s \quad B =_{\beta} B'}
+                 {\Gamma \vdash A : B'}& &
+    \end{alignat*}
+\edf
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{$\lambda$-cube と CIC}
 %Coq による証明は, Curry-Howard 同型と呼ばれる, 
 %\begin{align*}
@@ -1109,8 +1167,6 @@ $\lambda 2$での型付けの例として, 以下のようなものがある.
 %
 %まず, 前提の要素それぞれに$pq$, $p$と名前をつける. これがプログラム中の{\tt move$\Rightarrow$ [] pq p}のことである. 
 %ここで, $P \to Q$という型は, 入力する値の型が$P$, 出力する値の型が$Q$であるような関数の型であるため, $P$の要素$p$に$pq$を適用することで, $Q$の要素を構成することができる. この関数適用がプログラム中の{\tt apply pq}のことである. 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Coq} \label{sec coq}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
