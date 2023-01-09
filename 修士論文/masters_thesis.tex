@@ -1150,28 +1150,59 @@ $\lambda$Pの型導出規則を, 以下のように定める.
                  {\Gamma \vdash A : B'}& &
     \end{alignat*}
 \edf
+\bex[\cite{Bar} p86]
+$\lambda$Pでの型付けには以下のようなものがある. 
+  \begin{align*}
+    A : \ast &\vdash (\lambda x . x) \colon (\Pi x: A .\ \ast) \colon \square \\
+    A : \ast,\ P : A \to \ast,\ a : A &\vdash P a : \ast \\
+    A : \ast,\ P : A \to \ast &\vdash (\lambda a : A\ \lambda x : P a.\ x) \colon 
+      (\Pi a : A .\ (Pa \to Pa))\\
+  \end{align*}
+\eex
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{$\lambda$-cube と CIC}
-%Coq による証明は, Curry-Howard 同型と呼ばれる, 
-%\begin{align*}
-%  \text{命題} &\leftrightarrow \text{型} \\
-%  \text{証明} &\leftrightarrow \text{型の要素}
-%\end{align*}
-%という対応関係に基づいている. また, 論理演算子についても, 以下のような対応がある. 
-%\begin{align*}
-%  P \text{ならば} Q &\quad P \rightarrow Q \\
-%  P \text{かつ} Q &\quad P \times Q \\
-%  P \text{または} Q &\quad  P + Q
-%\end{align*}
-%この同型をもとに上記の証明をもう一度考えてみると, $P \ra Q$と$P$という型に要素が存在することから, $Q$という型の要素を構成すればよいということである. 
-%
-%まず, 前提の要素それぞれに$pq$, $p$と名前をつける. これがプログラム中の{\tt move$\Rightarrow$ [] pq p}のことである. 
-%ここで, $P \to Q$という型は, 入力する値の型が$P$, 出力する値の型が$Q$であるような関数の型であるため, $P$の要素$p$に$pq$を適用することで, $Q$の要素を構成することができる. この関数適用がプログラム中の{\tt apply pq}のことである. 
+\subsection{$\lambda$-cube と Curry-Howard 同型}
+前節で$\lama$の拡張として$\lambda$2と$\lambda$Pを導入したが, これらを組み合わせたものとして$\lambda$P2という$\lambda$計算が存在し, 2階述語論理に相当する表現力を持つ. また, 本論文では触れないが, $\lama$のまた別の拡張として$\lambda \ul{\omega}$というものも存在する(\cite{Bar} Definition 5.1.4, Definition 5.1.5). 
+$\lama$を出発点とし, $\lambda$2, $\lambda$P, 
+$\lambda \ul{\omega}$の性質を持つかどうかで
+8つの$\lambda$計算
+\begin{itemize}
+  \item $\lama$
+  \item $\lambda$2
+  \item $\lambda \ul{\omega}$
+  \item $\lambda \omega$ ($\lambda 2 + \lambda \ul{\omega}$)
+  \item $\lambda$P
+  \item $\lambda$P2
+  \item $\lambda$P$\ul{\omega}$
+  \item $\lambda$P$\omega$ ($\lambda 2 + \lambda \ul{\omega}$ + $\lambda$P)
+\end{itemize}
+を考えることができ, これらをまとめて$\lambda$-cube と呼んでいる(\cite{Bar} p77, 78). $\lambda$-cube のうち最も強い$\lambda$P$\omega$に帰納的型を導入した$\lambda$計算が Coq で採用されている. 
+
+型付き$\lambda$計算と証明の形式化をつなぐのが, Curry-Howard 同型と呼ばれる, 
+\begin{align*}
+  \text{命題} &\leftrightarrow \text{型} \\
+  \text{証明} &\leftrightarrow \text{型の要素}
+\end{align*}
+という対応関係である. $\lambda$Pの説明の際にも触れたが, この対応関係を基に命題の証明をシュミレートすることが形式化であり, Coq に型付き$\lambda$計算が関係する理由である. 
+\bex 命題$P$, $Q$について, $P \Lra Q$かつ$P$であれば, $Q$が成り立つというモーダスポーネンスの証明をこの同型をもとに考えてみることにする. 論理演算子と型の間にも対応があり, $\Lra$に対応するのは$\lama$で見た関数型$\to$であるため, モーダスポーネンスを証明するには, 
+
+「$P$という型の要素と$P \to Q$という型の要素から$Q$という型の要素を構成すればよい」
+
+と思うことができる. ここで$P$の要素に$a$, 関数型$P \to Q$の要素(つまり関数)を$f$と名前をつてみると, $f$に$a$を適用した$f a$にはどんな型がつくであろうか. $\lama$の導出規則を思い出してみると, ($\to$除去)が使えて$f a$には$Q$という型がつく. よって型として$Q$を持つような要素として具体的に$f a$という項が構成できたため, $Q$が成り立つことを証明できたことになる. 
+\eex
+論理演算子と型の対応をまとめると以下のようになる. 
+\begin{align*}
+  P \text{ならば} Q &\quad \text{関数型}P \rightarrow Q \\
+  P \text{かつ} Q &\quad \text{直積型}P \times Q \\
+  P \text{または} Q &\quad  \text{直和型}P + Q \\
+  \text{ある} x \in A \text{について} P(x) &\quad \text{依存和型}\sum_{x : A} P (x)\\
+  \text{任意の} x \in A \text{について} P(x) &\quad \text{依存関数型}\prod_{x : A} P (x)
+\end{align*}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Coq} \label{sec coq}
+ここでは定理証明支援系 Coq の使い方を, 具体例を用いて説明する. また, この後の形式化でよく使う型について, その構造の説明も行う.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Coqの使い方} \label{ssec coq_use}
-この節ではCoqのコマンドとタクティックの使い方について述べる. ここでは, タクティックは証明の中でコンテクスト(変数や仮定)やゴール(証明すべき主張)を変形させるもの, コマンドはタクティック以外のものとして扱う. 
+この節ではCoqのコマンドとタクティックの使い方について述べる. ただし, タクティックは証明の中でコンテクスト(変数や仮定)やゴール(証明すべき主張)を変形させるもの, コマンドはタクティック以外のものとする. 
 まず, よく使うコマンドについて説明する. 
 \begin{description}
   \item[\tt Require Import]
@@ -1273,7 +1304,7 @@ Lemma Dq_pow n x : x != 0 -> Dq (fun x => x ^ n) x = qnat n * x ^ (n - 1). \end{
 以下, 2つの具体例を用いて{\tt Proof}内でのタクティックの使い方を説明する. 
 \bex{モーダスポーネンス}
 
-命題$P$, $Q$について, $P \Lra Q$かつ$P$であれば, $Q$が成り立つということをCoqで証明する. 
+Curry-Howard 同型の際にも見たモーダスポーネンスをCoqで証明する. 
 まずこの主張を形式化すると以下の通り. 
 \begin{lstlisting}{Coq}
 From mathcomp Require Import ssreflect.

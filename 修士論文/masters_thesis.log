@@ -1,4 +1,4 @@
-This is e-pTeX, Version 3.14159265-p3.8.1-180518-2.6 (utf8.sjis) (TeX Live 2018/W32TeX) (preloaded format=platex 2018.7.29)  10 JAN 2023 04:56
+This is e-pTeX, Version 3.14159265-p3.8.1-180518-2.6 (utf8.sjis) (TeX Live 2018/W32TeX) (preloaded format=platex 2018.7.29)  10 JAN 2023 06:33
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -614,31 +614,31 @@ LaTeX Font Info:    Try loading font information for U+eus on input line 1114.
  (c:/w32tex/share/texmf-dist/tex/latex/amsfonts/ueus.fd
 File: ueus.fd 2013/01/14 v3.01 Euler Script
 ) [12]
-LaTeX Font Info:    Font shape `JT1/mc/m/n' will be
-(Font)              scaled to size 8.64899pt on input line 1207.
-LaTeX Font Info:    Font shape `JY1/mc/m/n' will be
-(Font)              scaled to size 8.64899pt on input line 1207.
-LaTeX Font Info:    Font shape `JT1/gt/m/n' will be
-(Font)              scaled to size 8.64899pt on input line 1207.
-LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
-(Font)              scaled to size 8.64899pt on input line 1207.
-
 [13]
-LaTeX Font Info:    Try loading font information for OMS+txtt on input line 126
-4.
-LaTeX Font Info:    No file OMStxtt.fd. on input line 1264.
+LaTeX Font Info:    Font shape `JT1/mc/m/n' will be
+(Font)              scaled to size 8.64899pt on input line 1238.
+LaTeX Font Info:    Font shape `JY1/mc/m/n' will be
+(Font)              scaled to size 8.64899pt on input line 1238.
+LaTeX Font Info:    Font shape `JT1/gt/m/n' will be
+(Font)              scaled to size 8.64899pt on input line 1238.
+LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
+(Font)              scaled to size 8.64899pt on input line 1238.
+ [14]
+LaTeX Font Info:    Try loading font information for OMS+txtt on input line 129
+5.
+LaTeX Font Info:    No file OMStxtt.fd. on input line 1295.
 
 
 LaTeX Font Warning: Font shape `OMS/txtt/m/n' undefined
 (Font)              using `OMS/txsy/m/n' instead
-(Font)              for symbol `textbraceleft' on input line 1264.
+(Font)              for symbol `textbraceleft' on input line 1295.
 
-[14] [15] [16] [17] [18] [19] [20] [21] [22] [23] [24] [25] [26] [27] [28]
-[29] [30] [31] [32] [33] [34] [35]
+[15] [16] [17] [18] [19] [20] [21] [22] [23] [24] [25] [26] [27] [28] [29]
+[30] [31] [32] [33] [34] [35] [36]
 第2章
-[36
+[37
 
-] [37] [38] [39] [40] [41] [42] [43] [44] [45
+] [38] [39] [40] [41] [42] [43] [44] [45] [46
 
 ] (./masters_thesis.aux)
 
@@ -651,10 +651,10 @@ LaTeX Warning: There were multiply-defined labels.
 Here is how much of TeX's memory you used:
  6109 strings out of 493249
  75612 string characters out of 6146370
- 213223 words of memory out of 5000000
+ 208223 words of memory out of 5000000
  9951 multiletter control sequences out of 15000+600000
  53971 words of font info for 193 fonts, out of 8000000 for 9000
  934 hyphenation exceptions out of 8191
- 35i,16n,58p,754b,1832s stack positions out of 5000i,500n,10000p,500000b,80000s
+ 35i,16n,58p,754b,1830s stack positions out of 5000i,500n,10000p,500000b,80000s
 
-Output written on masters_thesis.dvi (46 pages, 290940 bytes).
+Output written on masters_thesis.dvi (47 pages, 296144 bytes).
