@@ -1097,7 +1097,7 @@ $\lambda 2$での型付けの例として, 以下のようなものがある.
 %Coq による証明は, Curry-Howard 同型と呼ばれる, 
 %\begin{align*}
 %  \text{命題} &\leftrightarrow \text{型} \\
-%  \text{証明} &\leftrightarrow \text{型に要素が存在する}
+%  \text{証明} &\leftrightarrow \text{型の要素}
 %\end{align*}
 %という対応関係に基づいている. また, 論理演算子についても, 以下のような対応がある. 
 %\begin{align*}
@@ -1387,13 +1387,43 @@ forall x : nat, addn x 0 = x \end{lstlisting}
 このように, Coqでの証明は, ゴールを自明な形になるまで繰り返し書き変えていくやり方が基本である. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{mathcomp の型}
-%今回は mathcomp の ssrnum にある{\tt rcfType}を用いる. {\tt rcfType}とは, real closed field, つまり実閉体全体からなる型であり, この型の要素を実数として用いることにする. mathcomp はある型を構成するために他の型を用いているため, ヒエラルキー(階層構造)がある. 通常の数学において体が環の性質を, 環が群の性質を引き継ぐように, mathcomp でもより一般の型の性質を引き継いでいる. {\tt rcfType}も多くの性質を引き継いでおり, 特に環の性質, {\tt ringType}を持っていることが重要である. 実際, 形式化で利用するライブラリの補題の多くは{\tt ringType}に対するものである.
-%
-%自然数型{\tt nat}
-%{.+1}は{\tt nat}での後続数を表す
-%
-%整数型{\tt int}
-%
+本節では, 今回の形式化においてよく用いる型, {\tt rcfType}, {\tt nat}, {\tt int}について説明する. 
+\subsubsection*{\tt rcfType}
+本論文では 実数の形式化としてmathcomp の ssrnum にある{\tt rcfType}を用いることにする. {\tt rcf}とはreal closed field, つまり実閉体の意味であり, {\tt rcfType}とは実閉体全体を表す型のことである. よって, この型そのものではなくこの型の要素を実数として形式化に用いる. 実際の形式化では
+\begin{lstlisting}{Coq}
+Variable (R : rcfType) (q : R). \end{lstlisting}
+としており, {\tt R}が{\tt rcfType}の要素であること, {\tt q}が{\tt R}の要素であることを宣言している. このとき{\tt R}は具体的な型ではなく, 実閉体としての性質をもつ抽象的な型変数を1つ固定したものとして扱っている.
+
+mathcomp はある型を構成するために他の型を用いているため, ヒエラルキー(階層構造)がある. 通常の数学において体が環の性質を, 環が群の性質を引き継ぐように, mathcomp でもより一般の型の性質を引き継いでいる. {\tt rcfType}のヒエラルキーは
+\begin{align*}
+  {\tt eqType} &\to {\tt choiceType} \\
+                   &\to {\tt zmodType} \to {\tt ringType} \to 
+                          {\tt comRingType} \to {\tt comUnitRingType} \to 
+                          {\tt idomainType} \to {\tt fieldType}\\
+                   &\to {\tt numFieldType} \to {\tt realFieldType} \to {\tt rcfType}
+\end{align*}
+となっており, 多くの性質を引き継いでいる. 特にCoqでの環全体を表す型{\tt ringType}の性質を持っていることが重要で, 実際, 形式化で利用するライブラリの補題の多くは{\tt ringType}に対するものである.
+\subsubsection*{\tt nat}
+自然数を表す型は{\tt nat}であり, 以下のように帰納的に定義されている. 
+\begin{lstlisting}{Coq}
+Inductive nat : Set :=  O : nat | S : nat -> nat. \end{lstlisting}
+このコードの意味を大まかに説明すると, {\tt nat}という型は{\tt O}という要素と, {\tt nat}の要素から新しく{\tt nat}の要素を作る操作{\tt S}で定義されており, またこれ以外には{\tt nat}の要素がないということである. よって, {\tt O}, {\tt SO}, {\tt S(SO)}などが{\tt nat}の要素である. 
+{\tt O}は$0$に対応し(したがって Coq での自然数は$0$を含んでいる), {\tt S}は次の数を作る操作, つまり$+1$に対応するため, {\tt O}, {\tt S O}, {\tt S (S O)}はそれぞれ$0$, $1$, $2$のことである. また, 今後形式化で登場する{\tt .+1}という記号は{\tt S}の別表記であり, 
+{\tt n$\colon$nat}に対して{\tt n.+1}は{\tt S n}と同じ意味である. 
+
+帰納的に定義された型の特徴は場合分けが行えることであり, {\tt nat}であれば{\tt n = O}のときと{\tt n = S n0}の場合, つまり$0$かある数の$+1$であるかの場合分けができる. また, {\tt nat}に対しては数学的帰納法を用いることもできる.
+\brmk
+  証明中で場合分けをしたいときに対応する Coq のタクティックは{\tt case}であり, 
+  定義などに使いたい場合は  {\tt match with}等の構文が用意されている. 
+  帰納法に対応するタクティックは{\tt elim}である. 
+\ermk
+\subsubsection*{\tt int}
+整数の形式化には{\tt int}という型を利用している. こちらは以下のように定義されている. 
+\begin{lstlisting}{Coq}
+Variant int : Set :=  Posz : nat -> int | Negz : nat -> int. \end{lstlisting}
+{\tt nat}を用いており, {\tt Posz}は自然数から$0$以上の整数に送る関数, {\tt Negz}は自然数から負の整数に送る関数であり, {\tt Negz n = - (Posz n.+1)}という関係がある. 
+
+{\tt int}に対しても場合分けができ, {\tt n : int}とすれば, {\tt n = Posz n0}のときと{\tt n = Negz n0}のとき, すなわち0以上か負かでの場合分けが行える. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{形式化}\label{sec form}
 本節から実際に$q$-類似の形式化を行っていく. 
@@ -1425,25 +1455,8 @@ Notation "f // g" := (fun x => f x / g x) (at level 40).
 
 Definition dq (f : R -> R) x := f (q * x) - f x.
 Definition Dq f := dq f // dq id. \end{lstlisting}
-%となる. このコードの意味は大まかに以下のとおりである. 
-%\begin{itemize}
-%  \item 最初の2行で必要なライブラリの指定をしている. 
-%  \item {\tt Variable}でそのセクション内で共通して使う変数を宣言している. 
-%          {\tt R}がCoqにおける実数(正確には{\tt mathcomp}の{\tt algebra}の real closed field
-%          ：実閉体)の役割を果たす. ここではまだ出てきていないが, {\tt nat}が$0$を含む
-%          自然数に, {\tt int}が整数に対応する. 
-%  \item {\tt Hypothesis}で, $q$が1でないという仮定をしている. 使いやすさのため, 
-%          $q \ne 1$ではなく$q - 1 \ne 0$という形にしている. 
-%  \item {\tt Notation}で関数同士の割り算の記法を定義している. 
-%  \item 2つの{\tt Definition}で$q$-差分と$q$-微分をそれぞれ定義している. 
-%          {\tt $\coloneqq$}以前に定義の名前と引数, 以後に具体的な定義が書いてある. 
-%          例えば$q$-差分についてであれば, {\tt d\_q}が名前, {\tt f}と{\tt x}が引数, 
-%          {f (q * x) - f x}が定義である. ({\tt f}の後ろの{\tt : R $\to$ R}は{\tt f}の型である. 
-%          一方, もう一つの引数である{\tt x}には型を書いていない. これは, Coqには強力な
-%          型推論があるため, 推論できるものであれば型を書く必要がないためである. )
-%          $D_q$の定義の中の{\tt id}は恒等関数のことである. 
-%\end{itemize}
-%5行目の{\tt Variables (R$\colon$rcfType) (q$\colon$R).}は, {\tt R}が{\tt rcfType}の要素であること, {\tt q}が{\tt R}の要素であることを表している. {\tt rcfType}は実閉体全体を表す型であるため, {\tt R}は具体的な型ではなく, 実閉体としての性質をもつ抽象的な型として扱っている. 
+2行目の{\tt Import GRing}は{\tt ringType}に対する補題を使いやすくするためのコマンドで, 
+7行目の{\tt Notation}は記法を定めるためのコマンドである. 今回であれば関数同士の割り算の記法を定義している. また, {\tt Dq}の定義の中の{\tt id}は恒等関数のことである. 
 \brmk
   $f$が微分可能であるとき, 
   \[
@@ -1584,7 +1597,7 @@ Proof.
     by rewrite -mulrDl -qnat_cat1.
 Qed.
 \end{lstlisting}
-ここで{\tt elim:\,n}は{\tt n}の帰納法に対応している. 
+{\tt elim:\,n}で{\tt n}に対する数学的帰納法をしており, 後はすべて{\tt rewrite}による式変形である. {\tt elim}の直後の{\tt -}はゴールを変形するタクティックではなく, ゴールが増えた際にコードを読みやすくするために入れている記号である. 
 
 指数法則については, 一般には$(x - a)^{m + n} \neq (x - a)^m_q(x - a)^n_q$であり, 以下のようになる. 
 \bprop[\cite{Kac} p8 (3.6)] \label{q_exp_low}
@@ -1632,12 +1645,7 @@ Qed.
 \begin{lstlisting}{Coq}
 Definition qbinom_neg a n x := 1 / qbinom_pos (q ^ ((Negz n) + 1) * a) n x.
 \end{lstlisting}
-となる. ここで, {\tt Negz n}とは{\tt Negz n = - n.+1}をみたすものであるので, 
-{\tt (Negz n) + 1}は{\tt -n}となり, \cite{Kac}の定義と一致する. また{\tt int}は
-\begin{lstlisting}{Coq}
-Variant int : Set := Posz : nat -> int | Negz : nat -> int.
-\end{lstlisting}
-のように定義されている. よって, {\tt int}は$0$以上か負かで場合分けできるため, 
+となる. {\tt int}は$0$以上か負かで場合分けできるため, 
 {\tt n$\colon$int}に対して{\tt qbinom\_pos}の定義を以下のように整数に拡張する. 
 \begin{lstlisting}{Coq}
 Definition qbinom a n x :=
@@ -1880,7 +1888,9 @@ Proof.
     move/mulnon0.
     by rewrite addrK mulrA -{2}(expr1z q) -expfzDr.
 Qed.\end{lstlisting}
-非常に長くなっているが積の交換則や結合則などが多く, {\tt Dq\_quot}が商の$q$-微分公式の形式化であるため, \cite{Kac}の証明をそのまま形式化したものになっている. また, いくつかの項が$0$でないという条件がついているが, これらの項は Definition \ref{qbinom_neg} において分母に現れるため, {\tt Dq\_of\_pow}のときと同様妥当であると考えられる. これらをまとめて以下のように形式化できる. 
+非常に長くなっているが積の交換則や結合則などが多く, {\tt Dq\_quot}が商の$q$-微分公式の形式化であるため, \cite{Kac}の証明をそのまま形式化したものになっている. また, 約分のためいくつかの項が$0$でないという条件がついている. 
+
+これらをまとめて以下のように形式化できる. 
 \begin{lstlisting}{Coq}
 Theorem Dq_qbinom a n x : q != 0 -> x != 0 ->
   x - q ^ (n - 1) * a != 0 ->
@@ -1992,6 +2002,19 @@ Definition Dqp p := dqp p %/ dqp 'X.
 Lemma Dqp_ok p : dqp 'X %| dqp p.
 \end{lstlisting}
 ここで, {\tt p' \%| p}で{\tt p}が{\tt p'}で割り切れることを表す. 
+\brmk
+  mathcomp の fraction.v では整域から構成する商体を形式化している. 
+  通常の数学と同様{\tt \{poly R\}}は整域になるため, fraction.v の内容を使って{\tt Dqp}の定義が妥当であることを証明できる. 
+  \begin{lstlisting}{Coq}
+Import FracField.
+
+Local Notation tofrac := (@tofrac [idomainType of {poly R}]).
+Local Notation "x %:F" := (tofrac x).
+
+Theorem Dqp_ok_frac p : (dqp p)%:F / (dqp 'X)%:F = (Dqp p)%:F.
+\end{lstlisting}
+ここで{\tt x \%:F}は整域の要素{\tt x}を商体の要素{\tt x/1}に送る操作である. 
+\ermk
 今後は扱いやすさのため, {\tt `X}で約分した形
 \begin{lstlisting}{Coq}
 Definition Dqp' (p : {poly R}) := \poly_(i < size p) (qnat (i.+1) * p`_i.+1).
@@ -2095,7 +2118,55 @@ Theorem general_Taylor D n P (f : {poly R}) a :
   (forall m, size (P m) = m.+1) ->
   size f = n.+1 ->
   f = \sum_(0 <= i < n.+1)
-          ((D \^ i) f).[a] *: P i. \end{lstlisting}
+          ((D \^ i) f).[a] *: P i. 
+Proof.
+  move=> Hl Hd HP0 HP HdP Hdf.
+  have Hdf' : (size f <= n.+1)%N.
+    by rewrite Hdf leqnn.
+  move: (poly_basis n P f HdP Hdf') => [c] Hf.
+  have Hc0 : c 0%N = ((D \^ 0) f).[a] => /=.
+    rewrite Hf.
+    destruct n.
+      by rewrite big_nat1 hornerZ HP0 mulr1.
+    rewrite hornersumD.
+    rewrite (@big_cat_nat _ _ _ 1) //= big_nat1.
+    rewrite hornerZ HP0 mulr1.
+    have -> : (1 = 0 + 1)%N by [].
+    rewrite big_addn subn1 /=.
+    under eq_big_nat => i /andP [_ _].
+      rewrite hornerZ addn1 HP mulr0.
+    over.
+    by rewrite big1 // addr0.
+  have ithD : forall j, (j.+1 <= n)%N ->
+    (D \^ j.+1) f = \sum_(j.+1 <= i < n.+1) c i *: P (i - j.+1)%N.
+    move=> j Hj.
+    rewrite Hf linear_distr; last by apply nth_islinear.
+    rewrite {1}(lock j.+1).
+    rewrite (@big_cat_nat _ _ _ j.+1) //=; last by apply leqW.
+    rewrite -lock.
+    under eq_big_nat => i /andP [_ Hi].
+      rewrite nthisfderiv_0 // scaler0.
+    over.
+    rewrite big1 // add0r.
+    by under eq_big_nat => i /andP [Hi _] do rewrite nthisfderiv_pos //.
+  have coef : forall j, (j <= n)%N -> c j = ((D \^ j) f).[a].
+    move=> j Hj.
+    destruct j => //.
+    rewrite ithD //.
+    rewrite (@big_cat_nat _ _ _ j.+2) //= big_nat1 hornerD.
+    rewrite subnn hornerZ HP0 mulr1 hornersumD.
+    under eq_big_nat => i /andP [Hi Hi'].
+      rewrite hornerZ.
+      move: (Hi).
+      rewrite -addn1 -leq_subRL //; last by apply ltnW.
+      case: (i - j.+1)%N => // k Hk.
+      rewrite HP mulr0.
+    over.
+    by rewrite big1 // addr0.
+  rewrite {1}Hf big_nat_cond [RHS]big_nat_cond.
+  apply eq_bigr => i /andP [/andP [Hi Hi'] _].
+  by rewrite coef.
+Qed.\end{lstlisting}
 記号の意味などは以下の通りである. 
 \begin{itemize}
   \item {\tt islinear}, {\tt isfderiv}はそれぞれ
@@ -2109,6 +2180,11 @@ Definition isfderiv D (P : nat -> {poly R}) := forall n,
   | n.+1 => (D (P n.+1)) = P n
   end. \end{lstlisting}
     という定義であり, 前者が線形作用素であること, 後者は条件(iii)を形式化したものである. 
+  \item {\tt under / over}は総和$\sum$, 総積$\prod$など同じ演算を繰り返す記号
+    (これを big operator と呼ぶ)に対して用いるタクティックで, 
+    big operator で束縛されている各項を書き換えたい際に使う. 
+    {\tt under}で各項に注目し, 書き換えが終わったら{\tt over}でもとの big operator に戻る. 
+    big operator について詳しくは mathcomp の bigop.v を参照のこと.  
   \item \cite{Kac}での証明には, $\{P_0(x), P_1(x), \ldots , P_n(x)\}$が$V$の基底
     となることを用いている. これを以下のように形式化した. 
     \begin{lstlisting}{Coq}
@@ -2154,7 +2230,7 @@ Theorem q_Taylorp n (f : {poly R}) c :
   size f = n.+1 ->
   f = \sum_(0 <= i < n.+1) ((Dqp' \^ i) f).[c] *: (qbinom_pos_poly c i / (qfact i)%:P).
 \end{lstlisting}
-{\tt Dqp}, {\tt qbinom\_pos\_poly}をもとの定義に戻したものについては, 
+{\tt Dqp}, {\tt qbinom\_pos\_poly}をもとの定義に戻したものについては以下の通り. 
 \begin{lstlisting}{Coq}
 Theorem q_Taylor n (f : {poly R}) x c :
   q != 0 ->
