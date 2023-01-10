@@ -1161,7 +1161,7 @@ $\lambda$Pでの型付けには以下のようなものがある.
   \end{align*}
 \eex
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{$\lambda$-cube}
+\subsection{$\lambda$-cube と Curry-Howard同型}
 前節で$\lama$の拡張として$\lambda$2と$\lambda$Pを導入したが, これらを組み合わせたものとして$\lambda$P2という$\lambda$計算が存在し, 2階述語論理に相当する表現力を持つ. また, 本論文では触れないが, $\lama$のまた別の拡張として$\lambda \ul{\omega}$というものも存在する(\cite{Bar} Definition 5.1.4, Definition 5.1.5). 
 $\lama$を出発点とし, $\lambda$2, $\lambda$P, 
 $\lambda \ul{\omega}$の性質を持つかどうかで
@@ -1178,12 +1178,7 @@ $\lambda$P, $\lambda$P2, $\lambda$P$\ul{\omega}$, $\lambda$P$\omega$
   }
 \]
 ここで, 各辺となっている$\longrightarrow$は$\lambda$2, $\lambda \ul{\omega}$, $\lambda$Pのいずれかの性質の導入を表し, 下から上への矢印は$\lambda$2の導入を, 左下から右上への矢印は$\lambda \ul{\omega}$の導入を, 左から右への矢印は$\lambda$Pの導入を表す. 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Coq} \label{sec coq}
-本節では定理証明支援系 Coq について説明をする. まず型付き$\lambda$計算と Coq の関係性について触れ, 次に Coq の使い方を具体例を用いて説明する. また, この後の形式化でよく使う型について, その構造の説明も行う.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Curry-Howard同型}
-前節で述べた$\lambda$-cube のうち, 最も強い$\lambda$P$\omega$に帰納的型を導入した$\lambda$計算が Coq で採用されている. 
+
 型付き$\lambda$計算と証明の形式化をつなぐのが, Curry-Howard 同型と呼ばれる, 
 \begin{align*}
   \text{命題} &\leftrightarrow \text{型} \\
@@ -1204,7 +1199,10 @@ $\lambda$P, $\lambda$P2, $\lambda$P$\ul{\omega}$, $\lambda$P$\omega$
   \text{ある} x \in A \text{について} P(x) &\quad \text{依存和型}\sum_{x : A} P (x)\\
   \text{任意の} x \in A \text{について} P(x) &\quad \text{依存関数型}\prod_{x : A} P (x)
 \end{align*}
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Coq} \label{sec coq}
+前節で述べた$\lambda$-cube のうち, 最も強い$\lambda$P$\omega$に帰納的型を導入した$\lambda$計算が Coq で採用されている. 
+本節では定理証明支援系 Coq の使い方を具体例を用いて説明し, また, この後の形式化でよく使う型についてその構造の説明も行う.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Coqの使い方} \label{ssec coq_use}
 この節ではCoqのコマンドとタクティックの使い方について述べる. ただし, タクティックは証明の中でコンテクスト(変数や仮定)やゴール(証明すべき主張)を変形させるもの, コマンドはタクティック以外のものとする. 
