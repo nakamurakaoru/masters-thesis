@@ -1,4 +1,4 @@
-This is e-pTeX, Version 3.14159265-p3.8.1-180518-2.6 (utf8.sjis) (TeX Live 2018/W32TeX) (preloaded format=platex 2018.7.29)  10 JAN 2023 17:02
+This is e-pTeX, Version 3.14159265-p3.8.1-180518-2.6 (utf8.sjis) (TeX Live 2018/W32TeX) (preloaded format=platex 2018.7.29)  10 JAN 2023 20:30
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -759,4 +759,4 @@ Here is how much of TeX's memory you used:
  934 hyphenation exceptions out of 8191
  35i,16n,58p,754b,1830s stack positions out of 5000i,500n,10000p,500000b,80000s
 
-Output written on masters_thesis.dvi (47 pages, 297636 bytes).
+Output written on masters_thesis.dvi (47 pages, 297652 bytes).
