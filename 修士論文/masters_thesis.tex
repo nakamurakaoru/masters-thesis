@@ -21,7 +21,7 @@
 %\usepackage{graphics}
 \input{poster_packages.tex}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newtheorem{df}{$\textrm{Definition}$}[subsection]
+\newtheorem{df}{$\textrm{Definition}$}[section]
 \newtheorem{ex}[df]{$\textrm{Example}$}
 \newtheorem{prop}[df]{$\textrm{Proposition}$}
 \newtheorem{lem}[df]{$\textrm{Lemma}$}
@@ -1268,7 +1268,7 @@ Lemma Dq_pow n x : x != 0 -> Dq (fun x => x ^ n) x = qnat n * x ^ (n - 1). \end{
     証明を完了させて{\tt Qed}を書くことで Coq に補題を登録することができ, 他の補題の
     証明に使えるようになる. 
 \end{description}
-次に, タクティックについて述べる. タクティックは{\tt Proof...Qed}の間に使われるよく使われるタクティックは{\tt move}, {\tt apply}, {\tt rewrite}の3つである. 
+次にタクティックについて述べる. タクティックは{\tt Proof...Qed}の間に使われる. よく使われるタクティックは{\tt move}, {\tt apply}, {\tt rewrite}の3つである. 
 \begin{description}
   \item[\tt move]
     {\tt move=> H}でゴールの前提に{\tt H}という名前をつけてコンテクストに移動する. 
@@ -1283,12 +1283,12 @@ Lemma Dq_pow n x : x != 0 -> Dq (fun x => x ^ n) x = qnat n * x ^ (n - 1). \end{
     
     また, 補題{\it lem}が{\tt A = B}という形のとき, {\tt rewrite {\it lem}}でゴールに出現する
     {\tt A}を{\tt B}に書き換える(ただし, {\it lem}が{\tt H $\to$ (A = B)}という形であるとき, 
-    {\tt H}がゴールに追加される). 更に, {\tt rewrite {\it lem} in H}で, コンテクストの{\tt H}に
+    新たなゴールとして{\tt H}が追加される). 更に, {\tt rewrite {\it lem} in H}で, コンテクストの{\tt H}に
     出現する{\tt A}を{\tt B}に書き換える. {\tt apply}と同じく, 使いたい等式が仮定にある場合も
     同じように使える. 更に, {\tt rewrite}は繰り返し回数や適用箇所を指定できる.
     \begin{description}
       \item[\tt rewrite !{\it lem}] {\it lem}による書き換えを可能な限り繰り返す. 
-        ただし場合によっては繰り返しが終わらない場合があることに注意
+        ただし場合によっては繰り返しが終わらないことに注意
         ($x + y$を$y + x$に書き換える補題を使う場合など).
       \item[\tt rewrite n!{\it lem}] {\it lem}による書き換えを$n$回限り繰り返す.
       \item[\tt rewrite ?{\it lem}] {\it lem}による書き換えを$0$回または$1$回行う. 
@@ -1297,7 +1297,7 @@ Lemma Dq_pow n x : x != 0 -> Dq (fun x => x ^ n) x = qnat n * x ^ (n - 1). \end{
         つまり, {\it lem}が{\tt A = B}のとき, ゴールの{\tt B}を{\tt A}に書き換える. 
       \item[\tt rewrite \{n\}{\it lem}] {\it lem}で書き換えられる場所のうち
         $n$番目のみを書き換える. 
-      \item[\tt rewrite [条件]{\it lem}] 条件に一致する場所を{\it lem}で書き換える.
+      \item[{\tt rewrite [条件] {\it lem}}] 条件に一致する場所を{\it lem}で書き換える.
       \item[\tt rewrite (\_ : A = B)] ゴールの{\tt A}を{\tt B}に書き換える. 
         {\tt A = B}がゴールに追加される. この書き方の場合は補題を引数にとらない. 
     \end{description}
@@ -1458,7 +1458,7 @@ Qed. \end{lstlisting}
 更に, 前提が{\tt A = B}の形であるとき, {\tt move$\to$}でゴールの{\tt A}を{\tt B}に書き換えられること, {\tt ;}で異なるタクティックをつなげられることを用いれば以下のように書くこともでできる. 
 \begin{lstlisting}{Coq}
 Lemma substitution m n : m = 0 -> n + m = n.
-Proof. by move->; by rewrite addn0. Qed. \end{lstlisting}
+Proof. by move->; rewrite addn0. Qed. \end{lstlisting}
 \eex
 \brmk
   正確には, {\tt addn0}は
@@ -2067,7 +2067,7 @@ Qed.
   \item[\tt size p] 多項式$p$の次数$+1$
     {\tt size}が$0$である多項式はゼロ多項式のみであり, 
     {\tt size}が$1$である多項式は定数項のみからなる式である. 
-  \item[\tt p.[x]] 多項式$p$の$x$での値 
+  \item[{\tt p.[x]}] 多項式$p$の$x$での値 
 \end{description}
 より詳細な内容については mathcomp の poly.v を参照のこと. 
 
@@ -2076,7 +2076,7 @@ Qed.
 \begin{lstlisting}{Coq}
 Definition scale_var (p : {poly R}):= \poly_(i < size p) (q ^ i * p`_i).
 Definition dqp p := scale_var p - p. \end{lstlisting}
-{\tt scale\_var}は多項式{\tt p}を受け取り, $i$次の係数を$q^i$倍した多項式を返す操作である. また, {\tt dqp}は多項式に対しての$d_q$と同じ結果になることが確認できる(正確には, {\tt dqp}を適用した多項式での{\tt x}での値と${\tt x} \mapsto {\tt p.[x]}$という関数に${\tt d}_{\tt q}$を適用した関数の{\tt x}での値が等しいということである). 
+{\tt scale\_var}は多項式{\tt p}を受け取り, $i$次の係数を$q^i$倍した多項式を返す操作で, すなわち$x$を$qx$に変えている. また, {\tt dqp}は多項式に対しての$d_q$と同じ結果になることが確認できる(正確には, {\tt dqp}を適用した多項式での{\tt x}での値と${\tt x} \mapsto {\tt p.[x]}$という関数に${\tt d}_{\tt q}$を適用した関数の{\tt x}での値が等しいということである). 
 \begin{lstlisting}{Coq}
 Definition ap_op_poly (D : (R -> R) -> (R -> R)) (p : {poly R}) := D (fun (x : R) => p.[x]).
 Notation "D # p" := (ap_op_poly D p) (at level 49).
