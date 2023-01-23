@@ -22,5 +22,5 @@
 \contentsline {section}{\numberline {2.5}関数の外延性}{39}
 \contentsline {section}{\numberline {2.6}可縮, ファイバー}{40}
 \contentsline {section}{\numberline {2.7}レトラクト}{42}
-\contentsline {section}{\numberline {2.8}Univalence implies function extensionality}{43}
+\contentsline {section}{\numberline {2.8}関数の外延性を Univalence axiom から導く}{43}
 \contentsline {chapter}{参考文献}{46}

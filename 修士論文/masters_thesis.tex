@@ -123,7 +123,9 @@
 \tableofcontents
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{序文}
-本論文の主結果は, $q$-類似の初等的な結果をCoqによって形式化するものである. 具体的にはVictor Kac, Pokman Cheungの{\it Quantum Calculus}\cite{Kac}の4章(4.1)式の$q$-Taylor 展開, 及びその系として得られる Gauss's binomial formula の形式化を目標としている. 
+本論文の主結果は, $q$-類似の初等的な結果をCoqによって形式化するものである. 
+形式化とは, 証明のために用意されたプログラミング言語に数学的な主張を翻訳し, その正しさをコンピュータを用いて機械的に検証することであり,  また Coq はこの形式化を行いやすくするためのソフトウェアの一つである(このようなソフトウェアを総称して定理証明支援系と呼ぶ).
+具体的にはVictor Kac, Pokman Cheungの{\it Quantum Calculus}\cite{Kac}の4章(4.1)式の$q$-Taylor 展開, 及びその系として得られる Gauss's binomial formula の形式化を目標としている. 
 本論文での$q$-類似に関する定義や定理, 証明は\cite{Kac}によるものだが, その形式化を行ったという点において独自性がある. 形式化したコード全体は\url{https://github.com/nakamurakaoru/q-analogue}\cite{coq qana}にある. q\_analogue.v が\cite{Kac}の形式化をしたファイルであり, q\_tool.v は直接$q$-類似に関係はしないが, 形式化をするために自分で用意した補題をまとめたファイルである. 
 
 $q$-類似は, 学部4年次に卒業研究のテーマとして扱ったものである. 実数パラメータ$q$, 実数上の関数$f$に対して
@@ -208,7 +210,7 @@ Coqは型付き$\lambda$計算という理論に基づいている. この$\lamb
 \ref{ssec jacobi}節は極限や無限和に関するものであるため形式化はできていない. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{$q$-微分について成り立つ諸性質} \label{ssec qprops}
-$q$-微分は\cite{Kac}において, まず$q$-差分
+$q$-微分は\cite{Kac}において, まず$q$-差分を, $q$, $x \in \R$, 実数上の関数$f$について
 \[
   d_q f(x) = f(qx) - f(x)
 \]
@@ -280,44 +282,7 @@ $q$-微分は\cite{Kac}において, まず$q$-差分
 \]
 が成り立つことが証明されている(\cite{Kac} p18参照). この補題も形式化できており, \cite{coq qana}のq\_analogue.vの{\tt q\_pascal}という補題である.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\subsection{無限和に関する話題} \label{ssec infsum}
-%本節と次節の内容は形式化できていない. 
-%Gauss's binomial formula において, $x = 1$, $a = x$とすれば
-%\[
-%  (1 + x)^n_q = \sum_{j = 0}^n q^{j (j - 1) / 2} \qcoe{n}{j} x^j
-%\]
-%となる. ここで$|q| < 1$とすると, 
-%\[
-%  \lim_{n \to \infty} \qcoe{n}{j} =
-%  \lim_{n \to \infty} \frac{(1 - q^n)(1 - q^{n - 1}) \cdots (1 - q^{n - j + 1})}
-%                                  {(1 - q) (1 - q^2) \cdots (1 - q^j)} =
-%  \frac{1}{(1 - q) (1 - q^2) \cdots (1 - q^j)}
-%\]
-%となるので,  
-%\[
-%  (1 + x)^{\infty}_q = \sum_{j = 0}^{\infty} q^{j (j - 1)/2}
-%  \frac{x^j}{(1 - q) (1 - q^2) \cdots (1 - q^j)}
-%\]
-%無限積を無限和に書き換える式が得られる. この式は Euler により見つけられたため, Euler's first identity の意で\cite{Kac}では E1 と呼ばれている. 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{無限和への拡張} \label{ssec jacobi}
-%本節では, まだ形式化はできていない$q$-Taylor展開以降の\cite{Kac}の内容について, 特に$q$-類似を考える利点の1つであるJacobiの三重積について説明する. 
-%$q$-類似とは, $q \to 1$とすると通常の数学に一致するような拡張のことである. 例えば, 自然数$n$の$q$-類似$[n]$は
-%\[
-%  [n] = 1 + q + q^2 + \cdots q ^ {n -1} 
-%\]
-%であり, $(x-a)^n$の$q$-類似$(x-a)^n_q$は
-%\[
-%  (x-a)^n_q \coloneqq \begin{cases}
-%                                  1 & (n=0)\\
-%                                  (x-a)(x-qa)\cdots(x-q^{n-1}a) & (n\ge1)
-%                                \end{cases}
-%\]
-%である. 本論文では, この$(x - a)^n_q$に対して, 
-%\[
-%  (x+a)^n_q = \sum_{j=0}^n \qcoe{n}{j} q^{\frac{j(j-1)}{2}} a^j x^{n-j}
-%\]
-%が成り立つことの形式化を目標としている. 
 あえてパラメータを増やす$q$-類似を考える利点の一つとしては, 証明が複雑な定理に対してより簡単な別証明を与えられる場合があることである. 例えば, 以下のJacobiの三重積(\cite{Kac} p35 Theorem 11.1)はその一例である. 
 \begin{screen}
 $z$, $q \in \R$, $|q| < 1$として, 
@@ -429,18 +394,9 @@ $\lambda$計算には, 抽象と適用の2つの基本的な操作がある. ま
             を表す. 
   \item 最も外側の()は書かない. 
 \end{enumerate}
-%\begin{rmk}{(\cite{Bar} Notation 2.1.4)}
-%$M, N$を$\lambda$項とする. このとき, $M$と$N$が等しいか, 束縛変数の名前をつけかえることで互いにうつりあうとき, $M \equiv N$と書く. 例えば, 
-%\begin{align*}
-%  (\lambda x .x) z \equiv (\lambda x .x) z \\ 
-%  (\lambda x .x) z \equiv (\lambda y .y) z \\
-%  (\lambda x .x) z \nequiv (\lambda x .y) z
-%\end{align*}
-%となる. 
-%\end{rmk}
 次に, 束縛変数と自由変数, $\lambda$項の間の$\equiv$, 代入を定義する. 
 \begin{shadebox}
-  \begin{df}{(\cite{Bar} Notation 2.1.4, Definition 2.1.5)}
+  \begin{df}{(\cite{Bar} Notation 2.1.4, Definition 2.1.5)} \label{def FV}
     $M, N, P, Q \in \Lambda$, $x, y \in V$とする. 
     \begin{enumerate}
       \item $M$の自由変数の集合$FV(M)$を, 以下のように帰納的に定義する. 
@@ -480,7 +436,7 @@ $\lambda$計算には, 抽象と適用の2つの基本的な操作がある. ま
   であれば束縛変数は$x$, $y$で, 自由変数は$z$, $w$である. 
 \eex
 \begin{rmk}{(\cite{Bar} Notation 2.1.4)}
-2.について, 例えば, 
+Definition \ref{def FV}2.について, 例えば, 
 \begin{align*}
   (\lambda x .x) z \equiv (\lambda x .x) z \\ 
   (\lambda x .x) z \equiv (\lambda y .y) z \\
@@ -492,30 +448,6 @@ $\lambda$計算には, 抽象と適用の2つの基本的な操作がある. ま
   束縛変数は, 自由変数とは異なる名前とする. 例えば, $y\ (\lambda y . xy)$は
   $y\ (\lambda y' . xy')$などに書き換える. 
 \end{rmk}
-%$\lambda$計算を, $\lambda$項同士の等式による形式体系として考えるために, 次のように定義する. 
-%\begin{shadebox}
-%  \begin{df}{(\cite{Bar} Definition 2.1.7)}
-%    $M, M', N, L, Z \in \Lambda$とする. 
-%    \begin{enumerate}
-%      \item $\lambda$計算の主公理スキームを, 
-%        \[
-%          (\lambda x.M)\ N = M\ [x \coloneqq N]
-%        \]
-%        で定める. これを, $\beta$-変換という. 
-%      \item $\beta$-変換の他の公理を以下のように定める.  
-%        \begin{alignat*}{3}
-%          &M = M& \\
-%          &M = N& \quad &\Lra& \quad &N = M \\
-%          &M = N, N = L& &\Lra& &M = L \\
-%          &M = M'& &\Lra& &MZ = M'Z \\
-%          &M = M'& &\Lra& &ZM = ZM' \\
-%          &M = M'& &\Lra& &\lambda x. M = \lambda x. M' 
-%        \end{alignat*}
-%      \item $\lambda$計算において$M = N$が証明可能であることを, 
-%        $\lambda \vdash M = N$もしくは単に$M = N$と書く. 
-%    \end{enumerate}
-%  \end{df}
-%\end{shadebox}
 本節の最後に, 適用である$\beta$-簡約を定義する. 
 \begin{shadebox}
   \begin{df}{(\cite{Bar} Definition 2.3.2)}
@@ -638,12 +570,12 @@ $x_1 \colon \sigma_1 , \ldots , x_n \colon \sigma_n \vdash M \colon \sigma$
 導入規則は以下のようにも表される.
 \begin{itembox}[c]{導出規則1}
   \begin{alignat*}{3}
-    &(\text{公理})& \quad &\Gamma \vdash x \colon \sigma& 
+    &(\text{axiom})& \quad &\Gamma \vdash x \colon \sigma& 
       &(x \colon \sigma) \in \Gamma \text{のとき}\\
-    &(\text{$\to$除去})& 
+    &(\text{$\to$-elimination})& 
       &\frac{\Gamma \vdash M \colon (\sigma \to \tau) \quad
         \Gamma \vdash N \colon \sigma}{\Gamma \vdash (MN) \colon \tau}& & \\
-    &(\text{$\to$導入})& &\frac{\Gamma,\ x \colon \sigma \vdash M \colon \tau}
+    &(\text{$\to$-introduction})& &\frac{\Gamma,\ x \colon \sigma \vdash M \colon \tau}
       {\Gamma \vdash (\lambda x . M) \colon (\sigma \to \tau)}& &
   \end{alignat*}
 \end{itembox}
@@ -661,7 +593,7 @@ $\lambda$項に対してある型が付くことを示すには,
     \item  任意の$\sigma, \tau \in \T$について, 
       $\vdash (\lambda x y . x) \colon (\sigma \to \tau \to \sigma)$であることを確認する. 
       まず, $\lambda x y . x$の最も大きな構造は抽象である. 
-      抽象に対して型を割り当てる規則は$\to$導入なので, 
+      抽象に対して型を割り当てる規則は$\to$-introduction なので, 
       \[
         \frac{x \colon \sigma \vdash (\lambda y . x) \colon (\tau \to \sigma)}
           {\vdash (\lambda x y . x) \colon (\sigma \to \tau \to \sigma)}
@@ -708,297 +640,6 @@ $\lambda$項に対してある型が付くことを示すには,
     の両方がつくことはありえない. よって, $\lambda x .xx$には型がつかない. 
   \end{enumerate}
 \end{ex}
-%\textbf{$\lama$の性質}
-%
-%$\lama$の型付けに関するいくつかの性質を述べる. 1つ目の性質は, ある型付けを導出するためには, どれだけの基底が必要かを示すものである. 
-%\begin{shadebox}
-%  \begin{df}{(\cite{Bar} Definition 3.1.6)}
-%    $\Gamma = \{ x_1 \colon \sigma_1 , \ldots , x_n \colon \sigma_n\}$を基底とする. 
-%    \begin{enumerate}
-%      \item $\Gamma$を部分関数のように扱い, 
-%        dom($\Gamma$) = \{$x_1, \ldots , x_n$\},  $\sigma_i = \Gamma(x_i)$とする.
-%      \item $V_0$を変数の集合とする. このとき, 
-%        $\Gamma \upharpoonright V_0 
-%          = \{ x \colon \sigma\ |\ x \in V_0 \text{かつ} \sigma = \Gamma(x) \}$と定める.
-%      \item $\sigma, \tau \in \T$に対して, $\sigma$において$\alpha$に$\tau$を代入すること
-%        を$\sigma[\alpha \coloneqq \tau]$と表す.
-%    \end{enumerate}
-%  \end{df}
-%\end{shadebox}
-%\begin{shadebox}
-%  \begin{prop}{(\cite{Bar} Proposition 3.1.7)}(Basis lemma for $\lama$)\label{prop_gen}
-%    $\Gamma$を基底とする. 
-%    \begin{enumerate}
-%      \item $\Gamma' \supset \Gamma$が基底のとき, 
-%        \[
-%          \Gamma \vdash M \colon \sigma \Rightarrow \Gamma' \vdash M \colon \sigma.
-%        \]
-%      \item $\Gamma \vdash M \colon \sigma 
-%        \Rightarrow FV(M) \subset \text{dom}(\Gamma)$.
-%      \item $\Gamma \vdash M \colon \sigma 
-%        \Rightarrow \Gamma \upharpoonright FV(M) \vdash M \colon \sigma$.
-%    \end{enumerate}
-%  \end{prop}
-%\end{shadebox}
-%\begin{proof}
-%$M \colon \sigma$の導出に関する帰納法により示す. ここで, 導出に関する帰納法とは, 導出規則が帰納的に定義されてることを用いた証明法であり, 型付けに関する証明においてよく使われるやり方である. Proposition \ref{prop_gen}の証明の前に, 
-%\[
-%  \Gamma \vdash M \colon \sigma \Lra f(\Gamma, M, \sigma) \quad 
-% \text{(ここで, $f(\Gamma, M, \sigma)$は$\Gamma$と$M$と$\sigma$に関する何らかの主張)}
-%\]
-%という形の命題の, 導出に関する帰納法による証明の概略について述べておく. 
-%\begin{itemize}
-%  \item base case $\colon$ 前提がない場合
-%  
-%    $\Gamma \vdash M \colon \sigma$が前提なく導出されるのは, $M \equiv x$, 
-%    つまり$M$が変数1つのみのときである. この場合は, $(x \colon \sigma \in \Gamma)$
-%    のみを仮定して, $f(\Gamma, x, \sigma)$が成り立つことを示すことになる. 
-%  \item inductive case $\colon$ 前提がある場合
-%  
-%    前提をもとにある型が付くことが導出されるのは, $M \equiv M_1 M_2$もしくは
-%    $M \equiv \lambda x . M_1$のときである. このときは, 
-%    前提について主張が成り立つことを仮定して証明を進める. 例えば, 
-%    $M \equiv M_1 M_2$のときであれば, $\Gamma \vdash M \colon \sigma$は, 
-%    ある$\tau$について, $\Gamma \vdash M_1 \colon \tau \to \sigma$と
-%    $\Gamma \vdash M_2 \colon \tau$の2つの前提から導出されるので, 
-%    \begin{align*}
-%    &\Gamma \vdash M_1 \colon \tau \to \sigma 
-%      \Lra f(\Gamma, M_1, (\tau \to \sigma)) \\
-%    &\Gamma \vdash M_2 \colon \tau \Lra f(\Gamma, M_2, \tau)
-%    \end{align*}
-%    の2つを仮定して, 
-%    $\Gamma \vdash (M_1 M_2) \colon \sigma \Lra f(\Gamma, (M_1 M_2), \sigma)$
-%    を示すことになる. 
-%    同様に, $M \equiv \lambda x . M_1$の場合, 
-%    $\Gamma \vdash \lambda x. M_1 \colon \sigma$は, 
-%    ある$\sigma_1$, $\sigma_2$について, $\sigma = (\sigma_1 \to \sigma_2)$であり, 
-%    $\Gamma, x \colon \sigma_1 \vdash M_1 \colon \sigma_2$から導出されるので, 
-%    \[
-%      \Gamma, x \colon \sigma_1 \vdash M_1 \colon \sigma_2 
-%        \Lra f((\Gamma, x \colon \sigma_1), M_1, \sigma_2)
-%    \]
-%    を仮定して, 
-%    $\Gamma \vdash (\lambda x. M_1) \colon (\sigma_1 \to \sigma_2) 
-%      \Lra f(\Gamma, (\lambda x. M_1), (\sigma_1 \to \sigma_2))$
-%    を示すことになる. 
-%\end{itemize}
-%まとめると, $M$がどの形なのかで場合分けし, それぞれの導出の前提に対して成立を仮定して, 証明をするということである. 以下, 実際の Proposition \ref{prop_gen}の証明にうつる. 
-%  \begin{enumerate}
-%    \item 
-%      \begin{enumerate}
-%        \item $M \colon \sigma = x \colon \sigma$のとき\\
-%          $x \colon \sigma \in \Gamma$より$x \colon \sigma \in \Gamma'$から
-%          $\Gamma' \vdash x \colon \sigma$である. 
-%        \item $M \colon \sigma = (M_1 M_2) \colon \sigma$のとき\\
-%          $\Gamma \vdash (M_1 M_2) \colon \sigma$は, ある$\tau$について
-%          $\Gamma \vdash M_1 \colon (\tau \to \sigma)$と
-%          $\Gamma \vdash M_2 \colon \tau$から導出される. 
-%          $\Gamma \vdash M_1 \colon (\tau \to \sigma) \Rightarrow
-%           \Gamma' \vdash M_1 \colon (\tau \to \sigma)$かつ
-%          $\Gamma \vdash M_1 \colon (\tau \to \sigma) \Rightarrow
-%           \Gamma' \vdash M_2 \colon \tau$と仮定すると, $\to$除去規則より
-%          $\Gamma' \vdash (M_1 M_2) \colon \sigma$となる. 
-%        \item $M \colon \sigma = (\lambda x.M_1) \colon (\sigma_1 \to \sigma_2)$のとき\\
-%          $\Gamma \vdash (\lambda x.M_1) \colon (\sigma_1 \to \sigma_2)$は
-%          $\Gamma,\ x \colon \sigma_1 \vdash M_1 \colon \sigma_2$から導出される. 
-%          $x \notin \text{dom}(\Gamma')$としてよく, このとき, 
-%          $\Gamma',\ x \colon \sigma_1 \supset \Gamma,\ x \colon \sigma_1$である. 
-%          $\Gamma,\ x \colon \sigma_1 \vdash M \colon \sigma_2 \Rightarrow
-%           \Gamma',\ x \colon \sigma_1 \vdash M \colon \sigma_2$と仮定すると, 
-%          $\to$導入規則より 
-%          $\Gamma' \vdash (\lambda x.M_1) \colon (\sigma_1 \to \sigma_2)$
-%          となる. 
-%      \end{enumerate}
-%      \item 
-%        \begin{enumerate}
-%          \item $M \colon \sigma = x \colon \sigma$のとき, $FV(M) = x$よりすぐにわかる. 
-%          \item $M \colon \sigma = (M_1 M_2) \colon \sigma$のとき\\
-%            帰納法の仮定から, $FV(M_1) \subset \text{dom}(\Gamma)$かつ
-%            $FV(M_2)\subset \text{dom}(\Gamma)$が成り立つので, 
-%            \[
-%            (FV(M_1) \cup FV(M_2))\subset \text{dom}(\Gamma)
-%            \]
-%            となる. $FV(M_1 M_2) = FV(M_1) \cup FV(M_2)$より, 
-%            $FV(M_1 M_2) \subset \text{dom}\Gamma$がわかる. 
-%        \item $M \colon \sigma = (\lambda x. M_1) \colon (\sigma_1 \to \sigma_2)$のとき
-%        
-%            帰納法の仮定より, $FV(M_1) \subset \text{dom}(\Gamma, x \colon \sigma)$
-%            である. また, 
-%            \begin{align*}
-%              \text{dom}(\Gamma, x \colon \sigma)= \text{dom}(\Gamma) \cup \{ x \}\\
-%              FV(\lambda x . M_1) = FV(M_1) - \{ x \}
-%            \end{align*}
-%            より, $FV(\lambda x . M_1) \subset \text{dom}(\Gamma)$がわかる. 
-%        \end{enumerate}
-%      \item
-%        \begin{enumerate}
-%          \item $M \colon \sigma = x \colon \sigma$のとき\\
-%            $FV(M) = x$ から, $\Gamma \upharpoonright FV(M) = x \colon \sigma$となる. 
-%            $(x \colon \sigma) \vdash (x \colon \sigma)$より成り立つ. 
-%          \item $M \colon \sigma = (M_1 M_2) \colon \sigma$. のとき\\ 
-%             帰納法の仮定から,  ある$\tau$が存在し,
-%             $\Gamma \upharpoonright FV(M_1) \vdash M_1 \colon \tau \to \sigma$, 
-%             $\Gamma \upharpoonright FV(M_2) \vdash M_2 \colon \tau$となる. よって, 1.より, 
-%             $\Gamma \upharpoonright FV(M_1 M_2) \vdash M_1 \colon \tau \to \sigma$, 
-%             $\Gamma \upharpoonright FV(M_1 M_2) \vdash M_2 \colon \tau$がわかる. 
-%             したがって, $\Gamma \upharpoonright FV(M) \vdash M \colon \sigma$となる.
-%          \item $M \colon \sigma = \lambda x. M_1 \colon (\sigma_1 \to \sigma_2)$のとき
-%          
-%            帰納法の仮定から, $(\Gamma, x \colon \sigma_1) \upharpoonright FV(M_1) 
-%              \vdash M_1 \colon \sigma_2$となる. ここで, 
-%            $
-%              (\Gamma, x \colon \sigma) \upharpoonright FV(M_1)
-%                = \Gamma \upharpoonright FV(M_1) \cup 
-%                  (x \colon \sigma) \upharpoonright FV(M_1)
-%            $
-%            であり, 
-%            \begin{align*}
-%             \Gamma \uhr (FV(M_1) - \{ x \}) &\supset \Gamma \uhr FV(M_1) \\
-%             x \colon \sigma &\supset (x \colon \sigma) \uhr FV(M_1)
-%            \end{align*}
-%            から, 1. より
-%            $x \colon \sigma, \Gamma \uhr (FV(M_1) - \{ x \}) 
-%              \vdash M_1 \colon \sigma_2$
-%            となる. よって, 
-%            \[
-%              \Gamma \uhr FV(M_1) 
-%                \vdash \lambda x. M_1 \colon (\sigma_1 \to \sigma_2)
-%            \]
-%            がわかる. 
-%        \end{enumerate} 
-%    \end{enumerate}
-%\end{proof}
-%2つ目の性質は、特定の形の項がどのように型付けされるかを分析するものである. これは, ある種の項が型を持たないことを示すのに特に有用である. 
-%\begin{shadebox}
-%  \begin{prop}{(\cite{Bar} Proposition 3.1.8)}(Generation lemma for$\lama$)
-%  \label{prop1}%% prop1%%
-%    以下が成り立つ. 
-%    \begin{enumerate}
-%      \item $\Gamma \vdash x \colon \sigma \Rightarrow (x \colon \sigma) \in \Gamma$
-%      \item $\Gamma \vdash MN \colon \tau \Rightarrow
-%        \exists \sigma\ [\Gamma \vdash M \colon (\sigma \to \tau) \text{かつ}\ 
-%        \Gamma \vdash N \colon \sigma]$
-%      \item $\Gamma \vdash (\lambda x . M) \colon \rho \Rightarrow
-%        \exists \sigma, \tau\ [\Gamma,\ x \colon \sigma \vdash M \colon \tau
-%        \ \text{かつ}\ \rho \equiv (\sigma \to \tau)]$
-%    \end{enumerate}
-%  \end{prop}
-%\end{shadebox}
-%\begin{proof}
-%  導出規則より従う. 
-%\end{proof}
-%\begin{shadebox}
-%  \begin{prop}{(\cite{Bar} Proposition 3.1.9)} (Subterm lemma for $\lama$)
-%    $M'$を$M$の部分項とする. このとき, ある$\Gamma'$と$\sigma'$が存在して, 
-%    \[
-%      \Gamma \vdash M \colon \sigma \Rightarrow \Gamma' \vdash M' \colon \sigma'
-%    \]
-%    をみたす. つまり. $M$が型を持つとき, その任意の部分項も型を持つ. 
-%  \end{prop}
-%\end{shadebox}
-%\begin{proof}
-%  $\Gamma \vdash M \colon \sigma$の導出木を考えれば, 各部分項についての導出木も
-%  得られることからわかる. 
-%\end{proof}
-%\begin{rmk}
-%この命題の対偶から, 部分項に型が付かなければ, 全体にも型が付かないことがわかる. このことを用いれば, 例えば, $\lama$において$\lambda x .xx$に型が付かないことから, 
-%$(\lambda x . xx)(yz)$や, $\lambda y . (\lambda x. xx)$には型がつかない. 
-%\end{rmk}
-%\begin{shadebox}
-%  \begin{prop}{(\cite{Bar} Proposition 3.1.10)} (Substitution lemma for $\lama$)
-%  \label{prop2}%% prop 2%%
-%    以下が成り立つ. 
-%    \begin{enumerate}
-%      \item $\Gamma \vdash M \colon \sigma \Rightarrow 
-%        \Gamma[\alpha \coloneqq \tau] \vdash M \colon \sigma[\alpha \coloneqq \tau]$.
-%      \item $\Gamma,\ x \colon \sigma \vdash M \colon \tau$かつ
-%        $\Gamma \vdash N \colon \sigma$とする. このとき, 
-%        $\Gamma \vdash M[x \coloneqq N] : \tau$.
-%    \end{enumerate}
-%  \end{prop}
-%\end{shadebox}
-%\begin{proof}
-%  \begin{enumerate}
-%    \item $M \colon \sigma$の導出に関する帰納法により示される. 
-%    \item $\Gamma,\ x \colon \sigma \vdash M \colon \tau$
-%      の導出のステップ数に関する帰納法により示される. 
-%  \end{enumerate}
-%\end{proof}
-%次の結果は, ラムダ項がある型を持つということが, 簡約について閉じていることを示す. 
-%\begin{shadebox}
-%  \begin{prop}{\cite{Bar} Proposition 3.1.11} (Subject reduction theorem for $\lama$)
-%  \label{thm_srt}
-%    $M \twoheadrightarrow_{\beta} M'$とする. このとき, 
-%    \[
-%      \Gamma \vdash M \colon \sigma \Rightarrow \Gamma \vdash M' \colon \sigma.
-%    \]
-%  \end{prop}
-%\end{shadebox}
-%\begin{proof}
-%Prop \ref{prop1}, Prop \ref{prop2}を用いて, 簡約のステップ数に関する帰納法により示される.
-%\begin{itemize}
-%  \item ステップ数が0, つまり$M = M'$のとき, 
-%    $\Gamma \vdash M \colon \sigma$からすぐにわかる
-%  \item ステップ数が$n$以下のとき成立すると仮定し, $n+1$のとき成立することを示す. 
-%    \[
-%      \underbrace{M \thra_{\beta} M''}_{n\text{ステップ}} \to_{\beta} M'
-%    \]
-%    をみたす$M''$について, 
-%    $\Gamma \vdash M \colon \sigma \Lra \Gamma \vdash M'' \colon \sigma$
-%    を仮定して, 
-%    $\Gamma \vdash M'' \colon \sigma \Lra \Gamma \vdash M' \colon \sigma$
-%    を示す. $M'' \to_{\beta} M'$の簡約がどのようにされるかで場合分けする. 
-%    \begin{enumerate}
-%      \item $M'' \equiv (\lambda x . P) Q$かつ$M' \equiv P[x \coloneqq Q]$のとき,  
-%        \[
-%          \Gamma \vdash (\lambda x . P) Q \colon \sigma
-%        \]
-%        とすると, Proposition \ref{prop1}より, ある$\tau$が存在して, 
-%        \[
-%          \Gamma \vdash (\lambda x . P)  \colon (\tau \to \sigma) \text{かつ}\ 
-%            \Gamma \vdash Q \colon \tau
-%        \]
-%        をみたす. 更に, もう一度 Proposition \ref{prop1}から, 
-%        \[
-%          \Gamma,\ x \colon \tau \vdash P \colon \sigma\ \text{かつ}\ 
-%            \Gamma \vdash Q \colon \tau
-%        \]
-%        となる. ここで, Proposition \ref{prop2}を用いれば, 
-%        \[
-%          \Gamma \vdash P[x \coloneqq Q] \colon \sigma
-%        \]
-%        がわかる. 
-%      \item $M'' \equiv ZP$, $M' \equiv ZQ$のとき, 
-%        \[
-%          \Gamma \vdash ZP \colon \sigma 
-%        \]
-%        とすると, Proposition \ref{prop1} より, ある$\tau$が存在して, 
-%        \[
-%          \Gamma \vdash Z \colon \tau \to \sigma \text{かつ}
-%           \Gamma \vdash P \colon \tau
-%        \]
-%        をみたす. ここで, $\to_{\beta}$の定義から, $P \to_{\beta} Q$でなくてはならず, この簡約は
-%        1ステップであるから, 帰納法の仮定から$\Gamma \vdash Q \colon \tau$となる. よって, 
-%        \[
-%          \Gamma \vdash ZQ \colon \sigma
-%        \]
-%        がわかる. 
-%      \item $M'' \equiv PZ$, $M' \equiv QZ$のとき, 
-%        2のときと同様, Proposition 3.1.8 と帰納法の仮定から
-%        $\Gamma \vdash P \colon \tau \to \sigma \text{かつ}
-%           \Gamma \vdash Z \colon \tau$および
-%        $\Gamma \vdash Q \colon \tau \to \sigma$が得られることからわかる. 
-%      \item $M'' \equiv \lambda x . P$, $M' \equiv \lambda x . Q$のとき, 2, 3のときと同様, 
-%        Proposition 3.1.8 と帰納法の仮定から, ある$\tau$, $\rho$が存在して, 
-%        $\Gamma, x \colon \tau \vdash P \colon \rho$かつ$\sigma = (\tau \to \rho)$
-%        および$\Gamma, x \colon \tau \vdash Q \colon \rho$が得られる. よって, 
-%        \[
-%          \Gamma \vdash \lambda x . Q \colon (\tau \to \rho) (= \sigma)
-%        \]
-%        が得られる. 
-%    \end{enumerate}
-%  \end{itemize}
-%\end{proof}
 \subsection*{$\lambda 2$}
 $\lama$の拡張の1つとして, $\lambda 2$を考える. $\lambda$2の特徴は型を$\forall$で抽象化できることである. 論理学における2階命題論理に対応し, $\lambda$2の「2」はここから来ている. 同じく論理学との関係を見ると, $\lama$は1階命題論理に対応する. 
 \begin{shadebox}
@@ -1021,19 +662,19 @@ $\lama$の拡張の1つとして, $\lambda 2$を考える. $\lambda$2の特徴�
   \end{enumerate}
 \end{rmk}
 \begin{shadebox}
-  \begin{df}
+  \begin{df}[\cite{Bar} Definition 4.1.7]
     $\lambda 2$の型導出規則を, 以下のように定める.
     \begin{alignat*}{3}
-      &(\text{公理})& \quad &\Gamma \vdash x \colon \sigma& 
-        &(x \colon \sigma)\text{のとき}\\
-      &(\text{$\to$除去})& 
+      &(\text{start rule})& \quad &\frac{(x \colon \sigma \in \Gamma)}
+        {\Gamma \vdash x \colon \sigma}& &\\
+      &(\text{$\to$-elimination})& 
         &\frac{\Gamma \vdash M \colon (\sigma \to \tau) \quad
           \Gamma \vdash N \colon \sigma}{\Gamma \vdash (MN) \colon \tau}& & \\
-      &(\text{$\to$導入})& &\frac{\Gamma,\ x \colon \sigma \vdash M \colon \tau}
+      &(\text{$\to$-introduction})& &\frac{\Gamma,\ x \colon \sigma \vdash M \colon \tau}
         {\Gamma \vdash (\lambda x . M) \colon (\sigma \to \tau)}& & \\
-      &(\text{$\forall$除去})& &\frac{\Gamma, \vdash M \colon (\forall \alpha . \sigma)}
+      &(\text{$\forall$-elimination})& &\frac{\Gamma, \vdash M \colon (\forall \alpha . \sigma)}
         {\Gamma \vdash M \colon (\sigma[\alpha \coloneqq \tau])}& & \\
-      &(\text{$\forall$導入})& &\frac{\Gamma \vdash M \colon \sigma}
+      &(\text{$\forall$-introduction})& &\frac{\Gamma \vdash M \colon \sigma}
         {\Gamma \vdash M \colon (\forall \alpha . \sigma)}& &(\alpha \notin FV(\Gamma))
     \end{alignat*}
   \end{df}
@@ -1059,55 +700,6 @@ $\lambda 2$での型付けの例として, 以下のようなものがある.
   \]
 という導出木により確認できる. 型に$\forall$があることにより, $\lama$では型が付けられないような項についても, $\lambda 2$では型が付けられる場合がある. 
 \end{ex}
-%$\lambda 2$についても, Basis lemma, Subterm lemma, Substitution lemmaが成り立つことが知られている(\cite{Bar} Proposition 4.1.17, Proposition 4.1.18, Proposition 4.1.19 参照). 一方で, Generation lemma は成り立たない. では, Subject reduction lemma はどうであろうか?
-%\begin{shadebox}
-%  \begin{prop}[Basis lemma for the Curry system]
-%    $\Gamma$を基底とする. 以下の3つが成り立つ.
-%    \begin{enumerate}
-%      \item $\Gamma ' \supset \Gamma$も基底ならば, 
-%        $\Gamma \vdash M \colon \sigma \Lra \Gamma ' \vdash M \colon \sigma$.
-%      \item 
-%        $\Gamma \vdash M \colon \sigma \Lra FV(M) \subset \text{dom} (\Gamma)$.
-%      \item
-%        $\Gamma \vdash M \colon \sigma 
-%          \Lra \Gamma \upharpoonright FV(M) \vdash M \colon \sigma$.
-%    \end{enumerate}
-%  \end{prop}
-%\end{shadebox}
-%\begin{shadebox}
-%  \begin{prop}[Subterm lemma for the Curry system]
-%    $M'$を$M$の部分項とする. このとき, ある$\Gamma'$と$\sigma'$が存在して, 
-%    \[
-%      \Gamma \vdash M \colon \sigma \Rightarrow \Gamma' \vdash M' \colon \sigma'
-%    \]
-%    をみたす. つまり. $M$が型を持つとき, その任意の部分項も型を持つ.
-%  \end{prop}
-%\end{shadebox}
-%\begin{proof}
-%略
-%\end{proof}
-%\begin{shadebox}
-%  \begin{prop}[Substitution lemma for the Curry system] \label{prop10.1}
-%    以下が成り立つ. 
-%    \begin{enumerate}
-%      \item $\Gamma \vdash M \colon \sigma \Rightarrow 
-%        \Gamma[\alpha \coloneqq \tau] \vdash M \colon \sigma[\alpha \coloneqq \tau]$.
-%      \item $\Gamma,\ x \colon \sigma \vdash M \colon \tau$かつ
-%        $\Gamma \vdash N \colon \sigma$とする. このとき, 
-%        $\Gamma \vdash M[x \coloneqq N] : \tau$.
-%    \end{enumerate}
-%  \end{prop}
-%\end{shadebox}
-%\begin{proof}
-%略
-%\end{proof}
-%\begin{ex}
-%  $\lambda \rightarrow$, $\lambda2$, $\lambda \mu$, $\lambda \cap$それぞれについて, 
-%  \[
-%    \nvdash \bold{K} \colon (\alpha \to \alpha) 
-%  \]
-%  を示せ. 
-%\end{ex}
 \subsubsection*{$\lambda$P}
 $\lambda$2とは別の拡張として, $\lambda$Pがある. Pは predicate のPであり, 述語論理に対応する. $\lambda$Pの特徴は依存関数型を扱えることと, 命題の証明のシミュレートを行えることである. これからは項と型を区別せず, まとめて擬式と呼ぶことにして, 以下のように定義する. 
 \bdf[\cite{Bar} Definition 5.1.8]
@@ -1186,9 +778,9 @@ $\lambda$P, $\lambda$P2, $\lambda$P$\ul{\omega}$, $\lambda$P$\omega$
 \end{align*}
 という対応関係である. $\lambda$Pの説明の際にも触れたが, この対応関係を基に命題の証明をシミュレートすることが形式化であり, Coq に型付き$\lambda$計算が関係する理由である. 
 \bex 命題$P$, $Q$について, $P \Lra Q$かつ$P$であれば, $Q$が成り立つというモーダスポーネンスの証明をこの同型をもとに考えてみることにする. 論理演算子と型の間にも対応があり, $\Lra$に対応するのは$\lama$で見た関数型$\to$であるため, モーダスポーネンスを証明するには, 
-
+\begin{center}
 「$P$という型の要素と$P \to Q$という型の要素から$Q$という型の要素を構成すればよい」
-
+\end{center}
 と考えることができる. ここで$P$の要素に$a$, 関数型$P \to Q$の要素(つまり関数)に$f$と名前をつけたとすると, $f$に$a$を適用した$f a$にはどんな型がつくであろうか. $\lama$の導出規則を思い出してみると, ($\to$除去)が使えて$f a$には$Q$という型がつく. よって型として$Q$を持つような要素として具体的に$f a$という項が構成できたため, $Q$が成り立つことを証明できたことになる. 
 \eex
 論理演算子と型の対応をまとめると以下のようになる. 
@@ -1244,7 +836,7 @@ Definition dq (f : R -> R) x := f (q * x) - f x. \end{lstlisting}
     {\tt f (q * x) - f x}が{\tt dq}を定義する式である. また, {\tt x}と{\tt dq}そのものの型は
     推論できるため省略できる. 
   \item[\tt Fixpoint]
-    再起関数を定義するためのコマンドで, 
+    再帰関数を定義するためのコマンドで, 
     
     {\tt Fixpoint [関数名] ([引数]$\colon$[引数の型])$\colon$[関数の型] := 
     [定義中の関数を含む定義式]}
@@ -1313,7 +905,7 @@ Curry-Howard 同型の際にも見たモーダスポーネンスをCoqで証明�
 From mathcomp Require Import ssreflect.
 
 Lemma modus_ponens (P Q : Prop) : (P -> Q) /\ P -> Q. \end{lstlisting}
-{\tt Prop}とは Coq において命題全体を表す型であり, {\tt /\textbackslash}は「かつ」を表している. 
+{\tt Prop}とは Coq において命題全体を表す型であり, {\tt $\wedge$}は「かつ」を表している. 
 
 このとき, Coqのゴールエリア(コンテクストとゴールが表示される画面)は以下の通りである. 
 \begin{screen}
@@ -1324,7 +916,7 @@ Lemma modus_ponens (P Q : Prop) : (P -> Q) /\ P -> Q. \end{lstlisting}
     (P -> Q) /\ P -> Q \end{lstlisting}
 \end{screen}
 {\tt ---}の上がコンテクスト, 下がゴ－ルである. 1行目の{1 subgoal}はゴールが1つであることを示しており, 用いるタクティックによってはゴールが増えることもある. 
-命題$P_1$, $P_2$, $P_3$について$P_1 /\backslash P_2 \to P_3$と$P_1 \to P_2 \to P_3$は同じ意味であり, この書き換えは{\tt move=> []}で行える. 実行すると以下のようにゴールエリアが変化する. 
+命題$P_1$, $P_2$, $P_3$について$P_1 \wedge P_2 \to P_3$と$P_1 \to P_2 \to P_3$は同じ意味であり, この書き換えは{\tt move=> []}で行える. 実行すると以下のようにゴールエリアが変化する. 
 \begin{screen}
   \begin{lstlisting}{Coq}
     1 subgoal
@@ -1608,21 +1200,6 @@ forall x y z : R, z != 0 -> (x * z) / (y * z) = x / y \end{lstlisting}
 \begin{lstlisting}{Coq}
 divff : forall (F : fieldType) (x : F), x != 0 -> x / x = 1 \end{lstlisting}
 を用いているため{\tt z $\neq$ 0}という仮定が必要になる. よって, {\tt Dq\_pow}にも{\tt $x \ne 0$}という前提を加えている. 今後も補題を形式化するにあたって, その証明の中で約分を行う際には$0$でないという前提を付け加えることになる. 
-%\begin{itemize}
-%  \item {\tt Definition}と同様, {\tt Lemma}について, {\tt $\coloneqq$}の前に補題の名前と
-%          引数が, 後に補題の主張が書いてある. 今回であれば, {\tt Dq\_of\_pow}が補題の
-%          名前で, {\tt n}と{\tt x}が引数である. 
-%  \item {\tt Proof.}以下が補題の証明である. 
-%  \item {\it def}が定義のとき, {\tt rewrite /{\it def}}で定義を展開している. 
-%  \item {\it lem}が{\tt A = B}という形の補題のとき, {\tt rewrite {\it lem}}で結論に出現する
-%          {\tt A}を{\tt B}に書き換えている. 他のコマンドの使い方については \cite{Hag}等を参照. 
-%  \item {\tt red\_frac\_r}は, 
-%           \begin{lstlisting}{Coq}
-%red_frac_r : forall x y z : R, z != 0 -> x * z / (y * z) = x / y \end{lstlisting}
-%           という補題である. この補題を使うため, もともとはなかった{\tt $x \ne 0$}という
-%           前提を加えている. 実際, $D_q$の定義において分母に$x$が出現するので, 
-%           $x$が$0$でないという前提は妥当である.  
-%\end{itemize}
 \brmk
   {\tt qnat}という名前であるが, 実際には{\tt n}の型は{\tt nat}ではなく{\tt int}にしている. 
   また, {\tt Dq\_of\_pow}の{\tt n}の型は{\tt int}であるため, より一般化した形での形式化に
@@ -1775,11 +1352,11 @@ Definition qbinom a n x :=
                                              \frac{(x - a)^{m - n'}_q (x - q^{m - n'} a)^{n'}_q}
                                                     {(x - q^{m - n'} a)^{n'}_q} & m \ge n' \\
                                              \frac{(x - a)^m_q}
-                                     {(x - q^{m - n'})^{n' - m}_q (x - q^{n' - m}(q^{m - n'}a))} & m < n      
+                              {(x - q^{m - n'})^{n' - m}_q (x - q^{n' - m}(q^{m - n'}a))^m_q} & m < n      
                                            \end{cases}\\
                                        &= \begin{cases}
-                                              (x - a)^{m - n'} & m \ge n' \\
-                                              \frac{1}{(x - q^{m - n'})^{n' - m}_q} & m < n'
+                                              (x - a)^{m - n'}_q & m \ge n' \\
+                                              \frac{1}{(x - q^{m - n'}a)^{n' - m}_q} & m < n'
                                             \end{cases}\\
                                        &=  (x - a)^{m - n'}_q = (x - a)^{m + n}_q
   \end{align*}
@@ -1790,7 +1367,7 @@ Definition qbinom a n x :=
                               &= \frac{1}{(x - q^{-n'-m'}a)^{n'}_q (x - q^{n'}(q^{-m'-n'} a))^{m'}_q }\\
                                        &= \frac{1}{(x - q^{-n'-m'} a)^{n' + m'}_q}\\
                                        &= (x - a)^{-m'-n'}_q\\
-                                       &= (x - a)^{m' + n'}
+                                       &= (x - a)^{m + n}_q
   \end{align*}
   となる.
 \epf
@@ -2042,9 +1619,6 @@ Qed.
 	よって多項式に対して定義しなおした$q$-微分は$q = 0$かどうかにかかわらず
 	高階$q$-微分を定義できる. 
 \end{description}
-%前節までで$q$-微分と$(x - a)^n_q$の形式化ができたため, 主目的である$q$-Taylor展開の形式化に移りたいが, その前に関数と多項式の違いについて述べる. 
-
-%・$q$-Taylor展開は多項式に関しての定理である. 
 通常の数学では関数と多項式の違いをあまり意識しないことも多く, $(x - a)^n_q$は, \cite{Kac}の定義から多項式になることは当たり前に思えるかもしれないが, Coq では関数と多項式は明確に区別されている. 前節での$(x - a)^n_q$の形式化{\tt qbinom\_pos}は, {\tt R}の要素を受け取って{\tt R}の要素を返す関数として定義されており, Coq では一度関数として定義したものを多項式として扱うことはできない. そのため$(x - a)^n_q$の形式化を多項式として改めて定義し, 前節での定義と一致することを確認するという方法をとることにする. 
 
 また, これまでの$q$-微分の形式化{\tt Dq}は関数の各点での値として定義していたため, 多項式として定義しなおした{qbinom\_pos\_poly}に適用することはできない. そのため$q$-微分の形式化も多項式に対する定義に変えなくてはならない. 
@@ -2076,7 +1650,7 @@ Qed.
 \begin{lstlisting}{Coq}
 Definition scale_var (p : {poly R}):= \poly_(i < size p) (q ^ i * p`_i).
 Definition dqp p := scale_var p - p. \end{lstlisting}
-{\tt scale\_var}は多項式{\tt p}を受け取り, $i$次の係数を$q^i$倍した多項式を返す操作で, すなわち$x$を$qx$に変えている. また, {\tt dqp}は多項式に対しての$d_q$と同じ結果になることが確認できる(正確には, {\tt dqp}を適用した多項式での{\tt x}での値と${\tt x} \mapsto {\tt p.[x]}$という関数に${\tt d}_{\tt q}$を適用した関数の{\tt x}での値が等しいということである). 
+{\tt scale\_var}は多項式{\tt p}を受け取り, $i$次の係数を$q^i$倍した多項式を返す操作で, すなわち$x$を$qx$に変えている. また, {\tt dqp}は多項式に対しての{\tt dq}と同じ結果になることが確認できる(正確には, {\tt dqp}を適用した多項式での{\tt x}での値と${\tt x} \mapsto {\tt p.[x]}$という関数に{\tt dq}を適用した関数の{\tt x}での値が等しいということである). 
 \begin{lstlisting}{Coq}
 Definition ap_op_poly (D : (R -> R) -> (R -> R)) (p : {poly R}) := D (fun (x : R) => p.[x]).
 Notation "D # p" := (ap_op_poly D p) (at level 49).
@@ -2182,23 +1756,6 @@ $\{P_n(x)\}_{n=0}\subset V$ ($n=0,1,2,\cdots$)は次の三条件をみたすと�
   \]
 が成り立つ. 
 \ethm
-%\bpf
-%  条件(ii)から$\{P_0(x), P_1(x), \ldots , P_n(x)\}$が$V$の基底であるため, 係数列$c_k$
-%  が一意にとれて, 
-%  \[
-%    f(x) = \sum_{k = 0}^N c_k P_k(x)
-%  \]
-%  と表せる. このとき, 条件(i)から, $x = a$とすることで$c_0 = f(a)$が得られる. 更に, 条件(ii), (iii)と
-%  $D$の線形性から, 両辺に$n$回($1 \le n \le N$)$D$を作用させることで, 
-%  \[
-%    (D^n f)(x) = \sum_{k = n}^N c_k D^n P_k (x) = \sum_{k = n}^N c_k P_{k - n}(x)
-%  \]
-%  となる. ここで$x = a$とすることで	条件(i)から
-%  \[
-%    c_n = (D^n f)(a) \quad (0 \le n \le N)
-%  \]
-%  が得られる. 
-%\epf
 この定理を形式化すると以下のようになる. 
 \begin{lstlisting}{Coq}
 Theorem general_Taylor D n P (f : {poly R}) a :
@@ -2356,7 +1913,7 @@ Qed. \end{lstlisting}
 \elem
 \bpf
   Theorem \ref{q_Taylor}において, $f(x) = x^n$, $c = 1$とする. 
-  任意の正整数$j <= n$に対して, $D_q x^n = [n] x ^{n -1}$より, 
+  任意の正整数$j \le n$に対して, $D_q x^n = [n] x ^{n -1}$より, 
   \[
     (D_q^j f) (x) = [n] [n - 1] \cdots [n - j +1] x^{n - j}
   \]
@@ -2374,7 +1931,7 @@ Qed. \end{lstlisting}
   が成り立つ. この式は Gauss's binomial formula と呼ばれる. 
 \elem
 \bpf
-  $f = (x + a)^n_q$とすると, 任意の正整数$j <= n$に対して, 
+  $f = (x + a)^n_q$とすると, 任意の正整数$j \le n$に対して, 
   \[
     (D_q ^j f) (x) = [n] [n - 1] [n - j + 1] (x + a)^{n - j}_q
   \]
@@ -2411,26 +1968,6 @@ Theorem Gauss_binomial a n : (forall n, qfact n != 0) ->
   \sum_(0 <= i < n.+1) (qbicoef n i * q ^+ (i * (i - 1))./2 * a ^+ i) *: 'X^(n - i). \end{lstlisting}
 \brmk
 {\tt Gauss\_binomial}は{\tt q\_Taylorp}において{\tt c = 0}として証明している. {\tt q\_Taylorp}では約分の計算をしているが, 多項式を用いて定義しているため$0$での値を計算できる. 
-%\begin{lstlisting}{Coq}
-%Proof.
-%  move=> Hfact.
-%  rewrite (q_Taylorp n (qbinom_pos_poly (-a) n) 0) //; last by rewrite qbinom_size.
-%  under eq_big_nat => i /andP [_ Hi].
-%    rewrite hoDqp'_qbinom0 //.
-%    rewrite [(qbinom_pos_poly 0 i / (qfact i)%:P)]mulrC.
-%    rewrite polyCV scalerAl scale_constpoly.
-%    have -> : qbicoef n i * qfact i * q ^+ ((n - i) * (n - i - 1))./2 *
-%              a ^+ (n - i) / qfact i =
-%              qbicoef n i * q ^+ ((n - i) * (n - i - 1))./2 * a ^+ (n - i).
-%      rewrite -!mulrA; f_equal; f_equal.
-%      rewrite mulrC -mulrA; f_equal.
-%      by rewrite denomK.
-%    rewrite mul_polyC qbinom_x0.
-%  over.
-%  done.
-%Qed. \end{lstlisting}
-%となっており, {\tt q\_Taylor}ではなく{\tt q\_Taylorp}において{\tt c = 0}として証明している. 
-%{\tt q\_Taylor}には$c \neq 0$という前提があるため, この証明には使えない. 
 \ermk
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{少人数クラスまとめ} \label{chap hott}
@@ -2473,7 +2010,7 @@ $A$と$B$の2つの型が与えられたとき, そこから関数型$A \to B$�
                                        \prod_{(x, y : A)} \prod_{(p : x =_A y)} C(x, y, p)$
   \item 計算規則：ind$_{=_A} (C, c, x, x, {\rm refl}_x) : \equiv c(x)$
 \end{itemize}
-と定義する. 除去規則は, 依存和型のときと同様に考えると, 「任意の$x$, $y : A$, $x = y$について$C(x, y, p)$を示したければ, 任意の$x : A$について$C(x, x, \refl{x})$を示せばよい」となる. 
+と定義する. 除去規則は, 依存和型のときと同様に考えると, 「任意の$x$, $y : A$, $x = y$について$C(x, y, p)$を示したければ, 任意の$x : A$について$C(x, x, \refl{x})$を示せばよい」となる. 以下, この identity type の除去規則を用いることを path induction と呼ぶ. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{型の同型}
 ここで, 型と型の間の同型を定義したい. まず, 関数の間のホモトピーを定義する. 
@@ -2504,7 +2041,9 @@ $A$と$B$の2つの型が与えられたとき, そこから関数型$A \to B$�
                            \left( \sum_{h : B \to A} (h \circ f \sim \id_A) \right) \quad
                            \text{(\cite{hott} p73 (2.4.10))}
 \]
-と定めることにする. isequiv を使って型同士の同型を定義する. 
+と定めることにする. 関数$f$について$\iseq(f)$が成り立つとき, $f$は equivalence であるという. 
+
+isequiv を使って型同士の同型を定義する. 
 \bdf[\cite{hott} p73 (2.4.11)]
   $A$, $B : \U$について, 
   \[
@@ -2654,9 +2193,6 @@ $A$, $B$, $C : \U$について,
 \epf
 がある. この補題は, 写像はファイブレーションと同型であるというホモトピー論での基本的な結果に対応している.  
 最後に, ファイバーごとの equivalence は全空間(total space)の equivalence という言葉で特徴付けられることを示す. 
-%最後に、ファイバーワイズ同値が全空間の同値で特徴付けられることを示す。
-%2.3 節で、型族 P : A → U は全空間 ∑(x:A) P(x) を持つ A 上の fibration と見なすことができ、その fibration は射影 pr1 : ∑(x:A) P(x) → A であることを説明する。この観点から、二つの型族 P, Q : A → U が与えられたとき、関数 f : ∏(P(x) → Q(x)) をファイバーワイズ写像またはファイバーワイズ変換と呼ぶことがある。
-%このような写像は全空間上の関数を誘導する。
 \bdf[\cite{hott} Definition 4.7.5]
   型族$P$, $Q : A \to \U$と依存関数$f : \prod_{x : A} P(x) \to Q(x)$
   (このような関数を fiberwise map または fiberwise transformation と呼ぶ)が与えられたとき, 
@@ -2762,21 +2298,6 @@ fiberwise transformation $f : \prod_{x : A} P(x) \to Q(x)$が fiberwise equivale
     \prod_{b : B} \prod_{a : A} \prod_{p : g(a) = b} \psi_b \varphi (a, p) = (a, p)
   \]
   を示せば良い. 詳細は\cite{hott} p140 参照のこと. 
-%  初めの2つの$\prod$を入れ替え, $p$についての path induction から
-%  \[
-%    \prod_{a :A} \psi_{g(a)} (\varphi_{g(a)} (a, \refl_{g(a)})) = (a, \refl_{g(a)})
-%  \]
-%  となる. ここで, \cite{hott} Theorem 2.7.2 を用いると, $r(s(a)) = a$のパスとして$R(a)$がとれることから, 
-%  \[
-%    R(a)_* (K(s(a)) \cdot r'(L(a)) \cdot R'(g(a))) = \refl_{g(a)}
-%  \] 
-%  を示せばよいことになる. このとき, $R(a)_* \equiv \tp^{x \mapsto g(x) = g(a)} (R(a), -)$
-%  であるので, Theorem 2.11.3 より, 定数関数の ap は $\refl$になることに注意すれば, 
-%  \[
-%    R(a)_* (K(s(a)) \cdot r'(L(a)) \cdot R'(g(a))) =
-%    g(R(a))^{-1} \cdot K(s(a)) \cdot r'(L(a)) \cdot R'(g(a))
-%  \]
-%  となる. 
 \epf
 この補題から, equivalence とレトラクトに関する補題が従う. 
 \bthm[\cite{hott} Theorem 4.7.4]
@@ -2787,7 +2308,7 @@ fiberwise transformation $f : \prod_{x : A} P(x) \to Q(x)$が fiberwise equivale
   あり, $\iseq (f) \lra \iscont (f)$と Lemma \ref{lem ret_cont} から$\iseq (g)$が分かる. 
 \epf
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Univalence implies function extensionality} \label{sec funext}
+\section{関数の外延性を Univalence axiom から導く} \label{sec funext}
 最後に, univalence axiom から関数の外延性が導けることを示す.
 %よって, この節では関数の外延性を仮定しない. 
 証明は, まず univalence axiom から弱い関数の外延性が導けることを示し, 次に弱い関数の外延性から通常の関数の外延性が従うことを示すという2段階で行われる. 
@@ -2898,28 +2419,25 @@ $\fib_{\alpha} (\id_A)$のレトラクトであることを示せば, 弱い関�
 \ermk
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{thebibliography}{9}
-  \bibitem{Kac} Victor Kac, Pokman Cheung, {\it{Quantum Calculus}}, Springer, 2001.
-  \bibitem{coq qana} 中村 薫, {\it q-analogue}, \url{https://github.com/nakamurakaoru/q-analogue}, 2023.
-%  \bibitem{Gar} \url{https://www.math.nagoya-u.ac.jp/~garrigue/lecture/2021_AW/                  
-%                           ssrcoq2.pdf}
-  \bibitem{Hag} 萩原 学/アフェルト・レナルド, {\it Coq/SSReflect/Mathcomp}, 森北出版, 
-    2018.
-  \bibitem{coq sl} Coq Team, {\it The Coq Standard Library}, 
-  \url{https://coq.inria.fr/distrib/current/stdlib/}, 2023.
-  \bibitem{coq mc} Mathematical Components Team, {\it Mathematical Components}, \url{https://github.com/math-comp/math-comp}, 2023.
-%  \bibitem{coq poly} \url{https://github.com/math-comp/math-comp/blob/master/ 
-%                                 mathcomp/algebra/poly.v}
-  \bibitem{coq ana} Mathematical Components Team, 
-  {\it Mathematical Components compliant Analysis Library}, 
-  \url{https://github.com/math-comp/analysis}, 2023.
-  \bibitem{Ume} 梅村 浩, 『楕円関数論  楕円曲線の解析学』, 東京大学出版会, 2000.
-  \bibitem{Bar} H.P.Barendregt, {\it Lambda Calculi with Types}.  
+  \bibitem{Bar} Henk Barendregt, {\it Lambda Calculi with Types}.  
     In S. Abramsky, Dov M. Gabbay, S. E. Maibaum, 
     {\it Handbook of logic in computer science (vol. 2): background:
      computational structures}, Oxford University Press, 1993.
+  \bibitem{coq sl} Coq Team, {\it The Coq Standard Library}, 
+  \url{https://coq.inria.fr/distrib/current/stdlib/}, 2023.
+  \bibitem{Hag} 萩原 学/アフェルト・レナルド, {\it Coq/SSReflect/Mathcomp}, 森北出版, 
+    2018.
+  \bibitem{Kac} Victor Kac, Pokman Cheung, {\it{Quantum Calculus}}, Springer, 2001.
+  \bibitem{coq mc} Mathematical Components Team, {\it Mathematical Components}, \url{https://github.com/math-comp/math-comp}, 2023.
+  \bibitem{coq ana} Mathematical Components Team, 
+  {\it Mathematical Components compliant Analysis Library}, 
+  \url{https://github.com/math-comp/analysis}, 2023.
+  \bibitem{coq qana} 中村 薫, {\it q-analogue}, \url{https://github.com/nakamurakaoru/q-analogue}, 2023.
+%  \bibitem{coq poly} \url{https://github.com/math-comp/math-comp/blob/master/ 
+%                                 mathcomp/algebra/poly.v}
   \bibitem{hott} The Univalent Foundations Program, 
                       {\it{Homotopy Type Theory: Univalent Foundations of Mathematics}}, 
                       \url{https://homotopytypetheory.org/book}, 2013.
-
+  \bibitem{Ume} 梅村 浩, 『楕円関数論  楕円曲線の解析学』, 東京大学出版会, 2000.
 \end{thebibliography}
 \end{document}
