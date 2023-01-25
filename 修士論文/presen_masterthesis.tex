@@ -1,0 +1,422 @@
+\documentclass[dvipdfmx,cjk]{beamer}
+\usetheme{Madrid} %スライドのスタイル
+\setbeamertemplate{navigation symbols}{} %アイコン消す
+\usefonttheme{professionalfonts} %数学用のフォント
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{ascmac}
+\newtheoremstyle{mystyle}% % Name
+    {}%                      % Space above
+    {}%                      % Space below
+    {\normalfont}%           % Body font
+    {}%                      % Indent amount
+    {\bfseries}%             % Theorem head font
+    {}%                      % Punctuation after theorem head
+    { }%                     % Space after theorem head, ' ', or \newline
+    {}%                      % Theorem head spec (can be left empty, meaning `normal')
+\theoremstyle{mystyle}
+\usepackage{amssymb}
+\usepackage{ascmac}
+\usepackage{txfonts}
+%\usepackage{graphics}
+\input{poster_packages.tex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\setbeamertemplate{theorems}[numbered]  %% 定理に番号をつける
+\newtheorem{df}{$\textrm{Definition}$}[section]
+\newtheorem{ex}[df]{$\textrm{Example}$}
+\newtheorem{prop}[df]{$\textrm{Proposition}$}
+\newtheorem{lem}[df]{$\textrm{Lemma}$}
+\newtheorem{cor}[df]{$\textrm{Corollary}$}
+\newtheorem{rmk}[df]{$\textrm{Remark}$}
+\newtheorem{thm}[df]{$\textrm{Theorem}$}
+\newtheorem{axi}[df]{$\textrm{Axiom}$}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% theorems %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\bdf}{\begin{shadebox} \begin{df}}
+\newcommand{\edf}{\end{df} \end{shadebox}}
+\newcommand{\bex}{\begin{ex}}
+\newcommand{\eex}{\end{ex}}
+\newcommand{\bprop}{\begin{shadebox} \begin{prop}}
+\newcommand{\eprop}{\end{prop} \end{shadebox}}
+\newcommand{\blem}{\begin{shadebox} \begin{lem}}
+\newcommand{\elem}{\end{lem} \end{shadebox}}
+\newcommand{\bcor}{\begin{shadebox} \begin{cor}}
+\newcommand{\ecor}{\end{cor} \end{shadebox}}
+\newcommand{\brmk}{\begin{rmk}}
+\newcommand{\ermk}{\end{rmk}}
+\newcommand{\bthm}{\begin{shadebox} \begin{thm}}
+\newcommand{\ethm}{\end{thm} \end{shadebox}}
+\newcommand{\baxi}{\begin{shadebox} \begin{axi}}
+\newcommand{\eaxi}{\end{axi} \end{shadebox}}
+\newcommand{\bpf}{\begin{proof}}
+\newcommand{\epf}{\end{proof}}
+%% always %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\Lra}{\Longrightarrow}
+\newcommand{\Llra}{\Longleftrightarrow}
+\newcommand{\lra}{\leftrightarrow}
+\newcommand{\ra}{\rightarrow}
+\newcommand{\ol}[1]{{\overline{#1}}}
+\newcommand{\ul}[1]{{\underline{#1}}}
+%% sets %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\K}{\mathbb{K}}
+\newcommand{\D}{\mathbb{D}}
+%% q-analogue %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\qcoe}[2]{\left[\begin{array}{ccc}#1\\#2\end{array}\right]}
+%% algebra %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\plim}{{\displaystyle \lim_{\substack{\longleftarrow\\ n}}}}
+\newcommand{\seq}[2]{(#1_{#2})_{#2\ge1}}
+\newcommand{\Zmod}[1]{\Z/p^{#1}\Z}
+\newcommand{\sem}[1]{[\hspace{-2pt}[{#1}]\hspace{-2pt}]}
+\newcommand{\pros}[1]{\begin{array}{c} \ast \ast\\ \tt{#1} \end{array}}
+%% Jones %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\pgm}[1]{{\tt{#1}}\text{-プログラム}}
+\newcommand{\pgms}[1]{{\tt{#1}}\text{-プログラム集合}}
+\newcommand{\dtm}[1]{{\tt{#1}}\text{-データ}}
+\newcommand{\data}[1]{{\tt{#1}}\text{-データ集合}}
+\newcommand{\rtf}[3]{time^{\tt{#1}}_{\tt{#2}}({\tt{#3}})}
+%% Barendiregt %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\T}{\mathbb{T}}
+\newcommand{\V}{\mathbb{V}}
+\newcommand{\cT}{\mathcal{T}}
+\newcommand{\uhr}{\upharpoonright}
+\newcommand{\thra}{\twoheadrightarrow}
+\newcommand{\lama}{\lambda \! \! \to}
+%% HoTT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\U}{\mathcal{U}}
+\newcommand{\id}{\textrm{id}}
+\newcommand{\refl}{\textrm{refl}}
+\newcommand{\ap}{\textrm{ap}}
+\newcommand{\apd}{\textrm{apd}}
+\newcommand{\pr}{\textrm{pr}}
+\newcommand{\tp}{\textrm{transport}}
+\newcommand{\qinv}{\textrm{qinv}}
+\newcommand{\iseq}{\textrm{isequiv}}
+\newcommand{\peq}{\textrm{pair}^=}
+\newcommand{\sig}[3]{\sum_{{#1} : {#2}} {#3}\ ({#1})}
+\newcommand{\0}{\textbf{0}}
+%\newcommand{\1}{\textbf{1}}
+%\newcommand{\2}{\textbf{2}}
+\newcommand{\fune}{\textrm{funext}}
+\newcommand{\happ}{\textrm{happly}}
+\newcommand{\ua}{\textrm{ua}}
+\newcommand{\ide}{\textrm{idtoequiv}}
+\newcommand{\set}[1]{\textrm{isSet({#1})}}
+\newcommand{\fib}{\textrm{fib}}
+\newcommand{\iscont}{\textrm{isContr}}
+\newcommand{\total}{\textrm{total}}
+\newcommand{\idtoeqv}{\textrm{idtoeqv}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+\title{$q$-類似の Coq による形式化}
+\author[中村　薫]{アドバイザー $\colon$ Jacques Garrigue教授\\
+           学籍番号 $\colon$ 322101289\\
+           氏名 $\colon$ 中村　薫}
+\date{\today}
+\maketitle
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\tableofcontents
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{はじめに}
+
+\begin{frame}
+  \tableofcontents[currentsection] 
+\end{frame}
+
+\begin{frame}{はじめに}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{$q$-類似}
+
+\begin{frame}
+  \tableofcontents[currentsection] 
+\end{frame}
+
+\begin{frame}{$q$-類似の概要}
+  $q$-類似とは, 実数パラメータ$q$, 実数上の関数$f$に対して
+  \[
+    D_q f(x) \coloneqq \frac{f(qx) - f(x)}{(q - 1) x}
+  \]
+  で定義される$q$-微分を出発点とし, この$q$-微分に対してうまく振る舞い, 
+  かつ$q$を極限で$1$に近づけると通常の定義に一致するように数学の諸概念を
+  一般化するものである.
+\end{frame}
+
+\begin{frame}{$q$-微分}
+  まず$q$-微分の定義から始める. $q$を$1$でない実数とする. 
+\begin{df}[\cite{Kac} p1 (1.1), p2 (1.5)]
+  関数$f : \R \to \R$に対して, $f(x)$の$q$差分$d_q f(x)$を, 
+  \[
+    d_q f(x) \coloneqq f (qx) - f(x)
+  \]
+  と定める. 更に, $f(x)$の$q$微分を$D_q f(x)$を, 
+  \[
+    D_q f(x) \coloneqq \frac{d_q f(x)}{d_q x} = \frac{f(qx) - f(x)}{(q - 1) x}
+  \]
+  と定める. 
+\end{df}
+\end{frame}
+
+\begin{frame}{自然数の$q$-類似}
+  $x^n$を定義に沿って$q$-微分すると, 
+  \[
+    D_q x^n = \frac{(qx)^n - x^n}{(q - 1) x} = \frac{q^n - 1}{q - 1} x^{n - 1}
+  \]
+  となる. 通常の微分では, $(x^n)' = n x^{n - 1}$となることと比較して, $n$の$q$-類似$[n]$を
+  \[
+    [n] = \frac{q^n - 1}{q - 1}
+  \]
+  と定める.
+\end{frame}
+
+\begin{frame}{$(x - a)^n$の$q$-類似}
+続いて$(x - a)^n$の$q$-類似を定義し, その性質を調べる.  
+\begin{df}[\cite{Kac} p8 Definition (3.4)]
+  $x$, $a \in \R$, $n \in \Z_{\ge 0}$に対して, $(x - a)^n$の$q$-類似$(x - a)^n_q$を, 
+  \[
+  (x - a)^n_q = \begin{cases}
+                      1 & \text{if}\ n = 0 \\
+                      (x - a) (x - qa) \cdots (x - q^{n - 1} a) & \text{if}\ n \ge 1
+                    \end{cases}
+  \]
+  と定義する. 
+\end{df}
+\begin{prop} \label{Dq_qbinom_nonneg}
+  $n\in\Z_{>0}$に対し, 
+  \[
+    D_q(x-a)^n_q = [n](x-a)^{n-1}_q
+  \]
+  が成り立つ. 
+\end{prop}
+\begin{proof}
+  $n$についての帰納法により示される. 
+\end{proof}
+\end{frame}
+
+\begin{frame}{$q$-Taylor展開}
+  \bthm[\cite{Kac} p12 Theorem 4.1] \label{q_Taylor}
+$f(x)$を, $N$次の実数係数多項式とする. 任意の$c\in\R$に対し, 
+  \[
+    f(x) = \sum_{j=0}^N (D_q^jf)(c)\frac{(x-c)^j_q}{[j]!}
+  \]
+が成り立つ. 
+\ethm
+\bpf
+$\frac{(x-a)^n_q}{[n]!}$が, $a$, $D_q$に対してTheorem \ref{general_Taylor}の三条件をみたすことを確かめればよい. (i), (ii)は$(x-a)^n_q$の定義から, (iii)はProposition\ref{Dq_qbinom_nonneg}から分かる. 
+\epf
+\end{frame}
+
+\begin{frame}{Gauss's binomial formula}
+\blem[\cite{Kac} p15 Example (5.5)]
+  $n \in \Z_{>0}$について, 
+  \[
+    (x + a)^n_q = \sum_{j = 0}^n \qcoe{n}{j} q^{j (j - 1)/2} a^j x^{n - j}
+  \]
+  が成り立つ. この式は Gauss's binomial formula と呼ばれる. 
+\elem
+\bpf
+  $f = (x + a)^n_q$とすると, 任意の正整数$j \le n$に対して, 
+  \[
+    (D_q ^j f) (x) = [n] [n - 1] [n - j + 1] (x + a)^{n - j}_q
+  \]
+  であり, また
+  \[
+    (x + a)^m_q = (x + a) (x + qa) \cdots (x + q^{m - 1} a)
+  \]
+  から, $(0 + a)^m_q = a \cdot qa \cdots q^{m - 1}a = q^{m (m - 1)/2}a^m$となるので, 
+  \[
+    (D_q^j f) (0) = [n] [n - 1] \cdots [n - j +1]q^{(n - j) (n - j - 1)/2} a^{n - j}
+  \]
+  が成り立つ. よって, Theorem \ref{q_Taylor} において, $f = (x + a)^n_q$, $c = 0$として, 
+  \[
+    (x + a)^n_q = \sum_{j = 0}^n \qcoe{n}{j} q^{(n - j) (n - j - 1)/2} a^{n - j} x^j
+  \]
+  が得られる. この式の右辺において$j$を$n - j$に置き換えることで, 
+  \[
+    \qcoe{n}{n - j} = \frac{[n]!}{[n - j]![n - (n - j)]!} = \frac{[n]!}{[j]![n - j]!} = \qcoe{n}{j}
+  \]
+  に注意すれば, 
+  \[
+    (x - a)^n_q = \sum_{j = 0}^n \qcoe{n}{j} q^{j (j - 1)/2} a^j x^{n - j}
+  \]
+  が成り立つ. 
+\epf
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Coq}
+
+\begin{frame}
+  \tableofcontents[currentsection] 
+\end{frame}
+
+\begin{frame}{形式化}
+  形式化とは, 証明のために用意された人工言語に数学的な主張とその証明を翻訳し, 証明が論理学の推論規則に沿って正しく書かれていることをコンピュータを用いて機械的に検証することである.
+\end{frame}
+
+\begin{frame}{Coq の使い方 コマンド}
+  Coq に与える命令はコマンドとタクティックの2種類がある. 
+\begin{description}
+%  \item[\tt Require Import]
+%    ライブラリを読み込むためのコマンドである.
+%    {\tt From mathcomp Require Import ssreflect}
+%    であれば, ライブラリ群 mathcomp から ssreflect を読み込んでいる.
+%  \item[\tt Section / End]
+%    {\tt Section [セクション名]}, {\tt End [セクション名]}でセクションを作ることができ, 
+%    そのセクション内共通のコンテキストを宣言できる. 
+  \item[\tt Variable]
+    {\tt Variable [変数]$\colon$[型]}で, 特定の型を持つ変数を宣言できる. 例えば
+    
+    {\tt Variable n$\colon$nat}
+    
+    で, 変数{\tt n}が自然数型{\tt nat}の要素であることを表している. 
+%    {\tt Section/End}コマンドと組み合わせることで, {\tt End}まで同じ意味で扱われ, 
+%    {\tt End}以降は効力を失う. 
+%    同時に複数の変数を宣言することもできる. その場合は
+%    
+%    {\tt Variables [変数] [変数] $\cdots$ [変数]$\colon$[型]}
+%    
+%    と書く(ただし, Coq にとっては{Variable}と{Variables}に違いは無い).    
+%  \item[\tt Hypothesis]
+%    {\tt Hypothesis [仮定名]$\colon$[仮定]}で仮定を置くことができる. {\tt Variable}同様, 
+%    {\tt Section/End}と組み合わせることで, セクション内共通の仮定を置くことができる. 
+  \item[\tt Definition]
+    新たに関数を定義するためのコマンドで,
+    
+    {\tt Definition [関数名] ([引数]$\colon$[引数の型])$\colon$[関数の型] := 
+    [関数の定義式]}
+    
+    という形で用いる. 
+%    \begin{lstlisting}{Coq}
+%Definition dq (f : R -> R) x := f (q * x) - f x. \end{lstlisting}
+%    であれば, {\tt dq}が定義の名前, {\tt f}, {\tt x}が引数, {\tt R -> R}が{\tt f}の型であり, 
+%    {\tt f (q * x) - f x}が{\tt dq}を定義する式である. また, {\tt x}と{\tt dq}そのものの型は
+%    推論できるため省略できる. 
+%  \item[\tt Fixpoint]
+%    再帰関数を定義するためのコマンドで, 
+%    
+%    {\tt Fixpoint [関数名] ([引数]$\colon$[引数の型])$\colon$[関数の型] := 
+%    [定義中の関数を含む定義式]}
+%    
+%    と書く. 停止しない関数を認めてしまうと矛盾が生じるため, 停止性が保証されていない
+%    関数を定義することはできない. 
+  \item[\tt Lemma]
+    補題を宣言するためのコマンドで,
+    
+    {\tt Lemma [補題名] ([引数]$\colon$[引数の型])$\colon$[補題の主張]}
+    
+    という形である. 
+%    \begin{lstlisting}{Coq}
+%Lemma Dq_pow n x : x != 0 -> Dq (fun x => x ^ n) x = qnat n * x ^ (n - 1). \end{lstlisting}
+%    であれば, {\tt Dq\_pow}が補題名, {\tt n}, {\tt x}が引数, {\tt :}以降が補題の主張である. 
+%    
+    {\tt Lemma}の代わりに{\tt Theorem}, {\tt Corollary}等でも同じ機能をもつ. 
+  \item[\tt Proof/Qed]
+    {\tt Proof}は{\tt Lemma}の後に書いて補題の主張と証明を分ける(実際には省略可能で, 
+    人間の見やすさのために書いている). 
+    証明を完了させて{\tt Qed}を書くことで Coq に補題を登録することができ, 他の補題の
+    証明に使えるようになる. 
+\end{description}
+\end{frame}
+
+\begin{frame}{Coq の使い方 タクティック}
+タクティックは{\tt Proof...Qed}の間に使われる. よく使われるタクティックは{\tt move}, {\tt apply}, {\tt rewrite}の3つである. 
+\begin{description}
+  \item[\tt move]
+    {\tt move=> H}でゴールの前提に{\tt H}という名前をつけてコンテクストに移動する. 
+    また{\tt move$\colon$H}で補題{\tt H}もしくはコンテクストに存在する{\tt H}をゴールの
+    前提に移す. 
+  \item[\tt apply]
+    補題{\it lem}が{\tt P1 $\to$ P2}という形で, ゴールが{\tt P2}のとき, 
+    {\tt apply {\it lem}}でゴールを{\tt P1}に変える. 
+    コンテクストの仮定{\tt H}が{\tt P1 $\to P2$}であれば{\tt apply H}で同じことができる. 
+  \item[\tt rewrite]
+    {\it def}が定義のとき, {\tt rewrite /{\it def}}でゴールに出現している{\it def}を展開する. 
+    
+    また, 補題{\it lem}が{\tt A = B}という形のとき, {\tt rewrite {\it lem}}でゴールに出現する
+    {\tt A}を{\tt B}に書き換える(ただし, {\it lem}が{\tt H $\to$ (A = B)}という形であるとき, 
+    新たなゴールとして{\tt H}が追加される). 更に, {\tt rewrite {\it lem} in H}で, コンテクストの{\tt H}に
+    出現する{\tt A}を{\tt B}に書き換える. {\tt apply}と同じく, 使いたい等式が仮定にある場合も
+    同じように使える. 更に, {\tt rewrite}は繰り返し回数や適用箇所を指定できる.
+    \begin{description}
+      \item[\tt rewrite !{\it lem}] {\it lem}による書き換えを可能な限り繰り返す. 
+        ただし場合によっては繰り返しが終わらないことに注意
+        ($x + y$を$y + x$に書き換える補題を使う場合など).
+      \item[\tt rewrite n!{\it lem}] {\it lem}による書き換えを$n$回限り繰り返す.
+      \item[\tt rewrite ?{\it lem}] {\it lem}による書き換えを$0$回または$1$回行う. 
+        直前のタクティックでゴールが増える場合に特に有効. 
+      \item[\tt rewrite -{\it lem}] 逆向きに{\it lem}による書き換えを行う. 
+        つまり, {\it lem}が{\tt A = B}のとき, ゴールの{\tt B}を{\tt A}に書き換える. 
+      \item[\tt rewrite \{n\}{\it lem}] {\it lem}で書き換えられる場所のうち
+        $n$番目のみを書き換える. 
+      \item[{\tt rewrite [条件] {\it lem}}] 条件に一致する場所を{\it lem}で書き換える.
+      \item[\tt rewrite (\_ : A = B)] ゴールの{\tt A}を{\tt B}に書き換える. 
+        {\tt A = B}がゴールに追加される. この書き方の場合は補題を引数にとらない. 
+    \end{description}
+    このような, タクティックの前後に書いてその機能を拡張するものをタクティカルと言う. 
+    {\tt move=>}の{\tt =>}や{\tt move$\colon$}の{\tt $\colon$}もタクティカルである. 
+\end{description}\end{frame}
+
+\begin{frame}{Coq の使い方3 モーダスポーネンス}
+  モーダスポーネンスの形式化
+\end{frame}
+
+\begin{frame}{Coq の使い方4 代入計算}
+  代入に関する簡単な計算を形式化
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{$q$-類似の形式化}
+
+\begin{frame}
+  \tableofcontents[currentsection] 
+\end{frame}
+
+\begin{frame}{{\tt Dq}}
+  {\tt Dq}の定義
+\end{frame}
+
+\begin{frame}{{\tt qnat}}
+  {\tt qnat}の定義, $x^n$の微分
+\end{frame}
+
+\begin{frame}{\tt qbinom\_pos}
+  $(x - a)^n_q$の形式化
+\end{frame}
+
+\begin{frame}{\tt Dq qbinom\_pos}
+  \[
+    D_q (x - a)^n_q = [n] (x - a)^n_q
+  \]
+\end{frame}
+
+\begin{frame}{\tt qbinom}  
+\end{frame}
+
+\begin{frame}{関数から多項式へ}
+  {\tt Dqp}を定義
+\end{frame}
+
+\begin{frame}{$q$-Taylor展開の形式化}
+\end{frame}
+
+\begin{frame}{Gauss's binomial formula の形式化}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{今後の展望}
+
+\begin{frame}
+  \tableofcontents[currentsection] 
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{thebibliography}{9}
+  \bibitem{Kac} Victor Kac, Pokman Cheung, {\it{Quantum Calculus}}, Springer, 2001.
+%  \bibitem{bib1} H.P.Barendregt, {\it{Lambda Calculi with Types}}
+\end{thebibliography}
+\end{document}
