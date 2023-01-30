@@ -131,9 +131,23 @@
 \end{frame}
 
 \begin{frame}[fragile]{はじめに}
-  本発表における$q$-類似の定義, 定理及びその証明はVictor Kac, Pokman Cheungの
-  {\it Quantum Calculus}\cite{Kac}によるものだが, その形式化を行ったという点において
-  独自性がある. 
+	主目的：$q$-類似の初等的な結果を Coq を用いて形式化する
+ 	\begin{description}
+ 		\item[$q$-類似] $q \to 1$で通常の数学に戻るような諸概念の拡張
+		\item[形式化] 人工言語に数学的な主張とその証明を翻訳し, 
+		正しさを機械的に検証すること
+		\item[Coq] 形式化を行うためのソフトウェア
+	\end{description}
+	形式化の意義：
+	\begin{itemize}
+		\item 人間がチェックすることが難しい複雑な証明の正しさの保証
+		\item 証明付きプログラミング
+	\end{itemize}
+	本発表における$q$-類似の定義, 定理及びその証明はVictor Kac, Pokman Cheungの
+	{\it Quantum Calculus}\cite{Kac}によるものだが, その形式化を行ったという点において
+	独自性がある. 形式化したコード全体は
+	\url{https://github.com/nakamurakaoru/q-analogue/tree/thesis}\cite{coq qana}
+	にある.
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{$q$-類似}
@@ -153,7 +167,7 @@
     で定義される$q$-微分に対してうまく振る舞う
   \end{itemize}
   $q$-類似を考える利点：あえてパラメータを増やすことで証明が簡単になる場合がある
-  \begin{itembox}{Jacobi の三重積}
+  \begin{itembox}{Jacobi の三重積(\cite{Kac} p35 Theorem 11.1)}
     $z$, $q \in \R$, $|q| < 1$として, 
     \[
       \sum_{n = -\infty}^{\infty} q^{n^2} z^n =
@@ -174,15 +188,24 @@
     \[
       D_q f(x) \coloneqq \frac{d_q f(x)}{d_q x} = \frac{f(qx) - f(x)}{(q - 1) x}
     \]
-    と定める(\cite{Kac}). 
+    と定める. 
   \end{df}
 \end{frame}
 
+\begin{frame}{積の微分法則}
+
+\end{frame}
+
 \begin{frame}{自然数の$q$-類似}
-  $x^n$($n \in \N$)を定義に沿って$q$-微分すると, 
-  \[
-    D_q x^n = \frac{(qx)^n - x^n}{(q - 1) x} = \frac{q^n - 1}{q - 1} x^{n - 1}
-  \]
+	$x^n$($n \in \N$)を定義に沿って$q$-微分する.
+	\begin{screen}
+		\[
+			D_q f(x) \coloneqq \frac{d_q f(x)}{d_q x} = \frac{f(qx) - f(x)}{(q - 1) x}
+		\]
+	\end{screen} 
+	\[
+		D_q x^n = \frac{(qx)^n - x^n}{(q - 1) x} = \frac{q^n - 1}{q - 1} x^{n - 1}
+	\]
   となる. 
   
   通常の微分では, $(x^n)' = n x^{n - 1}$となることと比較して, $n$の$q$-類似$[n]$を
@@ -284,119 +307,210 @@
   \tableofcontents[currentsection] 
 \end{frame}
 
-\begin{frame}{形式化}
-  形式化とは, 証明のために用意された人工言語に数学的な主張とその証明を翻訳し, 証明が論理学の推論規則に沿って正しく書かれていることをコンピュータを用いて機械的に検証することである.
-\end{frame}
+%\begin{frame}{形式化}
+% 	\begin{description}
+%		\item[形式化] 人工言語に数学的な主張とその証明を翻訳し, 
+%		正しさを機械的に検証すること
+%		\item[Coq] 形式化を行うためのソフトウェア
+%	\end{description}
+%	応用例
+%	標準ライブラリ\cite{coq sl}に加えて mathcomp \cite{coq mc}を用いる
+%\end{frame}
 
 \begin{frame}{Coq の使い方 コマンド}
   Coq に与える命令はコマンドとタクティックの2種類がある. 
-\begin{description}
-%  \item[\tt Require Import]
-%    ライブラリを読み込むためのコマンドである.
-%    {\tt From mathcomp Require Import ssreflect}
-%    であれば, ライブラリ群 mathcomp から ssreflect を読み込んでいる.
-%  \item[\tt Section / End]
-%    {\tt Section [セクション名]}, {\tt End [セクション名]}でセクションを作ることができ, 
-%    そのセクション内共通のコンテキストを宣言できる. 
-  \item[\tt Variable]
-    {\tt Variable [変数]$\colon$[型]}で, 特定の型を持つ変数を宣言できる. 例えば
-    
-    {\tt Variable n$\colon$nat}
-    
-    で, 変数{\tt n}が自然数型{\tt nat}の要素であることを表している. 
-%    {\tt Section/End}コマンドと組み合わせることで, {\tt End}まで同じ意味で扱われ, 
-%    {\tt End}以降は効力を失う. 
-%    同時に複数の変数を宣言することもできる. その場合は
-%    
-%    {\tt Variables [変数] [変数] $\cdots$ [変数]$\colon$[型]}
-%    
-%    と書く(ただし, Coq にとっては{Variable}と{Variables}に違いは無い).    
-%  \item[\tt Hypothesis]
-%    {\tt Hypothesis [仮定名]$\colon$[仮定]}で仮定を置くことができる. {\tt Variable}同様, 
-%    {\tt Section/End}と組み合わせることで, セクション内共通の仮定を置くことができる. 
-  \item[\tt Definition]
-    新たに関数を定義するためのコマンドで,
-    
-    {\tt Definition [関数名] ([引数]$\colon$[引数の型])$\colon$[関数の型] := 
-    [関数の定義式]}
-    
-    という形で用いる. 
-%    \begin{lstlisting}{Coq}
-%Definition dq (f : R -> R) x := f (q * x) - f x. \end{lstlisting}
-%    であれば, {\tt dq}が定義の名前, {\tt f}, {\tt x}が引数, {\tt R -> R}が{\tt f}の型であり, 
-%    {\tt f (q * x) - f x}が{\tt dq}を定義する式である. また, {\tt x}と{\tt dq}そのものの型は
-%    推論できるため省略できる. 
-%  \item[\tt Fixpoint]
-%    再帰関数を定義するためのコマンドで, 
-%    
-%    {\tt Fixpoint [関数名] ([引数]$\colon$[引数の型])$\colon$[関数の型] := 
-%    [定義中の関数を含む定義式]}
-%    
-%    と書く. 停止しない関数を認めてしまうと矛盾が生じるため, 停止性が保証されていない
-%    関数を定義することはできない. 
-  \item[\tt Lemma]
-    補題を宣言するためのコマンドで,
-    
-    {\tt Lemma [補題名] ([引数]$\colon$[引数の型])$\colon$[補題の主張]}
-    
-    という形である. 
-%    \begin{lstlisting}{Coq}
-%Lemma Dq_pow n x : x != 0 -> Dq (fun x => x ^ n) x = qnat n * x ^ (n - 1). \end{lstlisting}
-%    であれば, {\tt Dq\_pow}が補題名, {\tt n}, {\tt x}が引数, {\tt :}以降が補題の主張である. 
-%    
-    {\tt Lemma}の代わりに{\tt Theorem}, {\tt Corollary}等でも同じ機能をもつ. 
-  \item[\tt Proof/Qed]
-    {\tt Proof}は{\tt Lemma}の後に書いて補題の主張と証明を分ける(実際には省略可能で, 
-    人間の見やすさのために書いている). 
-    証明を完了させて{\tt Qed}を書くことで Coq に補題を登録することができ, 他の補題の
-    証明に使えるようになる. 
-\end{description}
+	\begin{description}
+	  \item[\tt Require Import] ライブラリを読み込む.
+	%    {\tt From mathcomp Require Import ssreflect}
+	%    であれば, ライブラリ群 mathcomp から ssreflect を読み込んでいる.
+	%  \item[\tt Section / End]
+	%    {\tt Section [セクション名]}, {\tt End [セクション名]}でセクションを作ることができ, 
+	%    そのセクション内共通のコンテキストを宣言できる. 
+	  \item[\tt Variable] 特定の型を持つ変数を宣言する
+	%    {\tt Section/End}コマンドと組み合わせることで, {\tt End}まで同じ意味で扱われ, 
+	%    {\tt End}以降は効力を失う. 
+	%    同時に複数の変数を宣言することもできる. その場合は
+	%    
+	%    {\tt Variables [変数] [変数] $\cdots$ [変数]$\colon$[型]}
+	%    
+	%    と書く(ただし, Coq にとっては{Variable}と{Variables}に違いは無い).    
+	%  \item[\tt Hypothesis]
+	%    {\tt Hypothesis [仮定名]$\colon$[仮定]}で仮定を置くことができる. {\tt Variable}同様, 
+	%    {\tt Section/End}と組み合わせることで, セクション内共通の仮定を置くことができる. 
+	  \item[\tt Definition] 新たに関数を定義する.
+	%    \begin{lstlisting}{Coq}
+	%Definition dq (f : R -> R) x := f (q * x) - f x. \end{lstlisting}
+	%    であれば, {\tt dq}が定義の名前, {\tt f}, {\tt x}が引数, {\tt R -> R}が{\tt f}の型であり, 
+	%    {\tt f (q * x) - f x}が{\tt dq}を定義する式である. また, {\tt x}と{\tt dq}そのものの型は
+	%    推論できるため省略できる. 
+	  \item[\tt Fixpoint] 再帰関数を定義する. 
+	  	停止性が保証されていない関数を定義することはできない.
+	%    
+	%    {\tt Fixpoint [関数名] ([引数]$\colon$[引数の型])$\colon$[関数の型] := 
+	%    [定義中の関数を含む定義式]}
+	%    
+	%    と書く. 停止しない関数を認めてしまうと矛盾が生じるため, 停止性が保証されていない
+	%    関数を定義することはできない. 
+	  \item[\tt Lemma] 補題を宣言する. 
+	%    \begin{lstlisting}{Coq}
+	%Lemma Dq_pow n x : x != 0 -> Dq (fun x => x ^ n) x = qnat n * x ^ (n - 1). \end{lstlisting}
+	%    であれば, {\tt Dq\_pow}が補題名, {\tt n}, {\tt x}が引数, {\tt :}以降が補題の主張である. 
+	%    
+	    {\tt Lemma}の代わりに{\tt Theorem}, {\tt Corollary}等でも同じ機能をもつ. 
+	  \item[\tt Proof/Qed]
+	    {\tt Proof}は{\tt Lemma}の後に書いて補題の主張と証明を分ける.  
+	    証明を完了させて{\tt Qed}を書くことで Coq に補題を登録することができ, 他の補題の
+	    証明に使えるようになる. 
+	\end{description}
+	タクティックは{\tt Proof...Qed}の間に使われる. 
+	よく使われるタクティックは{\tt move}, {\tt apply}, {\tt rewrite}の3つ.
 \end{frame}
 
-\begin{frame}{Coq の使い方 タクティック}
-タクティックは{\tt Proof...Qed}の間に使われる. よく使われるタクティックは{\tt move}, {\tt apply}, {\tt rewrite}の3つである. 
-\begin{description}
-  \item[\tt move]
-    {\tt move=> H}でゴールの前提に{\tt H}という名前をつけてコンテクストに移動する. 
-    また{\tt move$\colon$H}で補題{\tt H}もしくはコンテクストに存在する{\tt H}をゴールの
-    前提に移す. 
-  \item[\tt apply]
-    補題{\it lem}が{\tt P1 $\to$ P2}という形で, ゴールが{\tt P2}のとき, 
-    {\tt apply {\it lem}}でゴールを{\tt P1}に変える. 
-    コンテクストの仮定{\tt H}が{\tt P1 $\to P2$}であれば{\tt apply H}で同じことができる. 
-  \item[\tt rewrite]
-    {\it def}が定義のとき, {\tt rewrite /{\it def}}でゴールに出現している{\it def}を展開する. 
-    
-    また, 補題{\it lem}が{\tt A = B}という形のとき, {\tt rewrite {\it lem}}でゴールに出現する
-    {\tt A}を{\tt B}に書き換える(ただし, {\it lem}が{\tt H $\to$ (A = B)}という形であるとき, 
-    新たなゴールとして{\tt H}が追加される). 更に, {\tt rewrite {\it lem} in H}で, コンテクストの{\tt H}に
-    出現する{\tt A}を{\tt B}に書き換える. {\tt apply}と同じく, 使いたい等式が仮定にある場合も
-    同じように使える. 更に, {\tt rewrite}は繰り返し回数や適用箇所を指定できる.
-    \begin{description}
-      \item[\tt rewrite !{\it lem}] {\it lem}による書き換えを可能な限り繰り返す. 
-        ただし場合によっては繰り返しが終わらないことに注意
-        ($x + y$を$y + x$に書き換える補題を使う場合など).
-      \item[\tt rewrite n!{\it lem}] {\it lem}による書き換えを$n$回限り繰り返す.
-      \item[\tt rewrite ?{\it lem}] {\it lem}による書き換えを$0$回または$1$回行う. 
-        直前のタクティックでゴールが増える場合に特に有効. 
-      \item[\tt rewrite -{\it lem}] 逆向きに{\it lem}による書き換えを行う. 
-        つまり, {\it lem}が{\tt A = B}のとき, ゴールの{\tt B}を{\tt A}に書き換える. 
-      \item[\tt rewrite \{n\}{\it lem}] {\it lem}で書き換えられる場所のうち
-        $n$番目のみを書き換える. 
-      \item[{\tt rewrite [条件] {\it lem}}] 条件に一致する場所を{\it lem}で書き換える.
-      \item[\tt rewrite (\_ : A = B)] ゴールの{\tt A}を{\tt B}に書き換える. 
-        {\tt A = B}がゴールに追加される. この書き方の場合は補題を引数にとらない. 
-    \end{description}
-    このような, タクティックの前後に書いてその機能を拡張するものをタクティカルと言う. 
-    {\tt move=>}の{\tt =>}や{\tt move$\colon$}の{\tt $\colon$}もタクティカルである. 
-\end{description}\end{frame}
+\begin{frame}[fragile]{Coq の使い方 モーダスポーネンス}
+	「命題$P$, $Q$について, $P \Lra Q$かつ$P$であれば, $Q$が成り立つ」
+	\begin{lstlisting}{Coq}
+From mathcomp Require Import ssreflect.
 
-\begin{frame}{Coq の使い方3 モーダスポーネンス}
-  モーダスポーネンスの形式化
+Lemma modus_ponens (P Q : Prop) : (P -> Q) /\ P -> Q. \end{lstlisting}
+	{\tt Prop}は Coq での命題全体を表す型, $\wedge$は「かつ」を表す
 \end{frame}
 
-\begin{frame}{Coq の使い方4 代入計算}
-  代入に関する簡単な計算を形式化
+\begin{frame}[fragile]{Coq の使い方 モーダスポーネンス}
+	\begin{screen}
+	  \begin{lstlisting}{Coq}
+1 subgoal
+P, Q : Prop
+-------------------------------
+(P -> Q) /\ P -> Q \end{lstlisting}
+	\end{screen}
+	タクティック：{\tt move=> []}
+\end{frame}
+
+\begin{frame}[fragile]{Coq の使い方 モーダスポーネンス}
+	\begin{screen}
+	  \begin{lstlisting}{Coq}
+1 subgoal
+P, Q : Prop
+-------------------------------
+(P -> Q) -> P -> Q \end{lstlisting}
+	\end{screen}
+	タクティック：{\tt move=> pq}
+\end{frame}
+
+\begin{frame}[fragile]{Coq の使い方 モーダスポーネンス}
+	\begin{screen}
+	  \begin{lstlisting}{Coq}
+1 subgoal
+P, Q : Prop
+pq : P -> Q
+-------------------------------
+P -> Q \end{lstlisting}
+	\end{screen}
+	タクティック：{\tt move=> p}
+\end{frame}
+
+\begin{frame}[fragile]{Coq の使い方 モーダスポーネンス}
+	\begin{screen}
+	  \begin{lstlisting}{Coq}
+1 subgoal
+P, Q : Prop
+pq : P -> Q
+p : P
+-------------------------------
+Q \end{lstlisting}
+	\end{screen}
+	タクティック：{\tt apply pq}
+\end{frame}
+
+\begin{frame}[fragile]{Coq の使い方 モーダスポーネンス}
+	\begin{screen}
+	  \begin{lstlisting}{Coq}
+1 subgoal
+P, Q : Prop
+pq : P -> Q
+p : P
+-------------------------------
+P \end{lstlisting}
+	\end{screen}
+	タクティック：{\tt done}
+\end{frame}
+
+\begin{frame}[fragile]{Coq の使い方 モーダスポーネンス}
+	\begin{screen}
+	  \begin{lstlisting}{Coq}
+  No more subgoals. \end{lstlisting}
+	\end{screen}
+	コマンド：{\tt Qed}
+\end{frame}
+
+\begin{frame}[fragile]{Coq の使い方　モーダスポーネンス}
+	\begin{lstlisting}{Coq}
+Lemma modus_ponens (P Q : Prop) : (P -> Q) /\ P -> Q.
+Proof.
+  move=> [].
+  move=> pq.
+  move=> p.
+  apply pq.
+  done.
+Qed. \end{lstlisting}
+\end{frame}
+
+%\begin{frame}{Coq の使い方 タクティック}
+%である. 
+%\begin{description}
+%  \item[\tt move]
+%    {\tt move=> H}でゴールの前提に{\tt H}という名前をつけてコンテクストに移動する. 
+%    また{\tt move$\colon$H}で補題{\tt H}もしくはコンテクストに存在する{\tt H}をゴールの
+%    前提に移す. 
+%  \item[\tt apply]
+%    補題{\it lem}が{\tt P1 $\to$ P2}という形で, ゴールが{\tt P2}のとき, 
+%    {\tt apply {\it lem}}でゴールを{\tt P1}に変える. 
+%    コンテクストの仮定{\tt H}が{\tt P1 $\to P2$}であれば{\tt apply H}で同じことができる. 
+%  \item[\tt rewrite]
+%    {\it def}が定義のとき, {\tt rewrite /{\it def}}でゴールに出現している{\it def}を展開する. 
+%    
+%    また, 補題{\it lem}が{\tt A = B}という形のとき, {\tt rewrite {\it lem}}でゴールに出現する
+%    {\tt A}を{\tt B}に書き換える(ただし, {\it lem}が{\tt H $\to$ (A = B)}という形であるとき, 
+%    新たなゴールとして{\tt H}が追加される). 更に, {\tt rewrite {\it lem} in H}で, コンテクストの{\tt H}に
+%    出現する{\tt A}を{\tt B}に書き換える. {\tt apply}と同じく, 使いたい等式が仮定にある場合も
+%    同じように使える. 更に, {\tt rewrite}は繰り返し回数や適用箇所を指定できる.
+%    \begin{description}
+%      \item[\tt rewrite !{\it lem}] {\it lem}による書き換えを可能な限り繰り返す. 
+%        ただし場合によっては繰り返しが終わらないことに注意
+%        ($x + y$を$y + x$に書き換える補題を使う場合など).
+%      \item[\tt rewrite n!{\it lem}] {\it lem}による書き換えを$n$回限り繰り返す.
+%      \item[\tt rewrite ?{\it lem}] {\it lem}による書き換えを$0$回または$1$回行う. 
+%        直前のタクティックでゴールが増える場合に特に有効. 
+%      \item[\tt rewrite -{\it lem}] 逆向きに{\it lem}による書き換えを行う. 
+%        つまり, {\it lem}が{\tt A = B}のとき, ゴールの{\tt B}を{\tt A}に書き換える. 
+%      \item[\tt rewrite \{n\}{\it lem}] {\it lem}で書き換えられる場所のうち
+%        $n$番目のみを書き換える. 
+%      \item[{\tt rewrite [条件] {\it lem}}] 条件に一致する場所を{\it lem}で書き換える.
+%      \item[\tt rewrite (\_ : A = B)] ゴールの{\tt A}を{\tt B}に書き換える. 
+%        {\tt A = B}がゴールに追加される. この書き方の場合は補題を引数にとらない. 
+%    \end{description}
+%    このような, タクティックの前後に書いてその機能を拡張するものをタクティカルと言う. 
+%    {\tt move=>}の{\tt =>}や{\tt move$\colon$}の{\tt $\colon$}もタクティカルである. 
+%\end{description}\end{frame}
+
+%\begin{frame}{Coq の使い方4 代入計算}
+%  代入に関する簡単な計算を形式化
+%\end{frame}
+
+\begin{frame}{mathcomp の構造}
+	標準ライブラリ\cite{coq sl}に加えて mathcomp \cite{coq mc}を用いる. 
+	
+	mathcomp の型には階層構造があり, より一般の型の性質を引き継ぐ. 
+	
+	今回は実数の形式化に{\tt rcfType}(Real Closed Field：実閉体)を使う. 
+	\begin{align*}
+		{\tt eqType} &\to {\tt choiceType} \\
+		                  &\to {\tt zmodType} \to {\tt ringType} \to 
+		                          {\tt comRingType} \to {\tt comUnitRingType}\\
+							  &\to {\tt idomainType} \to {\tt fieldType}\\
+		                  &\to {\tt numFieldType} \to {\tt realFieldType} \to {\tt rcfType}
+	\end{align*}
+	{\tt ringType}, {\tt fieldType}の性質が重要
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{$q$-類似の形式化}
@@ -405,45 +519,207 @@
   \tableofcontents[currentsection] 
 \end{frame}
 
-\begin{frame}{{\tt Dq}}
-  {\tt Dq}の定義
+\begin{frame}[fragile]{$D_q$の形式化}
+	\begin{screen}
+		\[
+			d_q f (x) \coloneqq f(qx) - f(x) \quad D_q f (x) \coloneqq \frac{d_q f(x)}{d_q x}
+		\]
+	\end{screen}
+	\begin{lstlisting}{Coq}
+From mathcomp Require Import all_ssreflect all_algebra.
+Import GRing.
+
+Section q_analogue.
+Local Open Scope ring_scope.
+Variables (R : rcfType) (q : R).
+Hypothesis Hq : q - 1 != 0.
+
+Notation "f // g" := (fun x => f x / g x) (at level 40).
+
+Definition dq (f : R -> R) x := f (q * x) - f x.
+Definition Dq f := dq f // dq id. \end{lstlisting}
 \end{frame}
 
-\begin{frame}{{\tt qnat}}
-  {\tt qnat}の定義, $x^n$の微分
+\begin{frame}[fragile]{$[n]$の形式化}
+	\begin{screen}
+		\[
+			[n] \coloneqq \frac{q^n - 1}{q - 1} \quad D_q x^n = [n] x^{n - 1}
+		\]
+	\end{screen}
+	\begin{lstlisting}{Coq}
+Definition qnat n : R := (q ^ n - 1) / (q - 1).
+
+Lemma Dq_pow n x : x != 0 ->
+  Dq (fun x => x ^ n) x = qnat n * x ^ (n - 1).
+Proof.
+  move=> Hx.
+  rewrite /Dq /dq /qnat.
+  rewrite -{4}(mul1r x) -mulrBl expfzMl -add_div;
+    last by apply mulf_neq0.
+  rewrite [in x ^ n](_ : n = (n -1) +1) //; last by rewrite subrK.
+  rewrite expfzDr ?expr1z ?mulrA -?mulNr ?red_frac_r ?add_div //.
+  rewrite -{2}[x ^ (n - 1)]mul1r -mulrBl mulrC mulrA.
+  by rewrite [in (q - 1)^-1 * (q ^ n - 1)] mulrC.
+Qed. \end{lstlisting}
 \end{frame}
 
-\begin{frame}{\tt qbinom\_pos}
-  $(x - a)^n_q$の形式化
+\begin{frame}[fragile]{$(x - a)^n_q$の形式化}
+	\begin{screen}
+		\begin{align*}
+			(x - a)^n_q = \begin{cases}
+	                      1 & \text{if}\ n = 0 \\
+	                      (x - a) (x - qa) \cdots (x - q^{n - 1} a) & \text{if}\ n \ge 1
+	                    \end{cases}
+		\end{align*}
+	\end{screen}
+	\begin{lstlisting}{Coq}
+Fixpoint qbinom_pos a n x :=
+  match n with
+  | 0 => 1
+  | n0.+1 => (qbinom_pos a n0 x) * (x - q ^ n0 * a)
+  end. \end{lstlisting}
 \end{frame}
 
-\begin{frame}{\tt Dq qbinom\_pos}
-  \[
-    D_q (x - a)^n_q = [n] (x - a)^n_q
-  \]
-\end{frame}
+%\begin{frame}{\tt Dq qbinom\_pos}
+%  \[
+%    D_q (x - a)^n_q = [n] (x - a)^n_q
+%  \]
+%\end{frame}
+%
+%\begin{frame}{\tt qbinom}  
+%\end{frame}
 
-\begin{frame}{\tt qbinom}  
+\begin{frame}{関数から多項式へ}
+	\textbf{約分に条件が必要ない}
+	
+	$x / x = 1$を計算するとき
+	\begin{itemize}
+		\item 実数 $\cdots$ $x \ne 0$が必要
+		\item 多項式 $\cdots$ $x$は単項式なので自動的に $x \ne 0$(ゼロ多項式)
+	\end{itemize}
+	$\to$多項式で考えれば約分した後でも$x = 0$での値が求められる. 
+	\[
+	  D_q (x + a)^n_q = [n](x + a)^{n - 1}_q
+	\]
+	という計算をした後でも$0$での値が求められる. 
+	
+	$\to$Gauss's binomial formulaの証明に必要
 \end{frame}
 
 \begin{frame}{関数から多項式へ}
-  {\tt Dqp}を定義
+	\textbf{$q = 0$のとき高階$D_q$が定義できる}	
+	\begin{align*}
+		(D_q ^2 f) (x) &= (D_0 ^2 f) (x) = (D_0 (D_0 f)) (x) \\
+								&= D_0 \left(x \mapsto \frac{f (0 x) - f(x)}{(0 - 1)x} \right) (x)
+									= D_0 \left(x \mapsto \frac{f(x) - f(0)}{x} \right) (x) \\
+								&= (D_0 F) (x) \quad
+									(F \coloneqq x \mapsto \frac{f(x) - f(0)}{x})\\
+								&= \left( x \mapsto \frac{F(x) - F(0)}{x} \right) (x)
+									= \frac{F(x) - F(0)}{x}
+	\end{align*}
+	\[
+		F(0) = \frac{f(0) - f(0)}{0} = \frac{0}{0}
+	\]
+	$d_q$が各点ごとに定義してあることが問題
+	
+	$\to$多項式の係数を変化させることで定義すれば$q = 0$かどうかに関らず高階$q$-微分を
+	定義できる
 \end{frame}
 
-\begin{frame}{$q$-Taylor展開の形式化}
+\begin{frame}{Coq での多項式}
+
+	{\tt T}$\colon${\tt ringType}のとき, {\tt \{poly T\}} $\cdots$ {\tt T}係数多項式全体
+	
+	{\tt \{poly R\}}も{\tt ringType}の構造を持っている
+	\begin{description}
+	  \item[\tt \textbackslash poly\_(i < n) E(i)] 次数が$n - 1$次以下, $i$次の係数が$E(i)$
+	    である多項式
+	  \item[\tt c\%:P] 定数$c$のみからなる単項式
+	  \item[\tt 'X] 変数$x$のみからなる単項式
+	  \item[\tt p`\_i] 多項式$p$の$i$次の係数 
+	  \item[\tt size p] 多項式$p$の次数$+1$
+	  \item[{\tt p.[x]}] 多項式$p$の$x$での値 
+	\end{description}
 \end{frame}
 
-\begin{frame}{Gauss's binomial formula の形式化}
+\begin{frame}[fragile]{多項式に対する$q$-微分の再定義}
+	多項式に対する$q$-差分
+	\begin{lstlisting}{Coq}
+Definition scale_var (p : {poly R}):=
+  \poly_(i < size p) (q ^ i * p`_i).
+Definition dqp p := scale_var p - p. 
+Definition Dqp p := dqp p %/ dqp 'X.
+\end{lstlisting}
+	多項式に対する$q$-微分
+	\begin{lstlisting}{Coq}
+Definition Dqp p := dqp p %/ dqp 'X.
+\end{lstlisting}
+	{\tt p \%/ p'}は多項式{\tt p}を多項式{\tt p'}で割った商
+\end{frame}
+
+\begin{frame}[fragile]{$q$-Taylor展開の形式化}
+	\begin{screen}
+		\[
+			f(x) = \sum_{j=0}^N (D_q^jf)(c)\frac{(x-c)^j_q}{[j]!}
+		\]
+	\end{screen}
+	\begin{lstlisting}{Coq}
+Fixpoint qfact n :=
+  match n with
+  | 0 => 1
+  | n.+1 => qfact n * qnat n.+1
+  end.
+
+Theorem q_Taylorp n (f : {poly R}) c :
+  (forall n, qfact n != 0) ->
+  size f = n.+1 ->
+  f = \sum_(0 <= i < n.+1)
+    ((Dqp' \^ i) f).[c] *: (qbinom_pos_poly c i / (qfact i)%:P).
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Gauss's binomial formula の形式化}
+	\begin{screen}
+		\[
+			(x + a)^n_q = \sum_{j = 0}^n \qcoe{n}{j} q^{j (j - 1)/2} a^j x^{n - j}
+		\]
+	\end{screen}
+	\begin{lstlisting}{Coq}
+Definition qbicoef n j := qfact n / (qfact j * qfact (n - j)).
+Theorem Gauss_binomial a n : (forall n, qfact n != 0) ->
+  qbinom_pos_poly (-a) n =
+    \sum_(0 <= i < n.+1)
+      (qbicoef n i * q ^+ (i * (i - 1))./2 * a ^+ i) *: 'X^(n - i). \end{lstlisting}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{今後の展望}
 
 \begin{frame}
-  \tableofcontents[currentsection] 
+	\tableofcontents[currentsection] 
+\end{frame}
+
+\begin{frame}{今後の展望}
+	現在開発中のライブラリ mathcomp analysis\cite{coq ana} の利用
+	\begin{itemize}
+		\item $q \to 1$で通常の数学に戻ることの形式化
+		\item 無限和に関する形式化 
+		
+		$\to$Gauss's binomial formulaの拡張, 
+		$q$-指数関数, $q$-三角関数
+	\end{itemize}	
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{thebibliography}{9}
-  \bibitem{Kac} Victor Kac, Pokman Cheung, {\it{Quantum Calculus}}, Springer, 2001.
+	\bibitem{coq sl} Coq Team, {\it The Coq Standard Library}, 
+		\url{https://coq.inria.fr/distrib/current/stdlib/}, 2023.
+	\bibitem{Kac} Victor Kac, Pokman Cheung, {\it{Quantum Calculus}}, Springer, 2001.
+	\bibitem{coq mc} Mathematical Components Team, {\it Mathematical Components}, 		
+		\url{https://github.com/math-comp/math-comp}, 2023.
+	\bibitem{coq ana} Mathematical Components Team, 
+		{\it Mathematical Components compliant Analysis Library}, 
+			\url{https://github.com/math-comp/analysis}, 2023.
+	\bibitem{coq qana} 中村 薫, {\it q-analogue}, 
+		\url{https://github.com/nakamurakaoru/q-analogue/tree/thesis}, 2023.
 %  \bibitem{bib1} H.P.Barendregt, {\it{Lambda Calculi with Types}}
 \end{thebibliography}
 \end{document}
