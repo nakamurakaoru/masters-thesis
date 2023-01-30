@@ -130,8 +130,7 @@
   \tableofcontents[currentsection] 
 \end{frame}
 
-\begin{frame}{はじめに}
-
+\begin{frame}[fragile]{はじめに}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{$q$-類似}
@@ -141,13 +140,24 @@
 \end{frame}
 
 \begin{frame}{$q$-類似の概要}
-  $q$-類似とは, 実数パラメータ$q$, 実数上の関数$f$に対して
-  \[
-    D_q f(x) \coloneqq \frac{f(qx) - f(x)}{(q - 1) x}
-  \]
-  で定義される$q$-微分を出発点とし, この$q$-微分に対してうまく振る舞い, 
-  かつ$q$を極限で$1$に近づけると通常の定義に一致するように数学の諸概念を
-  一般化するものである.
+  $q$-類似：以下の2つの条件をみたす数学の諸概念の一般化
+  \begin{itemize}
+    \item $q \to 1$とすると通常の数学に一致する
+    \item 実数パラメータ$q$, 実数上の関数$f$に対して
+      \[
+        D_q f(x) \coloneqq \frac{f(qx) - f(x)}{(q - 1) x}
+      \]
+    で定義される$q$-微分に対してうまく振る舞う
+  \end{itemize}
+  $q$-類似を考える利点：あえてパラメータを増やすことで証明が簡単になる場合がある
+  \begin{itembox}{Jacobi の三重積}
+    $z$, $q \in \R$, $|q| < 1$として, 
+    \[
+      \sum_{n = -\infty}^{\infty} q^{n^2} z^n =
+      \prod_{n = 1}^{\infty} (1 - q^{2n})(1 + q^{2n - 1}z)(1 + q^{2n - 1}z^{-1})
+    \]
+    が成り立つ. 
+  \end{itembox}
 \end{frame}
 
 \begin{frame}{$q$-微分}
