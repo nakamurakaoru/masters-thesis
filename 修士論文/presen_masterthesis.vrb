@@ -3,9 +3,10 @@
 ^^I^^I\[
 ^^I^^I^^I(x + a)^n_q = \sum_{j = 0}^n \qcoe{n}{j} q^{j (j - 1)/2} a^j x^{n - j}
 ^^I^^I\]
-^^I\end{screen}
+^^I\end{screen} \pause
 ^^I\begin{lstlisting}{Coq}
 Definition qbicoef n j := qfact n / (qfact j * qfact (n - j)).
+
 Theorem Gauss_binomial a n : (forall n, qfact n != 0) ->
   qbinom_pos_poly (-a) n =
     \sum_(0 <= i < n.+1)
