@@ -131,6 +131,9 @@
 \end{frame}
 
 \begin{frame}[fragile]{はじめに}
+  本発表における$q$-類似の定義, 定理及びその証明はVictor Kac, Pokman Cheungの
+  {\it Quantum Calculus}\cite{Kac}によるものだが, その形式化を行ったという点において
+  独自性がある. 
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{$q$-類似}
@@ -161,104 +164,118 @@
 \end{frame}
 
 \begin{frame}{$q$-微分}
-  まず$q$-微分の定義から始める. $q$を$1$でない実数とする. 
-\begin{df}[\cite{Kac} p1 (1.1), p2 (1.5)]
-  関数$f : \R \to \R$に対して, $f(x)$の$q$差分$d_q f(x)$を, 
-  \[
-    d_q f(x) \coloneqq f (qx) - f(x)
-  \]
-  と定める. 更に, $f(x)$の$q$微分を$D_q f(x)$を, 
-  \[
-    D_q f(x) \coloneqq \frac{d_q f(x)}{d_q x} = \frac{f(qx) - f(x)}{(q - 1) x}
-  \]
-  と定める. 
-\end{df}
+  $q$-差分, $q$-微分の定義をする. 以下, $q$を$1$でない実数とする. 
+  \begin{df}[\cite{Kac} p1 (1.1), p2 (1.5)]
+    関数$f : \R \to \R$に対して, $f(x)$の$q$差分$d_q f(x)$を, 
+    \[
+      d_q f(x) \coloneqq f (qx) - f(x)
+    \]
+    と定める. 更に, $f(x)$の$q$微分$D_q f(x)$を, 
+    \[
+      D_q f(x) \coloneqq \frac{d_q f(x)}{d_q x} = \frac{f(qx) - f(x)}{(q - 1) x}
+    \]
+    と定める(\cite{Kac}). 
+  \end{df}
 \end{frame}
 
 \begin{frame}{自然数の$q$-類似}
-  $x^n$を定義に沿って$q$-微分すると, 
+  $x^n$($n \in \N$)を定義に沿って$q$-微分すると, 
   \[
     D_q x^n = \frac{(qx)^n - x^n}{(q - 1) x} = \frac{q^n - 1}{q - 1} x^{n - 1}
   \]
-  となる. 通常の微分では, $(x^n)' = n x^{n - 1}$となることと比較して, $n$の$q$-類似$[n]$を
+  となる. 
+  
+  通常の微分では, $(x^n)' = n x^{n - 1}$となることと比較して, $n$の$q$-類似$[n]$を
   \[
-    [n] = \frac{q^n - 1}{q - 1}
+    [n] = \frac{q^n - 1}{q - 1} (= 1 + q + q^2 + \cdots q^{n - 1})
   \]
   と定める.
 \end{frame}
 
-\begin{frame}{$(x - a)^n$の$q$-類似}
-続いて$(x - a)^n$の$q$-類似を定義し, その性質を調べる.  
-\begin{df}[\cite{Kac} p8 Definition (3.4)]
-  $x$, $a \in \R$, $n \in \Z_{\ge 0}$に対して, $(x - a)^n$の$q$-類似$(x - a)^n_q$を, 
-  \[
-  (x - a)^n_q = \begin{cases}
-                      1 & \text{if}\ n = 0 \\
-                      (x - a) (x - qa) \cdots (x - q^{n - 1} a) & \text{if}\ n \ge 1
-                    \end{cases}
-  \]
-  と定義する. 
-\end{df}
-\begin{prop} \label{Dq_qbinom_nonneg}
-  $n\in\Z_{>0}$に対し, 
-  \[
-    D_q(x-a)^n_q = [n](x-a)^{n-1}_q
-  \]
-  が成り立つ. 
-\end{prop}
-\begin{proof}
-  $n$についての帰納法により示される. 
-\end{proof}
+\begin{frame}{$(x - a)^n$の$q$-類似} 
+	\begin{df}[\cite{Kac} p8 Definition (3.4)]
+	  $x$, $a \in \R$, $n \in \Z_{\ge 0}$に対して, $(x - a)^n$の$q$-類似$(x - a)^n_q$を, 
+	  \[
+	  (x - a)^n_q = \begin{cases}
+	                      1 & \text{if}\ n = 0 \\
+	                      (x - a) (x - qa) \cdots (x - q^{n - 1} a) & \text{if}\ n \ge 1
+	                    \end{cases}
+	  \]
+	  と定義する. 
+	\end{df}
+	\begin{prop} \label{Dq_qbinom_nonneg}
+	  $n\in\Z_{>0}$に対し, 
+	  \[
+	    D_q(x-a)^n_q = [n](x-a)^{n-1}_q
+	  \]
+	  が成り立つ. 
+	\end{prop}
+\end{frame}
+
+\begin{frame}{$(x - a)^n_q$の指数法則}
+
 \end{frame}
 
 \begin{frame}{$q$-Taylor展開}
-  \bthm[\cite{Kac} p12 Theorem 4.1] \label{q_Taylor}
-$f(x)$を, $N$次の実数係数多項式とする. 任意の$c\in\R$に対し, 
-  \[
-    f(x) = \sum_{j=0}^N (D_q^jf)(c)\frac{(x-c)^j_q}{[j]!}
-  \]
-が成り立つ. 
-\ethm
-\bpf
-$\frac{(x-a)^n_q}{[n]!}$が, $a$, $D_q$に対してTheorem \ref{general_Taylor}の三条件をみたすことを確かめればよい. (i), (ii)は$(x-a)^n_q$の定義から, (iii)はProposition\ref{Dq_qbinom_nonneg}から分かる. 
-\epf
+	\begin{df}[\cite{Kac} p7 (3.1)]
+		$n \in \N$について, 階乗の$q$-類似を以下のように定める. 
+    \[
+      [n]! \coloneqq \begin{cases}
+                            1 & (n=0)\\
+                            [n]\times[n-1]\times\cdots\times[1] & (n\ge1)
+                          \end{cases}
+    \]
+  \end{df}
+  \begin{thm}[\cite{Kac} p12 Theorem 4.1] \label{q_Taylor}
+	 $f(x)$を, $N$次の実数係数多項式とする. 任意の$c\in\R$に対し, 
+	 \[
+	   f(x) = \sum_{j=0}^N (D_q^jf)(c)\frac{(x-c)^j_q}{[j]!}
+	 \]
+	 が成り立つ. 
+  \end{thm}
 \end{frame}
 
 \begin{frame}{Gauss's binomial formula}
-\blem[\cite{Kac} p15 Example (5.5)]
-  $n \in \Z_{>0}$について, 
-  \[
-    (x + a)^n_q = \sum_{j = 0}^n \qcoe{n}{j} q^{j (j - 1)/2} a^j x^{n - j}
-  \]
-  が成り立つ. この式は Gauss's binomial formula と呼ばれる. 
-\elem
-\bpf
-  $f = (x + a)^n_q$とすると, 任意の正整数$j \le n$に対して, 
-  \[
-    (D_q ^j f) (x) = [n] [n - 1] [n - j + 1] (x + a)^{n - j}_q
-  \]
-  であり, また
-  \[
-    (x + a)^m_q = (x + a) (x + qa) \cdots (x + q^{m - 1} a)
-  \]
-  から, $(0 + a)^m_q = a \cdot qa \cdots q^{m - 1}a = q^{m (m - 1)/2}a^m$となるので, 
-  \[
-    (D_q^j f) (0) = [n] [n - 1] \cdots [n - j +1]q^{(n - j) (n - j - 1)/2} a^{n - j}
-  \]
-  が成り立つ. よって, Theorem \ref{q_Taylor} において, $f = (x + a)^n_q$, $c = 0$として, 
-  \[
-    (x + a)^n_q = \sum_{j = 0}^n \qcoe{n}{j} q^{(n - j) (n - j - 1)/2} a^{n - j} x^j
-  \]
-  が得られる. この式の右辺において$j$を$n - j$に置き換えることで, 
-  \[
-    \qcoe{n}{n - j} = \frac{[n]!}{[n - j]![n - (n - j)]!} = \frac{[n]!}{[j]![n - j]!} = \qcoe{n}{j}
-  \]
-  に注意すれば, 
-  \[
-    (x - a)^n_q = \sum_{j = 0}^n \qcoe{n}{j} q^{j (j - 1)/2} a^j x^{n - j}
-  \]
-  が成り立つ. 
-\epf
+	\begin{df}[\cite{Kac} p12 (4.5)]
+		$n \ge j$をみたす$n$, $j \in \N$について, 二項係数の$q$-類似を以下のように定める. 
+		\[
+			\qcoe{n}{j} \coloneqq \frac{[n]!}{[j]![n - j]!}
+		\]
+	\end{df}
+   \begin{lem}[\cite{Kac} p15 Example (5.5)]
+	  $n \in \Z_{>0}$について, 
+	  \[
+	    (x + a)^n_q = \sum_{j = 0}^n \qcoe{n}{j} q^{j (j - 1)/2} a^j x^{n - j}
+	  \]
+	  が成り立つ. この式は Gauss's binomial formula と呼ばれる. 
+	\end{lem}
+%\bpf
+%  $f = (x + a)^n_q$とすると, 任意の正整数$j \le n$に対して, 
+%  \[
+%    (D_q ^j f) (x) = [n] [n - 1] [n - j + 1] (x + a)^{n - j}_q
+%  \]
+%  であり, また
+%  \[
+%    (x + a)^m_q = (x + a) (x + qa) \cdots (x + q^{m - 1} a)
+%  \]
+%  から, $(0 + a)^m_q = a \cdot qa \cdots q^{m - 1}a = q^{m (m - 1)/2}a^m$となるので, 
+%  \[
+%    (D_q^j f) (0) = [n] [n - 1] \cdots [n - j +1]q^{(n - j) (n - j - 1)/2} a^{n - j}
+%  \]
+%  が成り立つ. よって, Theorem \ref{q_Taylor} において, $f = (x + a)^n_q$, $c = 0$として, 
+%  \[
+%    (x + a)^n_q = \sum_{j = 0}^n \qcoe{n}{j} q^{(n - j) (n - j - 1)/2} a^{n - j} x^j
+%  \]
+%  が得られる. この式の右辺において$j$を$n - j$に置き換えることで, 
+%  \[
+%    \qcoe{n}{n - j} = \frac{[n]!}{[n - j]![n - (n - j)]!} = \frac{[n]!}{[j]![n - j]!} = \qcoe{n}{j}
+%  \]
+%  に注意すれば, 
+%  \[
+%    (x - a)^n_q = \sum_{j = 0}^n \qcoe{n}{j} q^{j (j - 1)/2} a^j x^{n - j}
+%  \]
+%  が成り立つ. 
+%\epf
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Coq}

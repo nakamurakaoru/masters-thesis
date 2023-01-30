@@ -1,1 +1,4 @@
 \frametitle{はじめに}
+本発表における$q$-類似の定義, 定理及びその証明はVictor Kac, Pokman Cheungの
+  {\it Quantum Calculus}\cite{Kac}によるものだが, その形式化を行ったという点において
+  独自性がある.
