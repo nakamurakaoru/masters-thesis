@@ -1,5 +1,5 @@
 \beamer@sectionintoc {1}{はじめに}{3}{0}{1}
 \beamer@sectionintoc {2}{$q$-類似}{12}{0}{2}
-\beamer@sectionintoc {3}{Coq}{32}{0}{3}
-\beamer@sectionintoc {4}{$q$-類似の形式化}{57}{0}{4}
-\beamer@sectionintoc {5}{今後の展望}{90}{0}{5}
+\beamer@sectionintoc {3}{Coq}{33}{0}{3}
+\beamer@sectionintoc {4}{$q$-類似の形式化}{58}{0}{4}
+\beamer@sectionintoc {5}{今後の展望}{91}{0}{5}
