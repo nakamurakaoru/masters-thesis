@@ -1,4 +1,4 @@
-This is e-pTeX, Version 3.14159265-p3.8.1-180518-2.6 (utf8.sjis) (TeX Live 2018/W32TeX) (preloaded format=platex 2018.7.29)  1 FEB 2023 23:41
+This is e-pTeX, Version 3.14159265-p3.8.1-180518-2.6 (utf8.sjis) (TeX Live 2018/W32TeX) (preloaded format=platex 2018.7.29)  2 FEB 2023 02:25
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1181,55 +1181,60 @@ LaTeX Font Info:    Font shape `OT1/txss/m/n' will be
  (./presen_masterthesis.vrb) [53
 
 ]
-Overfull \hbox (0.19994pt too wide) detected at line 515
-[]
- []
-
-[54
-
-]
-Overfull \hbox (0.19994pt too wide) detected at line 515
-[]
- []
-
-[55
-
-]
-Overfull \hbox (0.19994pt too wide) detected at line 515
-[]
- []
-
-[56
-
-]
-Overfull \hbox (0.19994pt too wide) detected at line 515
-[]
- []
-
-[57
-
-]
-Overfull \hbox (0.19994pt too wide) detected at line 515
-[]
- []
-
-[58
-
-]
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 517.
+(hyperref)                removing `math shift' on input line 487.
 
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `math shift' on input line 517.
+(hyperref)                removing `math shift' on input line 487.
 
-(./presen_masterthesis.toc) [59
+(./presen_masterthesis.toc) [54
 
 ]
 \openout4 = `presen_masterthesis.vrb'.
 
  (./presen_masterthesis.vrb
+Overfull \hbox (14.70366pt too wide) in paragraph at lines 13--13
+[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
+][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
+ []
+
+) [55
+
+] (./presen_masterthesis.vrb
+Overfull \hbox (14.70366pt too wide) in paragraph at lines 13--13
+[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
+][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
+ []
+
+) [56
+
+] (./presen_masterthesis.vrb
+Overfull \hbox (14.70366pt too wide) in paragraph at lines 13--13
+[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
+][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
+ []
+
+) [57
+
+] (./presen_masterthesis.vrb
+Overfull \hbox (14.70366pt too wide) in paragraph at lines 13--13
+[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
+][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
+ []
+
+) [58
+
+] (./presen_masterthesis.vrb
+Overfull \hbox (14.70366pt too wide) in paragraph at lines 13--13
+[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
+][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
+ []
+
+) [59
+
+] (./presen_masterthesis.vrb
 Overfull \hbox (14.70366pt too wide) in paragraph at lines 13--13
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
@@ -1237,132 +1242,92 @@ Overfull \hbox (14.70366pt too wide) in paragraph at lines 13--13
 
 ) [60
 
-] (./presen_masterthesis.vrb
-Overfull \hbox (14.70366pt too wide) in paragraph at lines 13--13
-[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
-][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
- []
-
-) [61
-
-] (./presen_masterthesis.vrb
-Overfull \hbox (14.70366pt too wide) in paragraph at lines 13--13
-[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
-][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
- []
-
-) [62
-
-] (./presen_masterthesis.vrb
-Overfull \hbox (14.70366pt too wide) in paragraph at lines 13--13
-[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
-][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
- []
-
-) [63
-
-] (./presen_masterthesis.vrb
-Overfull \hbox (14.70366pt too wide) in paragraph at lines 13--13
-[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
-][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
- []
-
-) [64
-
-] (./presen_masterthesis.vrb
-Overfull \hbox (14.70366pt too wide) in paragraph at lines 13--13
-[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
-][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
- []
-
-) [65
-
 ]
 \openout4 = `presen_masterthesis.vrb'.
 
- (./presen_masterthesis.vrb) [66
+ (./presen_masterthesis.vrb) [61
 
-] (./presen_masterthesis.vrb) [67
+] (./presen_masterthesis.vrb) [62
 
 ]
 \openout4 = `presen_masterthesis.vrb'.
 
 
 (./presen_masterthesis.vrb
-Overfull \hbox (4.20369pt too wide) in paragraph at lines 17--18
+Overfull \hbox (4.20369pt too wide) in paragraph at lines 19--20
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
 )
-Overfull \vbox (0.30939pt too high) detected at line 585
+Overfull \vbox (0.30939pt too high) detected at line 552
  []
 
-[68
+[63
 
 ] (./presen_masterthesis.vrb
-Overfull \hbox (4.20369pt too wide) in paragraph at lines 17--18
+Overfull \hbox (4.20369pt too wide) in paragraph at lines 19--20
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
 )
-Overfull \vbox (0.30939pt too high) detected at line 585
+Overfull \vbox (0.30939pt too high) detected at line 552
  []
 
-[69
+[64
 
 ]
 \openout4 = `presen_masterthesis.vrb'.
 
- (./presen_masterthesis.vrb) [70
+ (./presen_masterthesis.vrb) [65
 
-] (./presen_masterthesis.vrb) [71
+] (./presen_masterthesis.vrb) [66
 
 ]
 LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <10.95> not available
-(Font)              Font shape `JT1/gt/m/n' tried instead on input line 632.
+(Font)              Font shape `JT1/gt/m/n' tried instead on input line 599.
 LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <10.95> not available
-(Font)              Font shape `JY1/gt/m/n' tried instead on input line 632.
+(Font)              Font shape `JY1/gt/m/n' tried instead on input line 599.
 LaTeX Font Info:    Font shape `OT1/txss/bx/n' in size <10.95> not available
-(Font)              Font shape `OT1/txss/b/n' tried instead on input line 632.
+(Font)              Font shape `OT1/txss/b/n' tried instead on input line 599.
 LaTeX Font Info:    Font shape `OT1/txss/b/n' will be
-(Font)              scaled to size 10.40245pt on input line 632.
- [72
+(Font)              scaled to size 10.40245pt on input line 599.
+ [67
 
 ]
-[73
+[68
 
-] [74
+] [69
 
-] [75
+] [70
 
-] [76
+] [71
 
-] [77
+] [72
 
-] [78
-
-]
-\openout4 = `presen_masterthesis.vrb'.
-
- (./presen_masterthesis.vrb) [79
-
-]
-(./presen_masterthesis.vrb) [80
-
-] (./presen_masterthesis.vrb) [81
-
-]
-(./presen_masterthesis.vrb) [82
+] [73
 
 ]
 \openout4 = `presen_masterthesis.vrb'.
 
- (./presen_masterthesis.vrb) [83
+ (./presen_masterthesis.vrb) [74
 
 ]
-(./presen_masterthesis.vrb) [84
+(./presen_masterthesis.vrb) [75
+
+] (./presen_masterthesis.vrb) [76
+
+]
+(./presen_masterthesis.vrb) [77
+
+]
+\openout4 = `presen_masterthesis.vrb'.
+
+ (./presen_masterthesis.vrb) [78
+
+]
+(./presen_masterthesis.vrb) [79
 
 ]
 \openout4 = `presen_masterthesis.vrb'.
@@ -1373,7 +1338,7 @@ Overfull \hbox (14.70366pt too wide) in paragraph at lines 13--13
 ][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
-) [85
+) [80
 
 ] (./presen_masterthesis.vrb
 Overfull \hbox (14.70366pt too wide) in paragraph at lines 13--13
@@ -1381,98 +1346,133 @@ Overfull \hbox (14.70366pt too wide) in paragraph at lines 13--13
 ][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][] 
  []
 
-) [86
+) [81
 
-] (./presen_masterthesis.toc) [87
+] (./presen_masterthesis.toc) [82
+
+] [83
+
+] [84
+
+] [85
+
+] [86
+
+]
+(./presen_masterthesis.toc) [87
 
 ] [88
 
 ] [89
 
-] [90
-
-] [91
-
-]
-(./presen_masterthesis.toc) [92
-
-] [93
-
-] [94
-
 ]
 \openout4 = `presen_masterthesis.vrb'.
 
- (./presen_masterthesis.vrb) [95
+ (./presen_masterthesis.vrb) [90
 
 ]
-(./presen_masterthesis.vrb) [96
+(./presen_masterthesis.vrb) [91
 
-] (./presen_masterthesis.vrb) [97
+] (./presen_masterthesis.vrb) [92
 
 ]
 \openout4 = `presen_masterthesis.vrb'.
 
 
-(./presen_masterthesis.vrb) [98
+(./presen_masterthesis.vrb) [93
 
-] (./presen_masterthesis.vrb) [99
-
-]
-\openout4 = `presen_masterthesis.vrb'.
-
-
-(./presen_masterthesis.vrb) [100
-
-] (./presen_masterthesis.vrb) [101
+] (./presen_masterthesis.vrb) [94
 
 ]
 \openout4 = `presen_masterthesis.vrb'.
 
 
-(./presen_masterthesis.vrb) [102
+(./presen_masterthesis.vrb) [95
 
-] (./presen_masterthesis.vrb) [103
-
-]
-\openout4 = `presen_masterthesis.vrb'.
-
-
-(./presen_masterthesis.vrb) [104
-
-] (./presen_masterthesis.vrb) [105
+] (./presen_masterthesis.vrb) [96
 
 ]
 \openout4 = `presen_masterthesis.vrb'.
 
 
-(./presen_masterthesis.vrb) [106
+(./presen_masterthesis.vrb) [97
 
-] (./presen_masterthesis.vrb) [107
-
-]
-\openout4 = `presen_masterthesis.vrb'.
-
-
-(./presen_masterthesis.vrb) [108
-
-] (./presen_masterthesis.vrb) [109
+] (./presen_masterthesis.vrb) [98
 
 ]
 \openout4 = `presen_masterthesis.vrb'.
 
 
-(./presen_masterthesis.vrb) [110
+(./presen_masterthesis.vrb) [99
+
+] (./presen_masterthesis.vrb) [100
 
 ]
-LaTeX Font Info:    Try loading font information for OMS+txtt on input line 950
+\openout4 = `presen_masterthesis.vrb'.
+
+
+(./presen_masterthesis.vrb) [101
+
+] (./presen_masterthesis.vrb) [102
+
+]
+\openout4 = `presen_masterthesis.vrb'.
+
+
+(./presen_masterthesis.vrb) [103
+
+] (./presen_masterthesis.vrb) [104
+
+]
+\openout4 = `presen_masterthesis.vrb'.
+
+
+(./presen_masterthesis.vrb) [105
+
+]
+Overfull \hbox (0.19994pt too wide) detected at line 917
+[]
+ []
+
+[106
+
+]
+Overfull \hbox (0.19994pt too wide) detected at line 917
+[]
+ []
+
+[107
+
+]
+Overfull \hbox (0.19994pt too wide) detected at line 917
+[]
+ []
+
+[108
+
+]
+Overfull \hbox (0.19994pt too wide) detected at line 917
+[]
+ []
+
+[109
+
+]
+Overfull \hbox (0.19994pt too wide) detected at line 917
+[]
+ []
+
+[110
+
+]
+LaTeX Font Info:    Try loading font information for OMS+txtt on input line 933
 .
-LaTeX Font Info:    No file OMStxtt.fd. on input line 950.
+LaTeX Font Info:    No file OMStxtt.fd. on input line 933.
 
 
 LaTeX Font Warning: Font shape `OMS/txtt/m/n' undefined
 (Font)              using `OMS/txsy/m/n' instead
-(Font)              for symbol `textbraceleft' on input line 950.
+(Font)              for symbol `textbraceleft' on input line 933.
 
 [111
 
@@ -1517,12 +1517,11 @@ File: beamericonarticle.pdf Graphic file (type pdf)
 \tf@snm=\write8
 \openout8 = `presen_masterthesis.snm'.
 
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1001.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 1001.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 984.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 984.
  (./presen_masterthesis.aux)
-Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 1001.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1001.
-
+Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 984.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 984.
 Package rerunfilecheck Info: File `presen_masterthesis.out' has not changed.
 (rerunfilecheck)             Checksum: 0C27D93F0E1A940041782FCD1B165DDB;276.
 
@@ -1531,12 +1530,12 @@ LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
  ) 
 Here is how much of TeX's memory you used:
- 19668 strings out of 493249
- 359100 string characters out of 6146370
- 482925 words of memory out of 5000000
- 23023 multiletter control sequences out of 15000+600000
- 47091 words of font info for 151 fonts, out of 8000000 for 9000
+ 19652 strings out of 493249
+ 358887 string characters out of 6146370
+ 482924 words of memory out of 5000000
+ 23007 multiletter control sequences out of 15000+600000
+ 46815 words of font info for 150 fonts, out of 8000000 for 9000
  929 hyphenation exceptions out of 8191
  48i,20n,62p,823b,1303s stack positions out of 5000i,500n,10000p,500000b,80000s
 
-Output written on presen_masterthesis.dvi (114 pages, 626780 bytes).
+Output written on presen_masterthesis.dvi (114 pages, 625592 bytes).

@@ -208,7 +208,7 @@
 \end{frame}
 
 \begin{frame}{自然数の$q$-類似}
-	$x^n$ ($n \in \N$)を定義に沿って$q$-微分する. \pause
+	$f(x) = x^n$ ($n \in \N$)を定義に沿って$q$-微分する. \pause
 	\begin{screen}
 		\[
 			D_q f(x) \coloneqq \frac{d_q f(x)}{d_q x} = \frac{f(qx) - f(x)}{(q - 1) x}
@@ -246,10 +246,6 @@
 	  が成り立つ. 
 	\end{prop}
 \end{frame}
-
-%\begin{frame}{$(x - a)^n_q$の指数法則}
-%
-%\end{frame}
 
 \begin{frame}{$q$-Taylor展開}
 	\begin{df}[\cite{Kac} p7 (3.1)]
@@ -319,16 +315,6 @@
   \tableofcontents[currentsection] 
 \end{frame}
 
-%\begin{frame}{形式化}
-% 	\begin{description}
-%		\item[形式化] 人工言語に数学的な主張とその証明を翻訳し, 
-%		正しさを機械的に検証すること
-%		\item[Coq] 形式化を行うためのソフトウェア
-%	\end{description}
-%	応用例
-%	標準ライブラリ\cite{coq sl}に加えて mathcomp \cite{coq mc}を用いる
-%\end{frame}
-
 \begin{frame}{Coq の使い方 コマンド}
   Coq に与える命令はコマンドとタクティックの2種類がある. \pause
 	\begin{description}
@@ -386,7 +372,6 @@
 	\]
 	\end{screen} \pause
 	\begin{lstlisting}{Coq}
-From mathcomp Require Import ssreflect.
 Lemma substitution m n : m = 0 -> n + m = n. \end{lstlisting}
 \end{frame}
 
@@ -498,21 +483,6 @@ Qed. \end{lstlisting}
 %  代入に関する簡単な計算を形式化
 %\end{frame}
 
-\begin{frame}{mathcomp の構造}
-	標準ライブラリ\cite{coq sl}に加えて mathcomp \cite{coq mc}を用いる. \pause
-	
-	mathcomp の型には階層構造があり, より一般の型の性質を引き継ぐ. \pause
-	
-	今回は実数として{\tt rcfType}(Real Closed Field：実閉体)を使う. \pause
-	\begin{align*}
-		{\tt eqType} &\to {\tt choiceType} \\
-		                  &\to {\tt zmodType} \to {\tt ringType} \to 
-		                          {\tt comRingType} \to {\tt comUnitRingType}\\
-							  &\to {\tt idomainType} \to {\tt fieldType}\\
-		                  &\to {\tt numFieldType} \to {\tt realFieldType} \to {\tt rcfType}
-	\end{align*} \pause
-	{\tt ringType}, {\tt fieldType}の性質が重要
-\end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{$q$-類似の形式化}
 
@@ -547,11 +517,6 @@ Theorem Gauss_binomial a n : (forall n, qfact n != 0) ->
 		\]
 	\end{screen} \pause
 	\begin{lstlisting}{Coq}
-From mathcomp Require Import all_ssreflect all_algebra.
-Import GRing.
-
-Section q_analogue.
-Local Open Scope ring_scope.
 Variables (R : rcfType) (q : R).
 Hypothesis Hq : q - 1 != 0.
 
@@ -564,7 +529,9 @@ Definition Dq f := dq f // dq id. \end{lstlisting}
 \begin{frame}[fragile]{$[n]$の形式化}
 	\begin{screen}
 		\[
-			[n] \coloneqq \frac{q^n - 1}{q - 1} \quad D_q x^n = [n] x^{n - 1}
+			[n] \coloneqq \frac{q^n - 1}{q - 1} \quad
+			D_q x^n = \frac{(qx)^n - x^n}{(q - 1) x} = \frac{q^n - 1}{q - 1} \cdot \frac{x^n}{x}
+							= [n] x^{n - 1}
 		\]
 	\end{screen} \pause
 	\begin{lstlisting}{Coq}
@@ -931,6 +898,22 @@ Proof.
   apply pq.
   done.
 Qed. \end{lstlisting}
+\end{frame}
+
+\begin{frame}{Appendix mathcomp の構造}
+	標準ライブラリ\cite{coq sl}に加えて mathcomp \cite{coq mc}を用いる. \pause
+	
+	mathcomp の型には階層構造があり, より一般の型の性質を引き継ぐ. \pause
+	
+	今回は実数として{\tt rcfType}(Real Closed Field：実閉体)を使う. \pause
+	\begin{align*}
+		{\tt eqType} &\to {\tt choiceType} \\
+		                  &\to {\tt zmodType} \to {\tt ringType} \to 
+		                          {\tt comRingType} \to {\tt comUnitRingType}\\
+							  &\to {\tt idomainType} \to {\tt fieldType}\\
+		                  &\to {\tt numFieldType} \to {\tt realFieldType} \to {\tt rcfType}
+	\end{align*} \pause
+	{\tt ringType}, {\tt fieldType}の性質が重要
 \end{frame}
 
 \begin{frame}{Coq の多項式}
