@@ -147,7 +147,7 @@
 	{\it Quantum Calculus}\cite{Kac}によるものだが, その形式化を行ったという点において
 	独自性がある. 形式化したコード全体は
 	\url{https://github.com/nakamurakaoru/q-analogue/tree/thesis}\cite{coq qana}
-	にある.
+	にある(q\_analogu.v 1556行, q\_tool.v 331行).
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{$q$-類似}
@@ -184,10 +184,10 @@
 			f(x) = \sum_{j=0}^N (D_q^jf)(c)\frac{(x-c)^j_q}{[j]!}
 		\]
 		が成り立つ. 
-	\end{itembox}
+	\end{itembox} \pause
 	\begin{enumerate}
-		\item $D_q$の定義
-		\item $[n]$の定義
+		\item $D_q$の定義 \pause
+		\item $[n]$の定義 \pause
 		\item $(x -c)^n_q$の定義
 	\end{enumerate}
 \end{frame}
@@ -223,12 +223,12 @@
 					= \frac{q^n - 1}{q - 1} x^{n - 1}
 	\] \pause
   
-  通常の微分では, $(x^n)' = n x^{n - 1}$となることと比較して, \pause
-  $n$の$q$-類似$[n]$を
+  通常の微分では, $(x^n)' = n x^{n - 1}$となることと比較して, 
+  $n$の$q$-類似$[n]$を次のように定める(\cite{Kac} p2 (1.9)). \pause
   \[
-    [n] = \frac{q^n - 1}{q - 1} (= 1 + q + q^2 + \cdots q^{n - 1})
+    [n] = \frac{q^n - 1}{q - 1} \pause
+    (= 1 + q + q^2 + \cdots q^{n - 1})
   \]
-  と定める(\cite{Kac} p2 (1.9)).
 \end{frame}
 
 \begin{frame}{$(x - a)^n$の$q$-類似} 
@@ -275,19 +275,19 @@
 \end{frame}
 
 \begin{frame}{Gauss's binomial formula}
-	\begin{df}[\cite{Kac} p12 (4.5)]
-		$n \ge j$をみたす$n$, $j \in \N$について, 二項係数の$q$-類似を以下のように定める. 
-		\[
-			\qcoe{n}{j} \coloneqq \frac{[n]!}{[j]![n - j]!}
-		\]
-	\end{df} \pause
-   \begin{lem}[\cite{Kac} p15 Example (5.5)]
+	\begin{lem}[\cite{Kac} p15 Example (5.5)]
 	  $n \in \Z_{>0}$について, 
 	  \[
 	    (x + a)^n_q = \sum_{j = 0}^n \qcoe{n}{j} q^{j (j - 1)/2} a^j x^{n - j}
 	  \]
 	  が成り立つ. この式は Gauss's binomial formula と呼ばれる. 
-	\end{lem}
+	\end{lem} \pause
+	\begin{df}[\cite{Kac} p12 (4.5)]
+		$n \ge j$をみたす$n$, $j \in \N$について, 二項係数の$q$-類似を以下のように定める. 
+		\[
+			\qcoe{n}{j} \coloneqq \frac{[n]!}{[j]![n - j]!}
+		\]
+	\end{df}
 %\bpf
 %  $f = (x + a)^n_q$とすると, 任意の正整数$j \le n$に対して, 
 %  \[
@@ -382,94 +382,171 @@
 	よく使われるタクティックは{\tt move}, {\tt apply}, {\tt rewrite}の3つ.
 \end{frame}
 
-\begin{frame}[fragile]{Coq の使い方 モーダスポーネンス}
-	「命題$P$, $Q$について, $P \Lra Q$かつ$P$であれば, $Q$が成り立つ」 \pause
+\begin{frame}[fragile]{Coq の使い方 代入計算}
+	\begin{screen}
+	自然数$m$, $n$について
+	\[
+		m = 0 \Longrightarrow n + m = n
+	\]
+	\end{screen} \pause
 	\begin{lstlisting}{Coq}
 From mathcomp Require Import ssreflect.
-
-Lemma modus_ponens (P Q : Prop) : (P -> Q) /\ P -> Q. \end{lstlisting} \pause
-	{\tt Prop}は Coq での命題全体を表す型, $\wedge$は「かつ」を表す
+Lemma substitution m n : m = 0 -> n + m = n. \end{lstlisting}
 \end{frame}
 
-\begin{frame}[fragile]{Coq の使い方 モーダスポーネンス}
+\begin{frame}[fragile]{Coq の使い方 代入計算}
 	\begin{screen}
-	  \begin{lstlisting}{Coq}
-1 subgoal
-P, Q : Prop
--------------------------------
-(P -> Q) /\ P -> Q \end{lstlisting}
+		\begin{lstlisting}{Coq}
+    1 subgoal
+    m, n : nat
+    -------------------------------
+    m = 0 -> n + m = n \end{lstlisting}
 	\end{screen} \pause
-	タクティック：{\tt move=> []}
+	タクティック：{\tt move=> Hm}
 \end{frame}
 
-\begin{frame}[fragile]{Coq の使い方 モーダスポーネンス}
+\begin{frame}[fragile]{Coq の使い方 代入計算}
 	\begin{screen}
-	  \begin{lstlisting}{Coq}
-1 subgoal
-P, Q : Prop
--------------------------------
-(P -> Q) -> P -> Q \end{lstlisting}
+	\begin{lstlisting}{Coq}
+    1 subgoal
+    m, n : nat
+    Hm : m = 0
+    -------------------------------
+    n + m = 0 \end{lstlisting}
+    \end{screen} \pause
+    タクティック：{\tt rewrite Hm}
+\end{frame}
+
+\begin{frame}[fragile]{Coq の使い方 代入計算}
+	\begin{screen}
+		\begin{lstlisting}{Coq}
+    1 subgoal
+    m, n : nat
+    Hm : m = 0
+    -------------------------------
+    n + 0 = n \end{lstlisting}
 	\end{screen} \pause
-	タクティック：{\tt move=> pq}
+	タクティック：{\tt rewrite addn0}
 \end{frame}
 
-\begin{frame}[fragile]{Coq の使い方 モーダスポーネンス}
+\begin{frame}[fragile]{Coq の使い方 代入計算}
 	\begin{screen}
-	  \begin{lstlisting}{Coq}
-1 subgoal
-P, Q : Prop
-pq : P -> Q
--------------------------------
-P -> Q \end{lstlisting}
-	\end{screen} \pause
-	タクティック：{\tt move=> p}
-\end{frame}
-
-\begin{frame}[fragile]{Coq の使い方 モーダスポーネンス}
-	\begin{screen}
-	  \begin{lstlisting}{Coq}
-1 subgoal
-P, Q : Prop
-pq : P -> Q
-p : P
--------------------------------
-Q \end{lstlisting}
-	\end{screen} \pause
-	タクティック：{\tt apply pq}
-\end{frame}
-
-\begin{frame}[fragile]{Coq の使い方 モーダスポーネンス}
-	\begin{screen}
-	  \begin{lstlisting}{Coq}
-1 subgoal
-P, Q : Prop
-pq : P -> Q
-p : P
--------------------------------
-P \end{lstlisting}
+		\begin{lstlisting}{Coq}
+    1 subgoal
+    m, n : nat
+    Hm : m = 0
+    -------------------------------
+    n = n \end{lstlisting}
 	\end{screen} \pause
 	タクティック：{\tt done}
 \end{frame}
 
-\begin{frame}[fragile]{Coq の使い方 モーダスポーネンス}
+\begin{frame}[fragile]{Coq の使い方 代入計算}
 	\begin{screen}
-	  \begin{lstlisting}{Coq}
-  No more subgoals. \end{lstlisting}
+		\begin{lstlisting}{Coq}
+    No more subgoals.  \end{lstlisting}
 	\end{screen} \pause
 	コマンド：{\tt Qed}
 \end{frame}
 
-\begin{frame}[fragile]{Coq の使い方　モーダスポーネンス}
+\begin{frame}[fragile]{Coq の使い方 代入計算}
 	\begin{lstlisting}{Coq}
-Lemma modus_ponens (P Q : Prop) : (P -> Q) /\ P -> Q.
+Lemma substitution m n : m = 0 -> n + m = n.
 Proof.
-  move=> [].
-  move=> pq.
-  move=> p.
-  apply pq.
-  done.
+  move=> Hm.
+  rewrite Hm.
+  rewrite addn0.
+  by [].
 Qed. \end{lstlisting}
 \end{frame}
+%\begin{frame}[fragile]{Coq の使い方 モーダスポーネンス}
+%	「命題$P$, $Q$について, $P \Lra Q$かつ$P$であれば, $Q$が成り立つ」 \pause
+%	\begin{lstlisting}{Coq}
+%From mathcomp Require Import ssreflect.
+%
+%Lemma modus_ponens (P Q : Prop) : (P -> Q) /\ P -> Q. \end{lstlisting} \pause
+%	{\tt Prop}は Coq での命題全体を表す型, $\wedge$は「かつ」を表す
+%\end{frame}
+%
+%\begin{frame}[fragile]{Coq の使い方 モーダスポーネンス}
+%	\begin{screen}
+%	  \begin{lstlisting}{Coq}
+%1 subgoal
+%P, Q : Prop
+%-------------------------------
+%(P -> Q) /\ P -> Q \end{lstlisting}
+%	\end{screen} \pause
+%	タクティック：{\tt move=> []}
+%\end{frame}
+%
+%\begin{frame}[fragile]{Coq の使い方 モーダスポーネンス}
+%	\begin{screen}
+%	  \begin{lstlisting}{Coq}
+%1 subgoal
+%P, Q : Prop
+%-------------------------------
+%(P -> Q) -> P -> Q \end{lstlisting}
+%	\end{screen} \pause
+%	タクティック：{\tt move=> pq}
+%\end{frame}
+%
+%\begin{frame}[fragile]{Coq の使い方 モーダスポーネンス}
+%	\begin{screen}
+%	  \begin{lstlisting}{Coq}
+%1 subgoal
+%P, Q : Prop
+%pq : P -> Q
+%-------------------------------
+%P -> Q \end{lstlisting}
+%	\end{screen} \pause
+%	タクティック：{\tt move=> p}
+%\end{frame}
+%
+%\begin{frame}[fragile]{Coq の使い方 モーダスポーネンス}
+%	\begin{screen}
+%	  \begin{lstlisting}{Coq}
+%1 subgoal
+%P, Q : Prop
+%pq : P -> Q
+%p : P
+%-------------------------------
+%Q \end{lstlisting}
+%	\end{screen} \pause
+%	タクティック：{\tt apply pq}
+%\end{frame}
+%
+%\begin{frame}[fragile]{Coq の使い方 モーダスポーネンス}
+%	\begin{screen}
+%	  \begin{lstlisting}{Coq}
+%1 subgoal
+%P, Q : Prop
+%pq : P -> Q
+%p : P
+%-------------------------------
+%P \end{lstlisting}
+%	\end{screen} \pause
+%	タクティック：{\tt done}
+%\end{frame}
+%
+%\begin{frame}[fragile]{Coq の使い方 モーダスポーネンス}
+%	\begin{screen}
+%	  \begin{lstlisting}{Coq}
+%  No more subgoals. \end{lstlisting}
+%	\end{screen} \pause
+%	コマンド：{\tt Qed}
+%\end{frame}
+%
+%\begin{frame}[fragile]{Coq の使い方　モーダスポーネンス}
+%	\begin{lstlisting}{Coq}
+%Lemma modus_ponens (P Q : Prop) : (P -> Q) /\ P -> Q.
+%Proof.
+%  move=> [].
+%  move=> pq.
+%  move=> p.
+%  apply pq.
+%  done.
+%Qed. \end{lstlisting}
+%\end{frame}
 
 %\begin{frame}{Coq の使い方 タクティック}
 %である. 
@@ -533,6 +610,26 @@ Qed. \end{lstlisting}
 
 \begin{frame}
   \tableofcontents[currentsection] 
+\end{frame}
+
+\begin{frame}[fragile]{本節の目標}
+	\begin{lstlisting}{Coq}
+Theorem q_Taylorp n (f : {poly R}) c :
+  (forall n, qfact n != 0) ->
+  size f = n.+1 ->
+  f = \sum_(0 <= i < n.+1)
+    ((Dqp' \^ i) f).[c] *: (qbinom_pos_poly c i / (qfact i)%:P).
+    
+Theorem Gauss_binomial a n : (forall n, qfact n != 0) ->
+  qbinom_pos_poly (-a) n =
+    \sum_(0 <= i < n.+1)
+      (qbicoef n i * q ^+ (i * (i - 1))./2 * a ^+ i) *: 'X^(n - i). \end{lstlisting} \pause
+	\begin{itemize}
+		\item $q$-微分の形式化 \pause
+		\item $[n]$の形式化 \pause
+		\item $(x - a)^n_q$の形式化 \pause
+		\item 関数から多項式へ
+	\end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]{$q$-微分の形式化}
@@ -646,84 +743,103 @@ Theorem Dq_qbinom_pos a n x : x != 0 ->
 %	定義できる
 %\end{frame}
 
-\begin{frame}{Coq での多項式}
+%\begin{frame}{Coq での多項式}
+%
+%	{\tt T}$\colon${\tt ringType}のとき, {\tt \{poly T\}} $\cdots$ {\tt T}係数多項式全体 
+%	\pause
+%	
+%	{\tt \{poly R\}}も{\tt ringType}の構造を持っている \pause
+%	\begin{description}
+%	  \item[\tt \textbackslash poly\_(i < n) E(i)] 次数が$n - 1$次以下, $i$次の係数が$E(i)$
+%	    である多項式
+%	  \item[\tt c\%:P] 定数$c$のみからなる単項式
+%	  \item[\tt 'X] 変数$x$のみからなる単項式
+%	  \item[\tt p`\_i] 多項式$p$の$i$次の係数 
+%	  \item[\tt size p] 多項式$p$の次数$+1$
+%	  \item[{\tt p.[x]}] 多項式$p$の$x$での値 
+%	\end{description}
+%\end{frame}
 
-	{\tt T}$\colon${\tt ringType}のとき, {\tt \{poly T\}} $\cdots$ {\tt T}係数多項式全体 
-	\pause
-	
-	{\tt \{poly R\}}も{\tt ringType}の構造を持っている \pause
-	\begin{description}
-	  \item[\tt \textbackslash poly\_(i < n) E(i)] 次数が$n - 1$次以下, $i$次の係数が$E(i)$
-	    である多項式
-	  \item[\tt c\%:P] 定数$c$のみからなる単項式
-	  \item[\tt 'X] 変数$x$のみからなる単項式
-	  \item[\tt p`\_i] 多項式$p$の$i$次の係数 
-	  \item[\tt size p] 多項式$p$の次数$+1$
-	  \item[{\tt p.[x]}] 多項式$p$の$x$での値 
-	\end{description}
-\end{frame}
-
-\begin{frame}[fragile]{多項式に対する$q$-微分の再定義}
-	多項式に対する$q$-差分 \pause
+\begin{frame}[fragile]{多項式での再定義}
+	$q$-差分
 	\begin{lstlisting}{Coq}
 Definition scale_var (p : {poly R}):=
-  \poly_(i < size p) (q ^ i * p`_i).
-Definition dqp p := scale_var p - p. 
-\end{lstlisting} \pause
-	多項式に対する$q$-微分 \pause
+ \poly_(i < size p) (q ^ i * p`_i).
+Definition dqp p := scale_var p - p. \end{lstlisting} \pause
+	$q$-微分
 	\begin{lstlisting}{Coq}
 Definition Dqp p := dqp p %/ dqp 'X.
-\end{lstlisting}
-	{\tt p \%/ p'}は多項式{\tt p}を多項式{\tt p'}で割った商 \pause
-	
-	$\to$余りが$0$でない可能性があるため, $q$-微分の正しい形式化である保証がない \pause
-	\begin{lstlisting}{Coq}
-Lemma Dqp_ok p : dqp 'X %| dqp p.
-\end{lstlisting}
-	{\tt p' \%| p} $\cdots$ {\tt p}が{\tt p'}で割り切れる
-\end{frame}
-
-\begin{frame}[fragile]{多項式に対する$q$-微分の再定義}
-	扱いやすさのため, {\tt `X}で約分した形を使う
-	\begin{lstlisting}{Coq}
 Definition Dqp' (p : {poly R}) :=
-  \poly_(i < size p) (qnat (i.+1) * p`_i.+1).
-\end{lstlisting} \pause
-	{\tt Dqp}と{\tt Dqp'}は等しく, また{\tt Dqp'}と多項式に対する{\tt Dq}は等しい
-	\begin{lstlisting}{Coq}
-Lemma Dqp_Dqp'E p : Dqp p = Dqp' p.
- 
-Definition ap_op_poly (D : (R -> R) -> (R -> R)) (p : {poly R}) :=
-  D (fun (x : R) => p.[x]).
-Notation "D # p" := (ap_op_poly D p) (at level 49).
-Lemma Dqp'_DqE p x : x != 0 -> (Dqp' p).[x] = (Dq # p) x.\end{lstlisting}
-\end{frame}
-
-\begin{frame}[fragile]{多項式としての$(x - a)^n_q$の再定義}
+  \poly_(i < size p) (qnat (i.+1) * p`_i.+1). \end{lstlisting} \pause
+	$(x - a)^n_q$
 	\begin{lstlisting}{Coq}
 Fixpoint qbinom_pos_poly a n :=
   match n with
   | 0 => 1
   | n0.+1 => (qbinom_pos_poly a n0) * ('X - (q ^ n0 * a)%:P)
-  end. \end{lstlisting} \pause
-	多項式の{\tt x}での値は元の定義の{\tt qbinom\_pos}と等しい
-	\begin{lstlisting}{Coq}
-Lemma qbinom_posE a n x :
-  qbinom_pos a n x = (qbinom_pos_poly a n).[x].
-\end{lstlisting} \pause
-	{\tt Dqp}と{\tt qbinom\_pos\_poly}に対しても
-	\begin{screen}
-		\[
-			D_q (x - a)^n_q = [n] (x - a)^n_q
-		\]
-	\end{screen}
-	が成り立つ \pause
-	\begin{lstlisting}{Coq}
-Lemma Dqp'_qbinom_poly a n :
-  Dqp' (qbinom_pos_poly a n.+1) =
-    (qnat n.+1) *: (qbinom_pos_poly a n).
-\end{lstlisting}
+  end. \end{lstlisting}
 \end{frame}
+
+%\begin{frame}[fragile]{多項式に対する$q$-微分の再定義}
+%	多項式に対する$q$-差分 \pause
+%	\begin{lstlisting}{Coq}
+%Definition scale_var (p : {poly R}):=
+%  \poly_(i < size p) (q ^ i * p`_i).
+%Definition dqp p := scale_var p - p. 
+%\end{lstlisting} \pause
+%	多項式に対する$q$-微分 \pause
+%	\begin{lstlisting}{Coq}
+%Definition Dqp p := dqp p %/ dqp 'X.
+%\end{lstlisting}
+%	{\tt p \%/ p'}は多項式{\tt p}を多項式{\tt p'}で割った商 \pause
+%	
+%	$\to$余りが$0$でない可能性があるため, $q$-微分の正しい形式化である保証がない \pause
+%	\begin{lstlisting}{Coq}
+%Lemma Dqp_ok p : dqp 'X %| dqp p.
+%\end{lstlisting}
+%	{\tt p' \%| p} $\cdots$ {\tt p}が{\tt p'}で割り切れる
+%\end{frame}
+
+%\begin{frame}[fragile]{多項式に対する$q$-微分の再定義}
+%	扱いやすさのため, {\tt `X}で約分した形を使う
+%	\begin{lstlisting}{Coq}
+%Definition Dqp' (p : {poly R}) :=
+%  \poly_(i < size p) (qnat (i.+1) * p`_i.+1).
+%\end{lstlisting} \pause
+%	{\tt Dqp}と{\tt Dqp'}は等しく, また{\tt Dqp'}と多項式に対する{\tt Dq}は等しい
+%	\begin{lstlisting}{Coq}
+%Lemma Dqp_Dqp'E p : Dqp p = Dqp' p.
+% 
+%Definition ap_op_poly (D : (R -> R) -> (R -> R)) (p : {poly R}) :=
+%  D (fun (x : R) => p.[x]).
+%Notation "D # p" := (ap_op_poly D p) (at level 49).
+%Lemma Dqp'_DqE p x : x != 0 -> (Dqp' p).[x] = (Dq # p) x.\end{lstlisting}
+%\end{frame}
+
+%\begin{frame}[fragile]{多項式としての$(x - a)^n_q$の再定義}
+%	\begin{lstlisting}{Coq}
+%Fixpoint qbinom_pos_poly a n :=
+%  match n with
+%  | 0 => 1
+%  | n0.+1 => (qbinom_pos_poly a n0) * ('X - (q ^ n0 * a)%:P)
+%  end. \end{lstlisting} \pause
+%	多項式の{\tt x}での値は元の定義の{\tt qbinom\_pos}と等しい
+%	\begin{lstlisting}{Coq}
+%Lemma qbinom_posE a n x :
+%  qbinom_pos a n x = (qbinom_pos_poly a n).[x].
+%\end{lstlisting} \pause
+%	{\tt Dqp}と{\tt qbinom\_pos\_poly}に対しても
+%	\begin{screen}
+%		\[
+%			D_q (x - a)^n_q = [n] (x - a)^n_q
+%		\]
+%	\end{screen}
+%	が成り立つ \pause
+%	\begin{lstlisting}{Coq}
+%Lemma Dqp'_qbinom_poly a n :
+%  Dqp' (qbinom_pos_poly a n.+1) =
+%    (qnat n.+1) *: (qbinom_pos_poly a n).\end{lstlisting}
+%\end{frame}
 
 \begin{frame}[fragile]{$q$-Taylor展開の形式化}
 	\begin{screen}
