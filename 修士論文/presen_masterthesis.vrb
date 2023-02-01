@@ -1,13 +1,14 @@
-\frametitle{Gauss's binomial formula の形式化}
-\begin{screen}
-^^I^^I\[
-^^I^^I^^I(x + a)^n_q = \sum_{j = 0}^n \qcoe{n}{j} q^{j (j - 1)/2} a^j x^{n - j}
-^^I^^I\]
-^^I\end{screen} \pause
-^^I\begin{lstlisting}{Coq}
-Definition qbicoef n j := qfact n / (qfact j * qfact (n - j)).
+\frametitle{Appendix {\tt Dq}と{\tt Dqp}}
+\begin{lstlisting}{Coq}
+Definition ap_op_poly (D : (R -> R) -> (R -> R)) (p : {poly R}) :=
+  D (fun (x : R) => p.[x]).
+Notation "D # p" := (ap_op_poly D p) (at level 49).
 
-Theorem Gauss_binomial a n : (forall n, qfact n != 0) ->
-  qbinom_pos_poly (-a) n =
-    \sum_(0 <= i < n.+1)
-      (qbicoef n i * q ^+ (i * (i - 1))./2 * a ^+ i) *: 'X^(n - i). \end{lstlisting}
+Lemma dqp_dqE p x : (dqp p).[x] = (dq # p) x.
+
+Lemma Dqp_Dqp'E p : Dqp p = Dqp' p.
+Lemma Dqp'_DqE p x : x != 0 -> (Dqp' p).[x] = (Dq # p) x.
+
+Lemma Dqp'_qbinom_poly a n :
+  Dqp' (qbinom_pos_poly a n.+1) =
+    (qnat n.+1) *: (qbinom_pos_poly a n).\end{lstlisting}
