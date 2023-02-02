@@ -811,12 +811,31 @@ Theorem Gauss_binomial a n : (forall n, qfact n != 0) ->
 	\end{df}
 \end{frame}
 
+\begin{frame}{Appendix $q$-指数関数, $q$-三角関数}
+	$q$-指数関数\cite{Kac} 9
+	\begin{align*}
+		e^x_q \coloneqq \sum_{j = 0}^{\infty} \frac{x^j}{[j]!} \quad
+		E^x_q \coloneqq \sum_{j = 0}^{\infty} q^{j(j - 1) / 2} \frac{x^j}{[j]!} \\
+		D_q e^x_q = e^x_q \quad D_q E^x_q = E^{qx}_x \\
+		e^x_q e^y_q = e^{x + y}_q \quad (\text{if}\ yx = qxy) \\
+		e^x_q E^{-x}_q = 1 \quad e^x_{1/q} = E^x_q
+	\end{align*}
+	$q$-三角関数\cite{Kac} 10
+	\begin{align*}
+		\sin_q x \coloneqq \frac{e^{ix}_q - e^{-ix}_q}{2i} \quad
+		\cos_q x \coloneqq \frac{e^{ix}_q + e^{-ix}_q}{2} \\
+		\textrm{Sin}_q x \coloneqq \frac{E^{ix}_q - E^{-ix}_q}{2i} \quad
+		\textrm{Cos}_q x \coloneqq \frac{E^{ix}_q + E^{-ix}_q}{2} \\
+		\cos_q x \textrm{Cos}_q x + \sin_q x \textrm{Sin}_q x = 1
+	\end{align*}
+\end{frame}
+
 \begin{frame}[fragile]{Appendix モーダスポーネンス}
-	「命題$P$, $Q$について, $P \Lra Q$かつ$P$であれば, $Q$が成り立つ」 \pause
+	「命題$P$, $Q$について, $P$かつ$P \Lra Q$であれば, $Q$が成り立つ」 \pause
 	\begin{lstlisting}{Coq}
 From mathcomp Require Import ssreflect.
 
-Lemma modus_ponens (P Q : Prop) : (P -> Q) /\ P -> Q. \end{lstlisting} \pause
+Lemma modus_ponens (P Q : Prop) : P /\ (P ->Q) -> Q. \end{lstlisting} \pause
 	{\tt Prop}は Coq での命題全体を表す型, $\wedge$は「かつ」を表す
 \end{frame}
 
@@ -826,7 +845,7 @@ Lemma modus_ponens (P Q : Prop) : (P -> Q) /\ P -> Q. \end{lstlisting} \pause
 1 subgoal
 P, Q : Prop
 -------------------------------
-(P -> Q) /\ P -> Q \end{lstlisting}
+P /\ (P -> Q) -> Q \end{lstlisting}
 	\end{screen} \pause
 	タクティック：{\tt move=> []}
 \end{frame}
@@ -837,19 +856,7 @@ P, Q : Prop
 1 subgoal
 P, Q : Prop
 -------------------------------
-(P -> Q) -> P -> Q \end{lstlisting}
-	\end{screen} \pause
-	タクティック：{\tt move=> pq}
-\end{frame}
-
-\begin{frame}[fragile]{Appendix モーダスポーネンス}
-	\begin{screen}
-	  \begin{lstlisting}{Coq}
-1 subgoal
-P, Q : Prop
-pq : P -> Q
--------------------------------
-P -> Q \end{lstlisting}
+P -> (P -> Q) -> Q \end{lstlisting}
 	\end{screen} \pause
 	タクティック：{\tt move=> p}
 \end{frame}
@@ -859,8 +866,20 @@ P -> Q \end{lstlisting}
 	  \begin{lstlisting}{Coq}
 1 subgoal
 P, Q : Prop
-pq : P -> Q
 p : P
+-------------------------------
+(P -> Q) -> Q \end{lstlisting}
+	\end{screen} \pause
+	タクティック：{\tt move=> pq}
+\end{frame}
+
+\begin{frame}[fragile]{Appendix モーダスポーネンス}
+	\begin{screen}
+	  \begin{lstlisting}{Coq}
+1 subgoal
+P, Q : Prop
+p : P
+pq : P -> Q
 -------------------------------
 Q \end{lstlisting}
 	\end{screen} \pause
@@ -872,8 +891,8 @@ Q \end{lstlisting}
 	  \begin{lstlisting}{Coq}
 1 subgoal
 P, Q : Prop
-pq : P -> Q
 p : P
+pq : P -> Q
 -------------------------------
 P \end{lstlisting}
 	\end{screen} \pause
@@ -890,11 +909,11 @@ P \end{lstlisting}
 
 \begin{frame}[fragile]{Appendix モーダスポーネンス}
 	\begin{lstlisting}{Coq}
-Lemma modus_ponens (P Q : Prop) : (P -> Q) /\ P -> Q.
+Lemma modus_ponens (P Q : Prop) : P /\ (P -> Q) -> Q.
 Proof.
   move=> [].
-  move=> pq.
   move=> p.
+  move=> pq.
   apply pq.
   done.
 Qed. \end{lstlisting}
