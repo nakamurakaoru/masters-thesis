@@ -1,0 +1,42 @@
+%% semantic markup commands
+\newcommand\newterm[1]{\emph{#1}}
+
+%% copiable underscore
+\newcommand{\us}{\char`\_}
+
+%% basic math notations
+\newcommand\imp{\Rightarrow}
+\newcommand\tuple[1]{\langle{#1}\rangle}
+\newcommand\enum[1]{\{ #1 \}}
+\newcommand\comprh[2]{\left\{{#1}\ \middle|\ {#2}\right\}}
+%\newcommand\comprh[2]{\left\{{#1}\ :\ {#2}\right\}}
+\newcommand\defarrow{\overset{def}\Longleftrightarrow}
+\newcommand\defeq{:=}
+
+%% matrix notations
+\newcommand\mx[2]{\left[ \begin{array}{#1} #2 \end{array} \right]}
+\newcommand\mxc{\mx{cccccccccc}}
+\newcommand\mxr{\mx{r}}
+
+%% calculus notations
+\newcommand\seq[2][n]{\left({#2}\right)_{{#1}\ge0}}
+\newcommand\seqa[2][n]{\left({#2}_{#1}\right)_{{#1}\ge0}}
+\newcommand\limseq[1][n]{\lim_{{#1}\to\infty}}
+\newcommand\ser[2][k]{\sum_{{#1}=0}^\infty{#2}}
+
+%% sets of numbers
+\newcommand\N{\mathbb N}
+\newcommand\Z{\mathbb Z}
+\newcommand\Q{\mathbb Q}
+\newcommand\R{\mathbb R}
+\newcommand\Rpos{\mathbb R_{>0}}
+\newcommand\Rneg{\mathbb R_{<0}}
+\newcommand\Rnneg{\mathbb R_{\geq0}}
+\newcommand\Rnpos{\mathbb R_{\leq0}}
+\newcommand\Rext{\mathbb R \cup \enum{\pm\infty}}
+
+%% set theory
+\DeclareMathOperator{\dom}{dom}
+\DeclareMathOperator{\ran}{ran}
+\DeclareMathOperator{\id}{id}
+\newcommand\power{\mathscr{P}}
