@@ -1,8 +1,7 @@
 \begin{screen}
     \begin{center}
-      {\Huge OCaml から Coq へのコンパイラ及び翻訳されたプログラムの証明} \\
-      {\Large 中村薫, Jacques Garrigue, 毎田詠人, 才川隆文}
-      \qquad {\large 名古屋大学}
+      {\Huge $q$-類似の Coq による形式化} \\
+      {\Large 中村薫} \qquad {\large 名古屋大学}
     \end{center}
   \end{screen}
 

@@ -1,0 +1,272 @@
+\documentclass[11pt]{jsreport}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[a4paper,margin=25mm]{geometry}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{ascmac}
+\newtheoremstyle{mystyle}% % Name
+    {}%                      % Space above
+    {}%                      % Space below
+    {\normalfont}%           % Body font
+    {}%                      % Indent amount
+    {\bfseries}%             % Theorem head font
+    {}%                      % Punctuation after theorem head
+    { }%                     % Space after theorem head, ' ', or \newline
+    {}%                      % Theorem head spec (can be left empty, meaning `normal')
+\theoremstyle{mystyle}
+\usepackage{amssymb}
+\usepackage{ascmac}
+\usepackage{txfonts}
+\usepackage[all]{xy}
+%\usepackage{graphics}
+\input{poster_packages.tex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newtheorem{df}{$\textrm{Definition}$}[section]
+\newtheorem{ex}[df]{$\textrm{Example}$}
+\newtheorem{prop}[df]{$\textrm{Proposition}$}
+\newtheorem{lem}[df]{$\textrm{Lemma}$}
+\newtheorem{cor}[df]{$\textrm{Corollary}$}
+\newtheorem{rmk}[df]{$\textrm{Remark}$}
+\newtheorem{thm}[df]{$\textrm{Theorem}$}
+\newtheorem{axi}[df]{$\textrm{Axiom}$}
+%% theorems %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\bdf}{\begin{shadebox} \begin{df}}
+\newcommand{\edf}{\end{df} \end{shadebox}}
+\newcommand{\bex}{\begin{ex}}
+\newcommand{\eex}{\end{ex}}
+\newcommand{\bprop}{\begin{shadebox} \begin{prop}}
+\newcommand{\eprop}{\end{prop} \end{shadebox}}
+\newcommand{\blem}{\begin{shadebox} \begin{lem}}
+\newcommand{\elem}{\end{lem} \end{shadebox}}
+\newcommand{\bcor}{\begin{shadebox} \begin{cor}}
+\newcommand{\ecor}{\end{cor} \end{shadebox}}
+\newcommand{\brmk}{\begin{rmk}}
+\newcommand{\ermk}{\end{rmk}}
+\newcommand{\bthm}{\begin{shadebox} \begin{thm}}
+\newcommand{\ethm}{\end{thm} \end{shadebox}}
+\newcommand{\baxi}{\begin{shadebox} \begin{axi}}
+\newcommand{\eaxi}{\end{axi} \end{shadebox}}
+\newcommand{\bpf}{\begin{proof}}
+\newcommand{\epf}{\end{proof}}
+%% always %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\Lra}{\Longrightarrow}
+\newcommand{\Llra}{\Longleftrightarrow}
+\newcommand{\lra}{\leftrightarrow}
+\newcommand{\ra}{\rightarrow}
+\newcommand{\ol}[1]{{\overline{#1}}}
+\newcommand{\ul}[1]{{\underline{#1}}}
+%% sets %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\K}{\mathbb{K}}
+\newcommand{\D}{\mathbb{D}}
+%% q-analogue %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\qcoe}[2]{\left[\begin{array}{ccc}#1\\#2\end{array}\right]}
+%% algebra %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\plim}{{\displaystyle \lim_{\substack{\longleftarrow\\ n}}}}
+\newcommand{\seq}[2]{(#1_{#2})_{#2\ge1}}
+\newcommand{\Zmod}[1]{\Z/p^{#1}\Z}
+\newcommand{\sem}[1]{[\hspace{-2pt}[{#1}]\hspace{-2pt}]}
+\newcommand{\pros}[1]{\begin{array}{c} \ast \ast\\ \tt{#1} \end{array}}
+%% Jones %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\pgm}[1]{{\tt{#1}}\text{-プログラム}}
+\newcommand{\pgms}[1]{{\tt{#1}}\text{-プログラム集合}}
+\newcommand{\dtm}[1]{{\tt{#1}}\text{-データ}}
+\newcommand{\data}[1]{{\tt{#1}}\text{-データ集合}}
+\newcommand{\rtf}[3]{time^{\tt{#1}}_{\tt{#2}}({\tt{#3}})}
+%% Barendiregt %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\T}{\mathbb{T}}
+\newcommand{\V}{\mathbb{V}}
+\newcommand{\cT}{\mathcal{T}}
+\newcommand{\uhr}{\upharpoonright}
+\newcommand{\thra}{\twoheadrightarrow}
+\newcommand{\lama}{\lambda \! \! \to}
+%% HoTT %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\U}{\mathcal{U}}
+\newcommand{\id}{\textrm{id}}
+\newcommand{\refl}{\textrm{refl}}
+\newcommand{\ap}{\textrm{ap}}
+\newcommand{\apd}{\textrm{apd}}
+\newcommand{\pr}{\textrm{pr}}
+\newcommand{\tp}{\textrm{transport}}
+\newcommand{\qinv}{\textrm{qinv}}
+\newcommand{\iseq}{\textrm{isequiv}}
+\newcommand{\peq}{\textrm{pair}^=}
+\newcommand{\sig}[3]{\sum_{{#1} : {#2}} {#3}\ ({#1})}
+\newcommand{\0}{\textbf{0}}
+%\newcommand{\1}{\textbf{1}}
+%\newcommand{\2}{\textbf{2}}
+\newcommand{\fune}{\textrm{funext}}
+\newcommand{\happ}{\textrm{happly}}
+\newcommand{\ua}{\textrm{ua}}
+\newcommand{\ide}{\textrm{idtoequiv}}
+\newcommand{\set}[1]{\textrm{isSet({#1})}}
+\newcommand{\fib}{\textrm{fib}}
+\newcommand{\iscont}{\textrm{isContr}}
+\newcommand{\total}{\textrm{total}}
+\newcommand{\idtoeqv}{\textrm{idtoeqv}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\setcounter{tocdepth}{2}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+\title{$q$-類似のCoqによる形式化}
+\author{アドバイザー $\colon$ Jacques Garrigue教授\\
+           学籍番号 $\colon$ 322101289\\
+           氏名 $\colon$ 中村　薫}
+\date{\today}
+\maketitle
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{序文}
+\subsubsection*{主結果}
+本論文の主結果は, $q$-類似の初等的な結果をCoqによって形式化するものである. 
+形式化とは, 証明のために用意された人工言語に数学的な主張とその証明を翻訳し, 証明が論理学の推論規則に沿って正しく書かれていることをコンピュータを用いて機械的に検証することである.   また Coq はこの形式化を行うためのソフトウェアの一つであり, このようなソフトウェアを総称して定理証明支援系と呼ぶ.
+
+具体的な形式化の対象はVictor Kac, Pokman Cheungの{\it Quantum Calculus}\cite{Kac}の4章(4.1)式の$q$-Taylor 展開, 及びその系として得られる Gauss's binomial formula である. 
+本論文での$q$-類似に関する定義や定理, 証明は\cite{Kac}によるものだが, その形式化を行ったという点において独自性がある. 形式化したコード全体は\url{https://github.com/nakamurakaoru/q-analogue/tree/thesis}\cite{coq qana}にある. q\_analogue.v が\cite{Kac}の形式化をしたファイルであり, q\_tool.v は直接$q$-類似に関係はしないが, 形式化をするために自分で用意した補題をまとめたファイルである(どちらもテキストファイルである). 本論文の主目的である$q$-Taylor展開, Gauss's binomial formula はそれぞれ q\_analogue.v の1417行目, 1512行目にある. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection*{$q$-類似}
+$q$-類似は, 学部4年次に卒業研究のテーマとして扱ったものである. 初めは Euler の分割に登場し, その後 Gauss や Heine らによって超幾何関数の研究の中で進展していった. $q$-類似を系統的に発展させたのは Jackson であり, また$q$-積分の概念も彼によって導入された. 
+
+$q$-類似とは, 実数パラメータ$q$, 実数上の関数$f$に対して
+\[
+  D_q f(x) \coloneqq \frac{f(qx) - f(x)}{(q - 1) x}
+\]
+で定義される$q$-微分を出発点とし, この$q$-微分に対してうまく振る舞い, かつ$q$を極限で$1$に近づけると通常の定義に一致するように数学の諸概念を一般化するものである.
+例えば, 自然数$n$について$x^n$を定義に沿って$q$-微分すると, 
+\[
+  D_q x^n = \frac{(qx)^n - x^n}{(q - 1) x} = \frac{q^n - 1}{q - 1} x^{n - 1}
+\]
+となる. 通常の微分では, $(x^n)' = n x^{n - 1}$となることと比較して, $n$の$q$-類似$[n]$を
+\[
+  [n] = \frac{q^n - 1}{q - 1}
+\]
+と定める. また, $(x - a)^n$の$q$-類似は, 
+\[
+  (x - a)^n_q \coloneqq \begin{cases}
+                                  1 & (n = 0) \\
+                                  (x - a) (x - qa) \cdots (x - q^{n - 1} a) & (n \ge 1)
+                                \end{cases}
+\]
+と定義することで, $q$-微分と自然数の$q$-類似に対してうまく振る舞う, つまり
+\[
+  D_q (x - a)^n_q = [n](x - a)^{n - 1}_q
+\]
+が成り立つ. 更に, 階乗と二項係数の$q$-類似をそれぞれ
+\begin{align*}
+  [n]! &\coloneqq \begin{cases}
+                        1 & (n = 0)\\
+                        [n] \times [n   - 1] \cdots [1] & (n \ge 1)
+                      \end{cases}\\
+  \qcoe{n}{j} &\coloneqq \frac{[n]!}{[j]![n - j]!}
+\end{align*}
+で定めれば, $q$-Taylor展開, Gauss's binomial formula は以下のように書ける. 
+\begin{itembox}{$q$-Taylor展開}
+  $f(x)$を$N$次の実係数多項式とする. 任意の$c \in \R$について
+  \[
+    f(x) = \sum_{j = 0}^N (Dq^j f) (c) \frac{(x - c)^j_q}{[j]!}
+  \]
+  が成り立つ. 
+\end{itembox}
+\begin{itembox}{Gauss's binomial formula}
+  $x$, $a \in \R$, $n \in \Z_{>0}$について
+  \[
+    (x+a)^n_q = \sum_{j=0}^n \qcoe{n}{j} q^{\frac{j(j-1)}{2}} a^j x^{n-j}
+  \]
+  が成り立つ. 
+\end{itembox}
+この2つを形式化することが本論文の主目的である. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection*{Coq}
+Coqとは, 前述のとおり定理証明支援系の1つであり, 人間がチェックすることが難しい複雑な証明でも正しさが保証され, また証明付きプログラミングにも応用される. Mizar, Isabelle/HOL等他にも定理証明支援系は存在するが, 修士1年次後期に履修した授業でCoqの使い方を学んだため, 今回の形式化に利用した. 
+
+Coqは型付き$\lambda$計算という理論に基づいている. $\lambda$計算とは, 大まかにいえば計算の実行をモデル化したもので, Church によって考案された. その後, もともとは Russell のパラドクスを回避するために Russell 自身によって導入された型理論と結びついて型付き$\lambda$計算(こちらも Church によって考案された)として発展し, Martin-L\"{o}fによって直観主義型理論が開発され, 構成主義的な数学の基礎付けがなされた. 更により表現力の高い$\lambda$計算の研究が続けられ, Coquand と Huet の開発したCoC(Calculus of Constructions) と呼ばれる2階述語論理よりも表現力の高い型付き$\lambda$計算を用いてCoq が開発された. この CoC を用いていることから, Coq には補題とその証明を同じ言語で記述できるという特徴がある. また, 現在の Coq には Paulin-Mohring によって帰納的型を導入した$\lambda$計算である CIC (Calculus of Inductive Constructions)が用いられている. 
+
+$\lambda$計算については修士1年次に少人数クラスで学習した内容であるため, Coq との関係にも触れつつ本論文でも説明を加える. 更に, 型と形式化に関する数学の理論として, Homotopy Type Theory がある. これについては修士2年次に少人数クラスで学んだため, $q$-類似の形式化とは章を分け, 少人数クラスのまとめとして概要を述べる. 
+今回の証明に関しては, Coqの標準ライブラリ \cite{coq sl}に加えて, 数学の証明のために整備されたライブラリ群である mathcomp \cite{coq mc}も用いている. 
+Coqが用いられた有名な例として, 四色定理や Feit-Thompson の定理(奇数位数定理)などがあり, それらも mathcomp に基づいている. 
+
+実際に Coq で定義, 補題, 証明を表すコードは例えば以下のようなものである(\cite{coq qana} q\_analogue.v 16-25行目, ただし説明のためコードに変更を加えている).
+\begin{lstlisting}{Coq}
+Definition dq (f : R -> R) x := f (q * x) - f x.
+
+Lemma dq_prod f g x :
+  dq (f ** g) x = (f (q * x)) * dq g x + (g x) * dq f x.
+Proof.
+  rewrite /dq.
+  rewrite !mulrBr 
+  rewrite [g x * f (q * x)]mulrC
+  rewrite [g x * f x]mulrC
+  by rewrite subrKA.
+Qed. \end{lstlisting}
+基本的には{\tt Lemma}コマンドで証明したい補題の主張(を Coq にあわせて翻訳したもの)を書き, {\tt Proof}以下にタクティックとよばれる命令を書くことで証明を進め, 証明が完了したところで{\tt Qed}コマンドを書くというのが一連の流れである. {\tt Qed}コマンドは Coq にその補題を登録する機能があるため, 他の補題の証明に利用することができる. また, {\tt Definition}コマンドで自分で新しく関数を定義することができる. 
+
+上記の例について見てみると,  
+まず{\tt Definition}で {\tt dq}という名前の関数を定義している. {\tt $\coloneqq$}の左の{\tt f $\colon$ R $\to$ R}と{\tt x}は関数{\tt dq}の引数を表しており, $:=$の右側は関数の定義である. 
+これは, 通常の数学での
+\begin{screen}
+実数上の関数$f$と実数$x$に対して, 
+\[
+  d_q f (x) \coloneqq f(qx) - f(x)
+\]
+と定める. 
+\end{screen}
+という定義を形式化したものである. 
+
+次に{\tt Lemma}で補題の主張を書いている. {\tt dq\_prod}は補題の名前であり, 他の証明に用いる際に使えるように名前を付けている. {\tt $\colon$}の左側の{\tt f}, {\tt g}, {\tt x}がこの補題の引数であり, {\tt $\colon$}の右側が補題の主張である. この{\tt Lemma}は, 
+\begin{screen}
+関数$f$, $g$と$x \in \R$について, 
+\[
+  d_q (f(x)g(x)) = f(qx)d_qg(x) + g(x)d_qf(x)
+\]
+が成り立つ.
+\end{screen}
+という補題の形式化である. 
+更に, {\tt Proof}以下について, {\tt rewrite}とは等式変形を行う命令であり, {\tt rewrite /dq}であれば{\tt dq}を定義に基づいて計算していて, {\tt rewrite !mulrBr}であれば積と差についての分配法則をできる限り繰り返している. {\tt mulrC}は積の交換律のことで, 
+{\tt [g x * f (q * x)]mulrC}であれば{\tt g x * f (q * x)}を{\tt f (q * x) * g x}に, 
+{\tt [g x * f  x]mulrC}であれば{\tt g x * f x}を{\tt [f x * g x]}に書き換えている. 
+{\tt by rewrite subrKA}は同じものの引き算は$0$になるという書き換えをし, 更にその書き換えで証明が完了することを表している. 
+最後に{\tt Qed}と書くことで, {\tt dq\_prod}という補題を他の証明で使えるようになる. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection*{構成}
+最後に構成について述べる. 
+まず\ref{sec qana}節で$q$-類似の概要について説明し, 
+\ref{sec lambda}節で修士1年次に少人数クラスで学習したH.P.Barendregtの{\it Lambda Calculi with Types}\cite{Bar}に沿って, 型付き$\lambda$計算について述べる. 
+\ref{sec coq}節は Coq の概要についてで, 特に\ref{ssec coq_use}節でCoq や mathcompの使い方を具体例を交えて説明するが, より詳細な情報については萩原 学/アフェルト・レナルドの{\it Coq/SSReflect/Mathcomp}\cite{Hag}等を参照のこと. 
+これらの準備のもと, \ref{sec form}節から本題の形式化に入る. \cite{Kac}での定義, 定理を述べた後, その形式化を与え, 必要であれば形式化をするにあたっての注意点を述べることを繰り返すという流れである. 
+証明の方針等は基本的に\cite{Kac}の通りであるが, \ref{ssec poly}節では一部\cite{Kac}から離れ, 多項式として$q$-微分や$q$-二項式を定義しなおして形式化を行っている. これらの新たな定義が多項式に対してのもとの定義を適用したものと一致していることの証明も行っている. また, \ref{chap hott}章で修士2年次に少人数クラスで学習した内容についてまとめている. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{謝辞}
+形式化の方針やCoq の使い方等, 本論文の作成において終始熱心に指導してくださった, アドバイザーである Jacques Garrigue 教授に心からの感謝を申し上げます. 
+
+今回の形式化の題材に選んだ$q$-類似について指導してくださった学部4年次の指導教員である古庄英和教授に感謝の意を表します. 
+
+多元数理科学研究科研究員の才川隆文氏から数多くの的確な助言をいただきました. 感謝申し上げます. 
+
+最後に, 研究室の皆様には常に刺激的な議論とアドバイスを頂き, 精神的にも絶えず支えられていました. 本当にありがとうございます. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{thebibliography}{9}
+  \bibitem{Bar} Henk Barendregt, {\it Lambda Calculi with Types}.  
+    In S. Abramsky, Dov M. Gabbay, S. E. Maibaum, 
+    {\it Handbook of logic in computer science (vol. 2): background:
+     computational structures}, Oxford University Press, 1993.
+  \bibitem{coq sl} Coq Team, {\it The Coq Standard Library}, 
+  \url{https://coq.inria.fr/distrib/current/stdlib/}, 2023.
+  \bibitem{Hag} 萩原 学/アフェルト・レナルド, {\it Coq/SSReflect/Mathcomp}, 森北出版, 
+    2018.
+  \bibitem{Kac} Victor Kac, Pokman Cheung, {\it{Quantum Calculus}}, Springer, 2001.
+  \bibitem{coq mc} Mathematical Components Team, {\it Mathematical Components}, \url{https://github.com/math-comp/math-comp}, 2023.
+  \bibitem{coq ana} Mathematical Components Team, 
+  {\it Mathematical Components compliant Analysis Library}, 
+  \url{https://github.com/math-comp/analysis}, 2023.
+  \bibitem{coq qana} 中村 薫, {\it q-analogue}, \url{https://github.com/nakamurakaoru/q-analogue/tree/thesis}, 2023.
+%  \bibitem{coq poly} \url{https://github.com/math-comp/math-comp/blob/master/ 
+%                                 mathcomp/algebra/poly.v}
+  \bibitem{Ume} 梅村 浩, 『楕円関数論  楕円曲線の解析学』, 東京大学出版会, 2000.
+  \bibitem{hott} The Univalent Foundations Program, 
+                      {\it{Homotopy Type Theory: Univalent Foundations of Mathematics}}, 
+                      \url{https://homotopytypetheory.org/book}, 2013.
+\end{thebibliography}
+\end{document}
