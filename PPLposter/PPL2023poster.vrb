@@ -5,226 +5,219 @@
     \end{center}
   \end{screen}
 
-  \begin{columns}[T]
-    \begin{column}{0.33\columnwidth}
-      \begin{block}{Coqgen project とは}
-        \begin{itemize}
-          \item OCaml の型推論の正しさを Coq で確認することを目標とするプロジェクト.
-          \item 具体的には OCaml から Coq へのコンパイラの作成, およびコンパイル後のプログラムに関する証明を行っている.
-          \item 以下, Coqgen project で得られた成果の一部をまとめ, 説明する.
-        \end{itemize}
-      \end{block}
-      \begin{block}{モナド}
-        \begin{itemize}
-          \item OCaml における store や例外を Coq でも表現することができるようにモナドを利用する.
-          \item store を Env, 例外を Exn で表し, これらをまとめて次のようにモナドを定義する.
-        \end{itemize}
-        \begin{lstlisting}{coq}
-Definition M T := Env -> Env * (T + Exn).  \end{lstlisting}
-      \end{block}
-      \begin{block}{Type translation}
-        OCaml の型はデータ型として定義されていて, Coq に翻訳される.
-        \begin{lstlisting}{Coq}
-Fixpoint coq_type (T : ml_type) : Type := ...  \end{lstlisting}
-      \end{block}
-      \begin{block}{今までの Coqgen}
-        \begin{itemize}
-          \item core ML（$\lambda$計算 $+$ 多相型, 再帰関数, データ型）
-          \item 参照型, 例外
-          \item 変換の例
-        \end{itemize}
-        \begin{lstlisting}{Caml}
-let rec fact_rec n =
-  if n <= 1 then 1 else n * fact_rec (n - 1)  \end{lstlisting}
-        \begin{lstlisting}{Coq}
-Fixpoint fact_rec (h : nat) (n : coq_type ml_int) : M (coq_type ml_int) :=
-  if h is h.+1 then (* 停止性のためにガスを減らす *)
-    do v <- ml_le h ml_int n 1%int63;
-    if v then Ret 1%int63 else
-      do v <- fact_rec h (Int63.sub n 1%int63); Ret (Int63.mul n v)
-  else FailGas.  \end{lstlisting}
-      \end{block}
-      \begin{block}{while loop}
-        \begin{itemize}
-          \item OCaml のプログラム
-        \end{itemize}
-        \begin{lstlisting}{Caml}
-let fact n =
-  let i = ref n in let v = ref 1 in
-  while !i > 0 do v := !v * !i; i := !i - 1 done;  !v  \end{lstlisting}
-        \begin{itemize}
-          \item Coqgen のライブラリ
-        \end{itemize}
-          \begin{lstlisting}{Coq}
-Fixpoint whileloop (h : nat) (f : M bool) (b : M unit) : M unit :=
-  if h is h.+1 then
-    do v <- f; if v then (do _ <- b; whileloop h f b) else Ret tt
-  else FailGas.  \end{lstlisting}
-        \begin{itemize}
-          \item コンパイル結果
-        \end{itemize}
-        \begin{lstlisting}{Coq}
-Definition fact (h : nat) (n : coq_type ml_int) : M (coq_type ml_int) :=
-  do i <- newref ml_int n;
-  do v <- newref ml_int 1%int63;
-  do _ <-
-  whileloop h (do v_1 <- getref ml_int i; ml_gt h ml_int v_1 0%int63)
-    (do _ <-
-    (do v_1 <-
-      (do v_1 <- getref ml_int i;
-      do v_2 <- getref ml_int v; Ret (Int63.mul v_2 v_1));
-      setref ml_int v v_1);
-    do v_1 <- (do v_1 <- getref ml_int i; Ret (Int63.sub v_1 1%int63));
-    setref ml_int i v_1);
-  getref ml_int v.  \end{lstlisting}
-      \end{block}
-    \end{column}
+	\begin{columns}[T]
+		\begin{column}{0.33\columnwidth}
+			\begin{block}{目的}
+				$q$-類似の初等的な結果を Coq で形式化する.
+				具体的には以下の2つの等式の形式化を行う.
+				\begin{align*}
+					f(x) &= \sum_{j=0}^N (D_q^jf)(c)\frac{(x-c)^j_q}{[j]!} \\
+					(x + a)^n_q &= \sum_{j = 0}^n \qcoe{n}{j} q^{j (j - 1)/2} a^j x^{n - j}
+				\end{align*}
+			\end{block}
+			
+		\begin{block}{$q$-類似とは}
+			以下の2つの条件をみたす数学の諸概念の一般化
+			\begin{itemize}
+				\item $q \to 1$とすると通常の数学に一致する
+	          \item 実数パラメータ$q$, 実数上の関数$f$に対して
+					\[
+						D_q f(x) := \frac{f(qx) - f(x)}{(q - 1) x}
+					\]
+					で定義される$q$-微分に対してうまく振る舞う
+			\end{itemize}
+		\end{block}
 
-    \begin{column}{0.33\columnwidth}
-      \begin{block}{lazy}
-        \begin{itemize}
-          \item OCaml のプログラム
-        \end{itemize}
-        \begin{lstlisting}{Caml}
-let lazy_id = lazy (fun x -> x) (* 多相型  (`a -> `a)lazy_t *)
+		\begin{block}{$q$-微分}
+			以下, $q$を$1$でない実数とする.
+			\begin{itembox}{Definition \cite{Kac} p1 (1.1), p2 (1.5)}
+				関数$f : \R \to \R$に対して, $f(x)$の$q$差分$d_q f(x)$を,
+				\[
+					d_q f(x) := f (qx) - f(x)
+				\]
+				と定める. 更に, $f(x)$の$q$微分$D_q f(x)$を,
+	 			\[
+					D_q f(x) := \frac{d_q f(x)}{d_q x} = \frac{f(qx) - f(x)}{(q - 1) x}
+				\]
+				と定める.
+			\end{itembox}
+		\end{block}
 
-let lazy_next c = lazy (incr c; !c)
+		\begin{block}{自然数の$q$-類似}
+			$f(x) = x^n$を定義に沿って$q$-微分すると以下の通りである.
+			\[
+				D_q x^n = \frac{(qx)^n - x^n}{(q - 1) x}
+							= \frac{q^n - 1}{q - 1} x^{n - 1}
+			\]
+			通常の微分では, $(x^n)' = n x^{n - 1}$となることと比較して,
+			$n$の$q$-類似$[n]$を次のように定める(\cite{Kac} p2 (1.9)).
+			\[
+				[n] = \frac{q^n - 1}{q - 1} (= 1 + q + q^2 + \cdots q^{n - 1})
+			\]
+		\end{block}
 
-let c = ref 0 in let m = lazy_next c in let n = lazy_next c in
-let n = Lazy.force n in let m = Lazy.force m in [m; n]  \end{lstlisting}
+		\begin{block}{$(x - a)^n$の$q$-類似}
+			\begin{itembox}{Definition \cite{Kac} p8 Definition (3.4)}
+			$x$, $a \in \R$, $n \in \N$に対して, $(x - a)^n$の$q$-類似$(x - a)^n_q$を,
+			\[
+				(x - a)^n_q := \begin{cases}
+					1 & \text{if}\ n = 0 \\
+					(x - a) (x - qa) \cdots (x - q^{n - 1} a) & \text{if}\ n \ge 1
+				\end{cases}
+			\]
+			と定義する.
+			\end{itembox}
+			\begin{itembox}{Proposition}
+			$n\in\Z_{>0}$に対し,
+			\[
+				D_q(x-a)^n_q = [n](x-a)^{n-1}_q
+			\]
+			が成り立つ.
+			\end{itembox}
+		\end{block}
+	\end{column}
 
-\begin{itemize}
-  \item Coqgen のライブラリ
-\end{itemize}
-\begin{lstlisting}{Coq}
-Inductive lazy_val (a : Type) :=
-  LzVal of a | LzThunk of M a | LzExn of ml_exns.
-Inductive lazy_t a a1 := Lval of a | Lref of (loc (ml_lazy_val a1)).
+	\begin{column}{0.33\columnwidth}
+		\begin{block}{$q$-Taylor展開}
+			\begin{itembox}{Definition \cite{Kac} p7 (3.1)}
+				$n \in \N$について, 階乗の$q$-類似を以下のように定める.
+				\[
+					[n]! := \begin{cases}
+													1 & (n=0)\\
+													[n]\times[n-1]\times\cdots\times[1] & (n\ge1)
+												\end{cases}
+				\]
+			\end{itembox}
+			\begin{itembox}{Theorem \cite{Kac} p12 Theorem 4.1}
+				$f(x)$を, $N$次の実数係数多項式とする. 任意の$c\in\R$に対し,
+				\[
+					f(x) = \sum_{j=0}^N (D_q^jf)(c)\frac{(x-c)^j_q}{[j]!}
+				\]
+				が成り立つ.
+			\end{itembox}
+		\end{block}
 
-Definition force a (lz : coq_type (ml_lazy a)) : M (coq_type a) := ...
-Definition make_lazy a (b : M (coq_type a)) : M (coq_type (ml_lazy a)) :=
-  do x <- newref (ml_lazy_val a) (LzThunk _ b); Ret (Lref _ _ x).
-Definition make_lazy_val a (b : coq_type a) : coq_type (ml_lazy a) :=
-  Lval (coq_type a) a b.
-\end{lstlisting}
-        \begin{itemize}
-          \item コンパイル結果
-        \end{itemize}
-        \begin{lstlisting}{Coq}
-Definition lazy_id (T : ml_type) : coq_type (ml_lazy (ml_arrow T T)) :=
-  make_lazy_val (ml_arrow T T) (fun x : coq_type T => Ret x).  \end{lstlisting}
-        make\_lazy\_val を使うことで多相型にできる.
-        \begin{lstlisting}{Coq}
-Definition lazy_next (c : coq_type (ml_ref ml_int))
-  : M (coq_type (ml_lazy ml_int)) :=
-      make_lazy ml_int (do _ <- incr c; getref ml_int c).
+		\begin{block}{Gauss's binomial formula}
+			\begin{itembox}{Lemma \cite{Kac} p15 Example (5.5)}
+				$n \in \Z_{>0}$について,
+				\[
+					(x + a)^n_q = \sum_{j = 0}^n \qcoe{n}{j} q^{j (j - 1)/2} a^j x^{n - j}
+				\]
+				が成り立つ. この式は Gauss's binomial formula と呼ばれる.
+			\end{itembox}
+			\begin{itembox}{Definition \cite{Kac} p12 (4.5)}
+				$n \ge j$をみたす$n$, $j \in \N$について, 二項係数の$q$-類似を
+				以下のように定める.
+				\[
+					\qcoe{n}{j} := \frac{[n]!}{[j]![n - j]!}
+				\]
+			\end{itembox}
+		\end{block}
+		
+		\begin{block}{$q$-微分の形式化}
+			\begin{lstlisting}{Coq}
+Variables (R : rcfType) (q : R).
+Hypothesis Hq : q - 1 != 0.
 
-Definition it_2 := Eval compute in
-  Restart it_1
-    (do c <- newref ml_int 0%int63;
-     do m <- lazy_next c; do n <- lazy_next c;
-     do n_1 <- force ml_int n; do m_1 <- force ml_int m;
-     Ret (m_1 :: n_1 :: @nil (coq_type ml_int))).
-Print it_2.
-it_2 = (..., inl [:: 2%sint63; 1%sint63]) : Env * (seq int + Exn)  \end{lstlisting}
-force されて初めて計算が実行されるという lazy の性質が表現できている.
-      \end{block}
-      \begin{block}{insertion sort}
-        \begin{itemize}
-          \item OCaml のプログラム
-        \end{itemize}
-        \begin{lstlisting}{Caml}
-let rec insert a l =
-  match l with
-  | [] -> [a]
-  | b :: l' -> if a <= b then a :: l else b :: insert a l'
-let rec isort l =
-  match l with
-  | [] -> []
-  | a :: l' -> insert a (isort l')  \end{lstlisting}
-        \begin{itemize}
-          \item コンパイル結果
-        \end{itemize}
-        \begin{lstlisting}{Coq}
-Fixpoint insert (h : nat) (T_1 : ml_type) (a : coq_type T_1)
-  (l : coq_type (ml_list T_1)) : M (coq_type (ml_list T_1)) :=
-  if h is h.+1 then
-    match l with
-    | @nil _ => Ret (a :: @nil (coq_type T_1))
-    | b :: l' =>
-      do v <- ml_le h T_1 a b;
-      if v then Ret (a :: l) else
-        do v <- insert h T_1 a l'; Ret (@cons (coq_type T_1) b v)
-    end
-  else FailGas.  \end{lstlisting}
-      \end{block}
-    \end{column}
+Notation "f // g" := (fun x => f x / g x) (at level 40).
 
-    \begin{column}{0.33\columnwidth}
-      \begin{block}{insertion sort 続}
-        \begin{lstlisting}{Coq}
-Fixpoint isort (h : nat) (T_1 : ml_type) (l_1 : coq_type (ml_list T_1))
-  : M (coq_type (ml_list T_1)) :=
-  if h is h.+1 then
-    match l_1 with
-    | @nil _ => Ret (@nil (coq_type T_1))
-    | a :: l' => do v <- isort h T_1 l'; insert h T_1 a v
-    end
-  else FailGas.  \end{lstlisting}
-      \end{block}
-      \begin{block}{insertion sort の証明}
-          整列している状態 sorted の定義
-        \begin{lstlisting}{Coq}
-Fixpoint sorted l :=
-  if l is a :: l' then all (le a) l' && sorted l' else true.  \end{lstlisting}
-          示したいことは, isort で作られた列が上の意味で整列していることである.
-        \begin{lstlisting}{Coq}
-Theorem isort_ok h l l' : isort h ml_int l = Ret l' -> sorted l'.
+Definition dq (f : R -> R) x := f (q * x) - f x.
+Definition Dq f := dq f // dq id. \end{lstlisting}
+		\end{block}
+		
+		\begin{block}{$[n]$の形式化}
+			\begin{lstlisting}{Coq}
+Definition qnat n : R := (q ^ n - 1) / (q - 1).
+
+Lemma Dq_pow n x : x != 0 ->
+  Dq (fun x => x ^ n) x = qnat n * x ^ (n - 1).
 Proof.
-  elim: h l l' => [_ _ |h IH [|a l] l'] /(happly empty_env) //=.
-  - by move=> [] <-.
-  - destruct h => //.
-    case: (isort_pure h.+1 l) => -[l'' H].
-    + rewrite H bindretf.
-      case: (insert_pure h.+1 a l'') => -[l0 H'].
-      - rewrite H' => -[] <-.
-        by apply /(insert_ok H') /(IH l l'').
-      - by rewrite H'.
-    + by rewrite H bindfailf.
-Qed.  \end{lstlisting}
-補題の先頭の isort h ml\_int l = Ret l'は「計算が成功すれば」という条件である.
+  move=> Hx.
+  rewrite /Dq /dq /qnat.
+  rewrite -{4}(mul1r x) -mulrBl expfzMl -add_div;
+    last by apply mulf_neq0.
+  rewrite [in x ^ n](_ : n = (n -1) +1) //; last by rewrite subrK.
+  rewrite expfzDr ?expr1z ?mulrA -?mulNr ?red_frac_r ?add_div //.
+  rewrite -{2}[x ^ (n - 1)]mul1r -mulrBl mulrC mulrA.
+  by rewrite [in (q - 1)^-1 * (q ^ n - 1)] mulrC.
+Qed. \end{lstlisting}
+		\end{block}
+	\end{column}
 
-        証明中に使われている補題は以下のとおりである.
-        \begin{lstlisting}{Coq}
-Lemma happly [A B] [f g : A -> B] x : f = g -> f x = g x.
-Lemma bindretf A B (a : A) (f : A -> M B) : Ret a >>= f = f a.
-Lemma bindfailf A B e (g : A -> M B) : @Fail A e >>= g = @Fail B e.
+	\begin{column}{0.33\columnwidth}
+		\begin{block}{$(x - a)^n_q$の形式化}
+			\begin{lstlisting}{Coq}
+Fixpoint qbinom_pos a n x :=
+  match n with
+  | 0 => 1
+  | n0.+1 => (qbinom_pos a n0 x) * (x - q ^ n0 * a)
+  end.
 
-Definition pure [T] (m : M T) :=
-  (exists r, m = Ret r) \/ (exists e, m = Fail e).
-Lemma insert_pure h b l : pure (insert h ml_int b l).
-Lemma isort_pure h l : pure (isort h ml_int l).
-Lemma insert_ok h a l l' : insert h ml_int a l = Ret l' ->
-  sorted l -> sorted l'.  \end{lstlisting}
-      \end{block}
-      \begin{block}{直接 Coq に書く場合との違い}
-        コンパイルされたプログラムはモナドに覆われているため,
-        一般に証明は煩雑になる.
-        しかし, 上のような bindretf や insert\_pure などの
-        モナドに関する補題を用意しておくことで, 直接 Coq に書いた場合の
-        証明に近づけることができる.
+Theorem Dq_qbinom_pos a n x : x != 0 ->
+  Dq (qbinom_pos a n.+1) x = qnat n.+1 * qbinom_pos a n x. \end{lstlisting}
+		\end{block}
 
-        例えば, isort\_ok であれば, 直接書くと
-        \begin{lstlisting}{Coq}
-Theorem isort_ok l : sorted (isort l).
-Proof. elim: l => //= a l IH; by rewrite insert_ok. Qed.  \end{lstlisting}
-        となるが, モナドに関する部分を除けば本質が同じであることが見て取れる.
-        今後はさらに近づける方法を考えたい.
-      \end{block}
-        Coqgen に関する情報
-        \begin{center}
-        \url{https://github.com/COCTI/ocaml/pull/3}
-        \end{center}
-        本研究はTezos財団及びJSPS科研費JP22K11902の助成を受けたものです.
-    \end{column}
-  \end{columns}
+		\begin{block}{関数から多項式へ}
+			$x / x = 1$を計算するとき
+			\begin{itemize}
+				\item 実数 $\cdots$ $x \ne 0$が必要
+				\item 多項式 $\cdots$ $x$は単項式なので自動的に $x \ne 0$(ゼロ多項式)
+			\end{itemize}
+			$\to$多項式で考えれば約分した後でも$x = 0$での値が求められる.
+		\end{block}
+
+		\begin{block}{多項式での再定義}
+			$q$-差分
+			\begin{lstlisting}{Coq}
+Definition scale_var (p : {poly R}):=
+ \poly_(i < size p) (q ^ i * p`_i).
+Definition dqp p := scale_var p - p. \end{lstlisting}
+{\tt scale\_var} $\cdots$ $p \mapsto$ ($p$の$i$次の係数を$q^i$倍した多項式)
+
+			$q$-微分
+			\begin{lstlisting}{Coq}
+Definition Dqp p := dqp p %/ dqp 'X.
+Definition Dqp' (p : {poly R}) :=
+  \poly_(i < size p) (qnat (i.+1) * p`_i.+1). \end{lstlisting}
+
+			$(x - a)^n_q$
+			\begin{lstlisting}{Coq}
+Fixpoint qbinom_pos_poly a n :=
+  match n with
+  | 0 => 1
+  | n0.+1 => (qbinom_pos_poly a n0) * ('X - (q ^ n0 * a)%:P)
+  end. \end{lstlisting}
+		\end{block}
+
+		\begin{block}{$q$-Taylor展開の形式化}
+			\begin{lstlisting}{Coq}
+Fixpoint qfact n :=
+  match n with
+  | 0 => 1
+  | n0.+1 => qfact n0 * qnat n0.+1
+  end.
+
+Theorem q_Taylorp n (f : {poly R}) c :
+  (forall n, qfact n != 0) ->
+  size f = n.+1 ->
+  f = \sum_(0 <= i < n.+1)
+    ((Dqp' \^ i) f).[c] *: (qbinom_pos_poly c i / (qfact i)%:P).
+\end{lstlisting}
+		\end{block}
+		
+		\begin{block}{Gauss's binomial formula の形式化}
+			\begin{lstlisting}{Coq}
+Definition qbicoef n j := qfact n / (qfact j * qfact (n - j)).
+
+Theorem Gauss_binomial a n : (forall n, qfact n != 0) ->
+  qbinom_pos_poly (-a) n =
+    \sum_(0 <= i < n.+1)
+      (qbicoef n i * q ^+ (i * (i - 1))./2 * a ^+ i) *: 'X^(n - i). \end{lstlisting}
+		\end{block}
+
+		\begin{block}{参考文献}
+			[Kac] Victor Kac, Pokman Cheung, {\it{Quantum Calculus}}, Springer, 2001.
+		\end{block}
+			
+	\end{column}
+	\end{columns}
