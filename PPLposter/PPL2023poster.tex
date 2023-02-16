@@ -95,11 +95,11 @@
 		\begin{block}{$q$-微分}
 			以下, $q$を$1$でない実数とする.
 			\begin{itembox}{Definition \cite{Kac} p1 (1.1), p2 (1.5)}
-				関数$f : \R \to \R$に対して, $f(x)$の$q$差分$d_q f(x)$を, 
+				関数$f : \R \to \R$に対して, $f(x)$の$q$-差分$d_q f(x)$を, 
 				\[
 					d_q f(x) := f (qx) - f(x)
 				\]
-				と定める. 更に, $f(x)$の$q$微分$D_q f(x)$を, 
+				と定める. 更に, $f(x)$の$q$-微分$D_q f(x)$を, 
 	 			\[
 					D_q f(x) := \frac{d_q f(x)}{d_q x} = \frac{f(qx) - f(x)}{(q - 1) x}
 				\]
@@ -231,26 +231,26 @@ Theorem Dq_qbinom_pos a n x : x != 0 ->
 		\end{block}
 
 		\begin{block}{多項式での再定義}
-			$q$-差分
+			\begin{itemize}
+			\item $q$-差分
 			\begin{lstlisting}{Coq}
 Definition scale_var (p : {poly R}):=
  \poly_(i < size p) (q ^ i * p`_i).
 Definition dqp p := scale_var p - p. \end{lstlisting}
 {\tt scale\_var} $\cdots$ $p \mapsto$ ($p$の$i$次の係数を$q^i$倍した多項式)
-
-			$q$-微分
+			\item $q$-微分
 			\begin{lstlisting}{Coq}
 Definition Dqp p := dqp p %/ dqp 'X.
 Definition Dqp' (p : {poly R}) :=
   \poly_(i < size p) (qnat (i.+1) * p`_i.+1). \end{lstlisting}
-
-			$(x - a)^n_q$
+			\item $(x - a)^n_q$
 			\begin{lstlisting}{Coq}
 Fixpoint qbinom_pos_poly a n :=
   match n with
   | 0 => 1
   | n0.+1 => (qbinom_pos_poly a n0) * ('X - (q ^ n0 * a)%:P)
   end. \end{lstlisting}
+  			\end{itemize}
 		\end{block}
 
 		\begin{block}{$q$-Taylor展開の形式化}

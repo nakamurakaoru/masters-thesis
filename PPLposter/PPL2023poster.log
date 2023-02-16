@@ -1,4 +1,4 @@
-This is LuaTeX, Version 1.07.0 (TeX Live 2018/W32TeX)  (format=lualatex 2018.7.29)  14 FEB 2023 12:39
+This is LuaTeX, Version 1.07.0 (TeX Live 2018/W32TeX)  (format=lualatex 2018.7.29)  15 FEB 2023 12:12
  restricted system commands enabled.
 **PPL2023poster.tex
 (./PPL2023poster.tex
@@ -32,7 +32,7 @@ Inserting `luaotfload.aux.set_capheight' at position 3 in `luaotfload.patch_font
 '.
 Inserting `luaotfload.rewrite_fontname' at position 4 in `luaotfload.patch_font'
 .
-luaotfload | main : initialization completed in 9.635 seconds
+luaotfload | main : initialization completed in 9.894 seconds
 (c:/w32tex/share/texmf-dist/tex/latex/beamer/beamer.cls
 Document Class: beamer 2018/02/20 v3.50 A class for typesetting presentations
 (c:/w32tex/share/texmf-dist/tex/latex/beamer/beamerbasemodes.sty
@@ -1541,14 +1541,14 @@ LaTeX Warning: There were undefined references.
 
 Here is how much of LuaTeX's memory you used:
  25357 strings out of 494412
- 1164254,552014 words of node,token memory allocated
- 740956 words of node memory still in use:
-   3927 hlist, 170 vlist, 915 rule, 60 disc, 115 local_par, 262 math, 3402 glue,
- 1048 kern, 296 penalty, 2758 glyph, 293683 attribute, 348 glue_spec, 15685 attr
-ibute_list, 4 write, 3854 user_defined, 1667 pdf_literal, 840 pdf_colorstack nod
+ 1164251,552014 words of node,token memory allocated
+ 744394 words of node memory still in use:
+   3936 hlist, 170 vlist, 918 rule, 62 disc, 115 local_par, 262 math, 3422 glue,
+ 1051 kern, 302 penalty, 2762 glyph, 295111 attribute, 348 glue_spec, 15760 attr
+ibute_list, 4 write, 3866 user_defined, 1667 pdf_literal, 854 pdf_colorstack nod
 es
-   avail lists: 1:16,2:11628,3:4128,4:9705,5:1822,6:265,7:13130,8:1908,9:8396,10
-:32,11:124
+   avail lists: 1:13,2:11628,3:4140,4:9757,5:1828,6:265,7:13178,8:1914,9:8414,10
+:32,11:128
  28143 multiletter control sequences out of 65536+600000
  158 fonts using 48198935 bytes
  52i,21n,109p,824b,1452s stack positions out of 5000i,500n,10000p,500000b,100000s
@@ -1563,7 +1563,7 @@ cmmi12.pfb><c:/w32tex/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb>
 /share/texmf-dist/fonts/type1/public/amsfonts/latxfont/lcircle1.pfb><c:/w32tex/s
 hare/texmf-dist/fonts/type1/public/amsfonts/latxfont/lcirclew.pfb><c:/w32tex/sha
 re/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on PPL2023poster.pdf (1 page, 224248 bytes).
+Output written on PPL2023poster.pdf (1 page, 224456 bytes).
 
 PDF statistics: 119 PDF objects out of 1000 (max. 8388607)
  81 compressed objects within 1 object stream
