@@ -1,4 +1,4 @@
-This is e-pTeX, Version 3.14159265-p3.8.1-180518-2.6 (utf8.sjis) (TeX Live 2018/W32TeX) (preloaded format=platex 2018.7.29)  8 FEB 2023 14:42
+This is e-pTeX, Version 3.14159265-p3.8.1-180518-2.6 (utf8.sjis) (TeX Live 2018/W32TeX) (preloaded format=platex 2018.7.29)  20 FEB 2023 10:13
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -590,15 +590,13 @@ LaTeX Font Info:    Try loading font information for U+rsfs on input line 120.
 (c:/w32tex/share/texmf-dist/tex/latex/jknappen/ursfs.fd
 File: ursfs.fd 1998/03/24 rsfs font definition file (jk)
 )
-
-LaTeX Warning: No \author given.
-
 LaTeX Font Info:    Font shape `JT1/gt/m/n' will be
 (Font)              scaled to size 9.60999pt on input line 122.
 LaTeX Font Info:    Font shape `JY1/gt/m/n' will be
 (Font)              scaled to size 9.60999pt on input line 122.
 LaTeX Font Info:    Try loading font information for OT1+txss on input line 122
 .
+
 (c:/w32tex/share/texmf-dist/tex/latex/txr/ot1txss.fd
 File: ot1txss.fd 2000/12/15 v3.1
 )
@@ -623,10 +621,10 @@ LaTeX Font Info:    Font shape `JY1/mc/m/n' will be
 Here is how much of TeX's memory you used:
  7246 strings out of 493249
  90815 string characters out of 6146370
- 238495 words of memory out of 5000000
+ 237495 words of memory out of 5000000
  11053 multiletter control sequences out of 15000+600000
  33136 words of font info for 123 fonts, out of 8000000 for 9000
  934 hyphenation exceptions out of 8191
  35i,9n,58p,865b,287s stack positions out of 5000i,500n,10000p,500000b,80000s
 
-Output written on mastersthesis_abstract.dvi (2 pages, 11456 bytes).
+Output written on mastersthesis_abstract.dvi (2 pages, 11676 bytes).

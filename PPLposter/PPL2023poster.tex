@@ -62,22 +62,16 @@
 
 \begin{document}
 \begin{frame}[fragile]
-  \begin{screen}
     \begin{center}
       {\Huge $q$-類似の Coq による形式化} \\
       {\Large 中村薫} \qquad {\large 名古屋大学}
     \end{center}
-  \end{screen}
 
 	\begin{columns}[T]
 		\begin{column}{0.33\columnwidth}
 			\begin{block}{目的}
 				$q$-類似の初等的な結果を Coq で形式化する.
-				具体的には以下の2つの等式の形式化を行う. 
-				\begin{align*}
-					f(x) &= \sum_{j=0}^N (D_q^jf)(c)\frac{(x-c)^j_q}{[j]!} \\
-					(x + a)^n_q &= \sum_{j = 0}^n \qcoe{n}{j} q^{j (j - 1)/2} a^j x^{n - j}
-				\end{align*}
+				具体的にはTaylor展開の$q$-類似の形式化を行う. 
 			\end{block}
 			
 		\begin{block}{$q$-類似とは}
@@ -94,16 +88,13 @@
 
 		\begin{block}{$q$-微分}
 			以下, $q$を$1$でない実数とする.
-			\begin{itembox}{Definition \cite{Kac} p1 (1.1), p2 (1.5)}
-				関数$f : \R \to \R$に対して, $f(x)$の$q$-差分$d_q f(x)$を, 
+			\begin{itembox}{Definition [Kac] p1 (1.1), p2 (1.5)}
+				関数$f : \R \to \R$に対して, $f(x)$の$q$-差分$d_q f(x)$と$q$-微分$D_q f(x)$を
+				以下のように定める.  
 				\[
-					d_q f(x) := f (qx) - f(x)
+					d_q f(x) := f (qx) - f(x), \quad
+					D_q f(x) := \frac{d_q f(x)}{d_q x} = \frac{f(qx) - f(x)}{(q - 1) x}.
 				\]
-				と定める. 更に, $f(x)$の$q$-微分$D_q f(x)$を, 
-	 			\[
-					D_q f(x) := \frac{d_q f(x)}{d_q x} = \frac{f(qx) - f(x)}{(q - 1) x}
-				\]
-				と定める. 
 			\end{itembox}
 		\end{block}
    
@@ -114,14 +105,15 @@
 							= \frac{q^n - 1}{q - 1} x^{n - 1}
 			\]
 			通常の微分では, $(x^n)' = n x^{n - 1}$となることと比較して, 
-			$n$の$q$-類似$[n]$を次のように定める(\cite{Kac} p2 (1.9)).
+			$n$の$q$-類似$[n]$を次のように定める([Kac] p2 (1.9)).
 			\[
 				[n] = \frac{q^n - 1}{q - 1} (= 1 + q + q^2 + \cdots q^{n - 1})
 			\]
 		\end{block}
 
 		\begin{block}{$(x - a)^n$の$q$-類似}
-			\begin{itembox}{Definition \cite{Kac} p8 Definition (3.4)}
+			$D_q(x-a)^n_q = [n](x-a)^{n-1}_q$をみたすように$(x - a)^n_q$の$q$-類似を定める. 
+			\begin{itembox}{Definition [Kac] p8 Definition (3.4)}
 			$x$, $a \in \R$, $n \in \N$に対して, $(x - a)^n$の$q$-類似$(x - a)^n_q$を, 
 			\[
 				(x - a)^n_q := \begin{cases}
@@ -131,56 +123,54 @@
 			\]
 			と定義する.
 			\end{itembox}
-			\begin{itembox}{Proposition}
-			$n\in\Z_{>0}$に対し, 
-			\[
-				D_q(x-a)^n_q = [n](x-a)^{n-1}_q
-			\]
-			が成り立つ.
+%			\begin{itembox}{Proposition}
+%			$n\in\Z_{>0}$に対し, 
+%			\[
+%				D_q(x-a)^n_q = [n](x-a)^{n-1}_q
+%			\]
+%			が成り立つ.
+%			\end{itembox}
+		\end{block}
+		
+		\begin{block}{$q$-Taylor展開}
+%			\begin{itembox}{Definition [Kac] p7 (3.1)}
+%				$n \in \N$について, 階乗の$q$-類似を以下のように定める. 
+%				\[
+%					[n]! := \begin{cases}
+%													1 & (n=0)\\
+%													[n]\times[n-1]\times\cdots\times[1] & (n\ge1)
+%												\end{cases}
+%				\]
+%			\end{itembox}
+			\begin{itembox}{Theorem [Kac] p12 Theorem 4.1}
+				$f(x)$を, $N$次の実数係数多項式とする. 任意の$c\in\R$に対し, 
+				\[
+					f(x) = \sum_{j=0}^N (D_q^jf)(c)\frac{(x-c)^j_q}{[j]!}
+						\left( [n]! := \begin{cases}
+													1 & (n=0)\\
+													[n]\times[n-1]\times\cdots\times[1] & (n\ge1)
+												\end{cases}
+						\right)
+				\]
+				が成り立つ.
 			\end{itembox}
 		\end{block}
 	\end{column}
 
 	\begin{column}{0.33\columnwidth}
-		\begin{block}{$q$-Taylor展開}
-			\begin{itembox}{Definition \cite{Kac} p7 (3.1)}
-				$n \in \N$について, 階乗の$q$-類似を以下のように定める. 
-				\[
-					[n]! := \begin{cases}
-													1 & (n=0)\\
-													[n]\times[n-1]\times\cdots\times[1] & (n\ge1)
-												\end{cases}
-				\]
-			\end{itembox}
-			\begin{itembox}{Theorem \cite{Kac} p12 Theorem 4.1}
-				$f(x)$を, $N$次の実数係数多項式とする. 任意の$c\in\R$に対し, 
-				\[
-					f(x) = \sum_{j=0}^N (D_q^jf)(c)\frac{(x-c)^j_q}{[j]!}
-				\]
-				が成り立つ.
-			\end{itembox}
-		\end{block}
-      
-		\begin{block}{Gauss's binomial formula}
-			\begin{itembox}{Lemma \cite{Kac} p15 Example (5.5)}
-				$n \in \Z_{>0}$について, 
-				\[
-					(x + a)^n_q = \sum_{j = 0}^n \qcoe{n}{j} q^{j (j - 1)/2} a^j x^{n - j}
-				\]
-				が成り立つ. この式は Gauss's binomial formula と呼ばれる.
-			\end{itembox}
-			\begin{itembox}{Definition \cite{Kac} p12 (4.5)}
-				$n \ge j$をみたす$n$, $j \in \N$について, 二項係数の$q$-類似を
-				以下のように定める. 
-				\[
-					\qcoe{n}{j} := \frac{[n]!}{[j]![n - j]!}
-				\]
-			\end{itembox}
+		\begin{block}{mathcomp の構造}
+			実数として mathcomp の ssrnum で定義されている{\tt rcfType}を用いている. 
+			\begin{lstlisting}{Coq}
+Variables (R : rcfType) (q : R). \end{lstlisting}			
+			mathcomp の型には階層構造があり, より一般の型の構造を引き継ぐ. 
+			
+			{\tt rcfType}は特に{\tt ringType}と{fieldType}を引き継いでいることが重要. 
+			
+			$\to$用いる補題のほとんどが{\tt ringType}に対するもの
 		\end{block}
 		
 		\begin{block}{$q$-微分の形式化}
 			\begin{lstlisting}{Coq}
-Variables (R : rcfType) (q : R).
 Hypothesis Hq : q - 1 != 0.
 
 Notation "f // g" := (fun x => f x / g x) (at level 40).
@@ -206,9 +196,7 @@ Proof.
   by rewrite [in (q - 1)^-1 * (q ^ n - 1)] mulrC.
 Qed. \end{lstlisting}
 		\end{block}
-	\end{column}
-
-	\begin{column}{0.33\columnwidth}
+		
 		\begin{block}{$(x - a)^n_q$の形式化}
 			\begin{lstlisting}{Coq}
 Fixpoint qbinom_pos a n x :=
@@ -229,7 +217,14 @@ Theorem Dq_qbinom_pos a n x : x != 0 ->
 			\end{itemize}
 			$\to$多項式で考えれば約分した後でも$x = 0$での値が求められる.
 		\end{block}
+		
+		\begin{block}{mathcomp での多項式の構造}
+			一般に環上の多項式全体は環を成し, 加群の構造を持ち, 体上の多項式全体は
+			整域となるが, このことも mathcomp で形式化されている. 
+		\end{block}
+	\end{column}
 
+	\begin{column}{0.33\columnwidth}
 		\begin{block}{多項式での再定義}
 			\begin{itemize}
 			\item $q$-差分
@@ -237,12 +232,13 @@ Theorem Dq_qbinom_pos a n x : x != 0 ->
 Definition scale_var (p : {poly R}):=
  \poly_(i < size p) (q ^ i * p`_i).
 Definition dqp p := scale_var p - p. \end{lstlisting}
-{\tt scale\_var} $\cdots$ $p \mapsto$ ($p$の$i$次の係数を$q^i$倍した多項式)
+		{\tt scale\_var} $\cdots$ {\tt (scale\_var p).[x] = p.[qx]}
 			\item $q$-微分
 			\begin{lstlisting}{Coq}
 Definition Dqp p := dqp p %/ dqp 'X.
 Definition Dqp' (p : {poly R}) :=
   \poly_(i < size p) (qnat (i.+1) * p`_i.+1). \end{lstlisting}
+		{\tt Dqp'} $\cdots$ {\tt Dqp}を{\tt 'X}で約分した形
 			\item $(x - a)^n_q$
 			\begin{lstlisting}{Coq}
 Fixpoint qbinom_pos_poly a n :=
@@ -269,16 +265,6 @@ Theorem q_Taylorp n (f : {poly R}) c :
 \end{lstlisting}
 		\end{block}
 		
-		\begin{block}{Gauss's binomial formula の形式化}
-			\begin{lstlisting}{Coq}
-Definition qbicoef n j := qfact n / (qfact j * qfact (n - j)).
-
-Theorem Gauss_binomial a n : (forall n, qfact n != 0) ->
-  qbinom_pos_poly (-a) n =
-    \sum_(0 <= i < n.+1)
-      (qbicoef n i * q ^+ (i * (i - 1))./2 * a ^+ i) *: 'X^(n - i). \end{lstlisting}
-		\end{block}
-
 		\begin{block}{参考文献}
 			[Kac] Victor Kac, Pokman Cheung, {\it{Quantum Calculus}}, Springer, 2001.
 		\end{block}
