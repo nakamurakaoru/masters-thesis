@@ -69,9 +69,14 @@
 
 	\begin{columns}[T]
 		\begin{column}{0.33\columnwidth}
-			\begin{block}{目的}
-				$q$-類似の初等的な結果を Coq で形式化する.
-				具体的にはTaylor展開の$q$-類似の形式化を行う. 
+			\begin{block}{はじめに}
+				\begin{itemize}
+				\item $q$-類似の初等的な結果を Coq で形式化する. 
+				
+					$\to$具体的にはTaylor展開の$q$-類似の形式化が目標 
+				\item $q$-類似の定義, 定理, 証明は[Kac]による. 
+				\item 形式化には mathcomp を用いている. 
+				\end{itemize}
 			\end{block}
 			
 		\begin{block}{$q$-類似とは}
@@ -102,13 +107,18 @@
 			$f(x) = x^n$を定義に沿って$q$-微分すると以下の通りである. 
 			\[
 				D_q x^n = \frac{(qx)^n - x^n}{(q - 1) x}
-							= \frac{q^n - 1}{q - 1} x^{n - 1}
+								= \frac{q^n - 1}{q - 1} \cdot \frac{x^n}{x}
+								= \frac{q^n - 1}{q - 1} x^{n - 1}
 			\]
 			通常の微分では, $(x^n)' = n x^{n - 1}$となることと比較して, 
-			$n$の$q$-類似$[n]$を次のように定める([Kac] p2 (1.9)).
-			\[
-				[n] = \frac{q^n - 1}{q - 1} (= 1 + q + q^2 + \cdots q^{n - 1})
-			\]
+			自然数の$q$-類似を定める.
+			\begin{itembox}{Definition [Kac] p2 (1.9)}.
+				$n \in \N$について, $n$の$q$-類似$[n]$を
+				\[
+					[n] = \frac{q^n - 1}{q - 1} (= 1 + q + q^2 + \cdots q^{n - 1})
+				\]
+				と定義する. 
+			\end{itembox}
 		\end{block}
 
 		\begin{block}{$(x - a)^n$の$q$-類似}
@@ -123,25 +133,9 @@
 			\]
 			と定義する.
 			\end{itembox}
-%			\begin{itembox}{Proposition}
-%			$n\in\Z_{>0}$に対し, 
-%			\[
-%				D_q(x-a)^n_q = [n](x-a)^{n-1}_q
-%			\]
-%			が成り立つ.
-%			\end{itembox}
 		\end{block}
 		
 		\begin{block}{$q$-Taylor展開}
-%			\begin{itembox}{Definition [Kac] p7 (3.1)}
-%				$n \in \N$について, 階乗の$q$-類似を以下のように定める. 
-%				\[
-%					[n]! := \begin{cases}
-%													1 & (n=0)\\
-%													[n]\times[n-1]\times\cdots\times[1] & (n\ge1)
-%												\end{cases}
-%				\]
-%			\end{itembox}
 			\begin{itembox}{Theorem [Kac] p12 Theorem 4.1}
 				$f(x)$を, $N$次の実数係数多項式とする. 任意の$c\in\R$に対し, 
 				\[
@@ -164,7 +158,7 @@
 Variables (R : rcfType) (q : R). \end{lstlisting}			
 			mathcomp の型には階層構造があり, より一般の型の構造を引き継ぐ. 
 			
-			{\tt rcfType}は特に{\tt ringType}と{fieldType}を引き継いでいることが重要. 
+			{\tt rcfType}は特に{\tt ringType}を引き継いでいることが重要. 
 			
 			$\to$用いる補題のほとんどが{\tt ringType}に対するもの
 		\end{block}
@@ -172,9 +166,7 @@ Variables (R : rcfType) (q : R). \end{lstlisting}
 		\begin{block}{$q$-微分の形式化}
 			\begin{lstlisting}{Coq}
 Hypothesis Hq : q - 1 != 0.
-
 Notation "f // g" := (fun x => f x / g x) (at level 40).
-
 Definition dq (f : R -> R) x := f (q * x) - f x.
 Definition Dq f := dq f // dq id. \end{lstlisting}
 		\end{block}
@@ -182,14 +174,12 @@ Definition Dq f := dq f // dq id. \end{lstlisting}
 		\begin{block}{$[n]$の形式化}
 			\begin{lstlisting}{Coq}
 Definition qnat n : R := (q ^ n - 1) / (q - 1).
-
 Lemma Dq_pow n x : x != 0 ->
   Dq (fun x => x ^ n) x = qnat n * x ^ (n - 1).
 Proof.
   move=> Hx.
   rewrite /Dq /dq /qnat.
-  rewrite -{4}(mul1r x) -mulrBl expfzMl -add_div;
-    last by apply mulf_neq0.
+  rewrite -{4}(mul1r x) -mulrBl expfzMl -add_div; last by apply mulf_neq0.
   rewrite [in x ^ n](_ : n = (n -1) +1) //; last by rewrite subrK.
   rewrite expfzDr ?expr1z ?mulrA -?mulNr ?red_frac_r ?add_div //.
   rewrite -{2}[x ^ (n - 1)]mul1r -mulrBl mulrC mulrA.
@@ -204,7 +194,6 @@ Fixpoint qbinom_pos a n x :=
   | 0 => 1
   | n0.+1 => (qbinom_pos a n0 x) * (x - q ^ n0 * a)
   end. 
-  
 Theorem Dq_qbinom_pos a n x : x != 0 ->
   Dq (qbinom_pos a n.+1) x = qnat n.+1 * qbinom_pos a n x. \end{lstlisting}
 		\end{block}
@@ -219,8 +208,10 @@ Theorem Dq_qbinom_pos a n x : x != 0 ->
 		\end{block}
 		
 		\begin{block}{mathcomp での多項式の構造}
-			一般に環上の多項式全体は環を成し, 加群の構造を持ち, 体上の多項式全体は
-			整域となるが, このことも mathcomp で形式化されている. 
+			一般に環上の多項式全体は環を成し, 加群の構造を持つが, 
+			このことも mathcomp で形式化されている. 
+			
+			$\to${\tt ringType}の補題がそのまま使え, スカラー倍も定義できる. 
 		\end{block}
 	\end{column}
 
@@ -236,8 +227,7 @@ Definition dqp p := scale_var p - p. \end{lstlisting}
 			\item $q$-微分
 			\begin{lstlisting}{Coq}
 Definition Dqp p := dqp p %/ dqp 'X.
-Definition Dqp' (p : {poly R}) :=
-  \poly_(i < size p) (qnat (i.+1) * p`_i.+1). \end{lstlisting}
+\end{lstlisting}
 		{\tt Dqp'} $\cdots$ {\tt Dqp}を{\tt 'X}で約分した形
 			\item $(x - a)^n_q$
 			\begin{lstlisting}{Coq}
@@ -248,7 +238,48 @@ Fixpoint qbinom_pos_poly a n :=
   end. \end{lstlisting}
   			\end{itemize}
 		\end{block}
+%		
+%		\begin{block}{{\tt Dqp}が正しい割り算である保証}
+%			{\tt Dqp}の定義からは余りが$0$でない可能性がある.
+%			
+%			$\to$実際に計算すると{\tt dqp p}は定数項が打ち消しあい, 
+%			{\tt dqp 'X}は{\tt (q - 1) * 'X}となるので割り切れるはず. 
+%			\begin{lstlisting}{Coq}
+%Lemma Dqp_ok p : dqp 'X %| dqp p.
+%\end{lstlisting}
+%以下, {\tt Dqp}を{\tt 'X}で約分した形
+%			更に, 一般に体上の多項式全体は整域となるため, 商体を構成できる. 
+%			商体は mathcomp の fraction.v で形式化されている. 
+%			\begin{lstlisting}{Coq}
+%Import FracField.
+%
+%Local Notation tofrac := (@tofrac [idomainType of {poly R}]).
+%Local Notation "x %:F" := (tofrac x).
+%
+%Theorem Dqp_ok_frac p : (dqp p)%:F / (dqp 'X)%:F = (Dqp p)%:F.
+%\end{lstlisting}
+%		\end{block}
 
+		\begin{block}{各点での定義との関係}
+				\begin{lstlisting}{Coq}
+Definition ap_op_poly (D : (R -> R) -> (R -> R)) (p : {poly R}) :=
+  D (fun (x : R) => p.[x]).
+Notation "D # p" := (ap_op_poly D p) (at level 49).
+Lemma dqp_dqE p x : (dqp p).[x] = (dq # p) x. \end{lstlisting}
+				$\to${\tt p}に{\tt dqp}を適用した多項式の{\tt x}での値と
+				{\tt p \mapsto p.[x]}という関数に{\tt dq}を適用した関数の{\tt x}での値は等しい
+				\begin{lstlisting}{Coq}
+Lemma Dqp_Dqp'E p : Dqp p = Dqp' p.
+Lemma Dqp'_DqE p x : x != 0 -> (Dqp' p).[x] = (Dq # p) x. 
+
+Lemma qbinom_posE a n x :
+  qbinom_pos a n x = (qbinom_pos_poly a n).[x].
+  
+Lemma Dqp'_qbinom_poly a n :
+  Dqp' (qbinom_pos_poly a n.+1) = (qnat n.+1) *: (qbinom_pos_poly a n).
+\end{lstlisting}
+		\end{block}
+		
 		\begin{block}{$q$-Taylor展開の形式化}
 			\begin{lstlisting}{Coq}
 Fixpoint qfact n :=
@@ -256,7 +287,6 @@ Fixpoint qfact n :=
   | 0 => 1
   | n0.+1 => qfact n0 * qnat n0.+1
   end.
-
 Theorem q_Taylorp n (f : {poly R}) c :
   (forall n, qfact n != 0) ->
   size f = n.+1 ->
@@ -265,10 +295,29 @@ Theorem q_Taylorp n (f : {poly R}) c :
 \end{lstlisting}
 		\end{block}
 		
+		\begin{block}{今後の展望}
+		　現在開発中のライブラリ mathcomp analysis\cite{coq ana} の利用
+			\begin{itemize}
+				\item $q \to 1$で通常の数学に戻ることの形式化
+				\item 無限和に関する形式化
+				
+				$\to$Gauss's binomial formulaの拡張, 
+				$q$-指数関数, $q$-三角関数
+			\end{itemize}
+		\end{block}
+		
 		\begin{block}{参考文献}
 			[Kac] Victor Kac, Pokman Cheung, {\it{Quantum Calculus}}, Springer, 2001.
 		\end{block}
-			
+
+		形式化したコードは github で公開している. 
+		
+		\url{https://github.com/nakamurakaoru/q-analogue/tree/thesis}
+		
+		また, 名古屋大学での修士論文も本ポスターの内容についてである. 
+		
+		\url{https://github.com/nakamurakaoru/masters-thesis/tree/main}
+		
 	\end{column}
 	\end{columns}
 \end{frame}
