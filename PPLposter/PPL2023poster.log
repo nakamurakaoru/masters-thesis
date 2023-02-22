@@ -1,4 +1,4 @@
-This is LuaTeX, Version 1.07.0 (TeX Live 2018/W32TeX)  (format=lualatex 2018.7.29)  21 FEB 2023 17:09
+This is LuaTeX, Version 1.07.0 (TeX Live 2018/W32TeX)  (format=lualatex 2018.7.29)  22 FEB 2023 17:18
  restricted system commands enabled.
 **PPL2023poster.tex
 (./PPL2023poster.tex
@@ -32,7 +32,7 @@ Inserting `luaotfload.aux.set_capheight' at position 3 in `luaotfload.patch_font
 '.
 Inserting `luaotfload.rewrite_fontname' at position 4 in `luaotfload.patch_font'
 .
-luaotfload | main : initialization completed in 9.644 seconds
+luaotfload | main : initialization completed in 9.942 seconds
 (c:/w32tex/share/texmf-dist/tex/latex/beamer/beamer.cls
 Document Class: beamer 2018/02/20 v3.50 A class for typesetting presentations
 (c:/w32tex/share/texmf-dist/tex/latex/beamer/beamerbasemodes.sty
@@ -1409,25 +1409,25 @@ Removing  `ltj.listings_unicode' from `process_input_buffer'.
 Removing  `ltj.process_input_buffer' from `process_input_buffer'.
 Inserting `ltj.listings_unicode' at position 1 in `process_input_buffer'.
 Inserting `ltj.process_input_buffer' at position 2 in `process_input_buffer'.
-LaTeX Font Info:    Calculating math sizes for size <29.04> on input line 104.
+LaTeX Font Info:    Calculating math sizes for size <29.04> on input line 110.
 LaTeX Font Info:    Font shape `JY3/mc/m/n' will be
-(Font)              scaled to size 19.55989pt on input line 104.
+(Font)              scaled to size 19.55989pt on input line 110.
 LaTeX Font Info:    Font shape `JY3/mc/m/n' will be
-(Font)              scaled to size 13.9714pt on input line 104.
+(Font)              scaled to size 13.9714pt on input line 110.
 
 
 LaTeX Font Warning: Font shape `U/rsfs/m/n' in size <29.04> not available
-(Font)              size <24.88> substituted on input line 104.
+(Font)              size <24.88> substituted on input line 110.
 
 
 LaTeX Font Warning: Font shape `U/rsfs/m/n' in size <20.3279> not available
-(Font)              size <20.74> substituted on input line 104.
+(Font)              size <20.74> substituted on input line 110.
 
 Removing  `ltj.listings_unicode' from `process_input_buffer'.
 Removing  `ltj.process_input_buffer' from `process_input_buffer'.
 Inserting `ltj.listings_unicode' at position 1 in `process_input_buffer'.
 Inserting `ltj.process_input_buffer' at position 2 in `process_input_buffer'.
-Overfull \hbox (9.08618pt too wide) in paragraph at lines 118--119
+Overfull \hbox (9.08618pt too wide) in paragraph at lines 124--125
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][][][][][] 
  []
@@ -1460,46 +1460,36 @@ Removing  `ltj.listings_unicode' from `process_input_buffer'.
 Removing  `ltj.process_input_buffer' from `process_input_buffer'.
 Inserting `ltj.listings_unicode' at position 1 in `process_input_buffer'.
 Inserting `ltj.process_input_buffer' at position 2 in `process_input_buffer'.
-Removing  `ltj.listings_unicode' from `process_input_buffer'.(load luc: C:/w32te
-x/share/ctxdir/luatex-cache/generic/fonts/otl/lmsans10-bold.luc)
-LaTeX Font Info:    Font shape `JT3/mc/bx/n' in size <34.83> not available
-(Font)              Font shape `JT3/gt/m/n' tried instead on input line 235.
-LaTeX Font Info:    Font shape `JT3/gt/m/n' will be
-(Font)              scaled to size 33.51408pt on input line 235.
-(load luc: C:/w32tex/share/ctxdir/luatex-cache/generic/fonts/otl/ipaexg.luc)(loa
-d cache: C:/w32tex/share/ctxdir/luatexja/extra_ipaexgothic.luc)
-luaotfload | aux : font no 153 (nil) does not define feature vrt2 for script dfl
-t with language dflt
-luaotfload | aux : no font with id 153
-LaTeX Font Info:    Font shape `JY3/mc/bx/n' in size <34.83> not available
-(Font)              Font shape `JY3/gt/m/n' tried instead on input line 235.
-LaTeX Font Info:    Font shape `JY3/gt/m/n' will be
-(Font)              scaled to size 33.51408pt on input line 235.
-
-
-LaTeX Warning: Citation `coq ana' on page 1 undefined on input line 235.
-
+Removing  `ltj.listings_unicode' from `process_input_buffer'.
+Removing  `ltj.process_input_buffer' from `process_input_buffer'.
+Inserting `ltj.listings_unicode' at position 1 in `process_input_buffer'.
+Inserting `ltj.process_input_buffer' at position 2 in `process_input_buffer'.
+Removing  `ltj.listings_unicode' from `process_input_buffer'.
+Removing  `ltj.process_input_buffer' from `process_input_buffer'.
+Inserting `ltj.listings_unicode' at position 1 in `process_input_buffer'.
+Inserting `ltj.process_input_buffer' at position 2 in `process_input_buffer'.
+Removing  `ltj.listings_unicode' from `process_input_buffer'.
 LaTeX Font Info:    Font shape `TU/lmss/m/it' in size <34.83> not available
-(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 246.
+(Font)              Font shape `TU/lmss/m/sl' tried instead on input line 256.
 (load luc: C:/w32tex/share/ctxdir/luatex-cache/generic/fonts/otl/lmsans17-obliqu
 e.luc)
 
 LaTeX Font Warning: Font shape `JT3/mc/m/it' undefined
-(Font)              using `JT3/mc/m/n' instead on input line 246.
+(Font)              using `JT3/mc/m/n' instead on input line 256.
 
 
 LaTeX Font Warning: Font shape `JY3/mc/m/it' undefined
-(Font)              using `JY3/mc/m/n' instead on input line 246.
+(Font)              using `JY3/mc/m/n' instead on input line 256.
 
 )(load luc: C:/w32tex/share/ctxdir/luatex-cache/generic/fonts/otl/lmsans8-regula
 r.luc)
 LaTeX Font Info:    Font shape `JT3/mc/m/n' will be
-(Font)              scaled to size 3.84888pt on input line 323.
-luaotfload | aux : font no 157 (nil) does not define feature vrt2 for script dfl
+(Font)              scaled to size 3.84888pt on input line 333.
+luaotfload | aux : font no 164 (nil) does not define feature vrt2 for script dfl
 t with language dflt
-luaotfload | aux : no font with id 157
+luaotfload | aux : no font with id 164
 LaTeX Font Info:    Font shape `JY3/mc/m/n' will be
-(Font)              scaled to size 3.84888pt on input line 323.
+(Font)              scaled to size 3.84888pt on input line 333.
  [1
 
 ]
@@ -1512,11 +1502,11 @@ LaTeX Font Info:    Font shape `JY3/mc/m/n' will be
 \tf@snm=\write9
 
 \openout9 = PPL2023poster.snm
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 324.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 324.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 334.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 334.
  (./PPL2023poster.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 324.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 324.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 334.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 334.
 Package rerunfilecheck Info: File `PPL2023poster.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
 
@@ -1527,38 +1517,35 @@ LaTeX Font Warning: Size substitutions with differences
 
 LaTeX Font Warning: Some font shapes were not available, defaults substituted.
 
-
-LaTeX Warning: There were undefined references.
-
 )
 
 Here is how much of LuaTeX's memory you used:
- 25368 strings out of 494412
- 1164229,662416 words of node,token memory allocated
- 809896 words of node memory still in use:
-   3993 hlist, 123 vlist, 1150 rule, 64 disc, 125 local_par, 242 math, 3681 glue
-, 862 kern, 346 penalty, 3218 glyph, 322739 attribute, 326 glue_spec, 17172 attr
-ibute_list, 4 write, 3921 user_defined, 1885 pdf_literal, 2 pdf_start_link, 2 pd
-f_end_link, 2 pdf_action, 990 pdf_colorstack nodes
-   avail lists: 1:17,2:11628,3:4668,4:10139,5:1450,6:285,7:14568,8:2382,9:8434,1
-0:30,11:132
- 28154 multiletter control sequences out of 65536+600000
- 158 fonts using 48198935 bytes
+ 25392 strings out of 494412
+ 1164247,662416 words of node,token memory allocated
+ 836192 words of node memory still in use:
+   4002 hlist, 130 vlist, 1227 rule, 66 disc, 129 local_par, 264 math, 3871 glue
+, 861 kern, 362 penalty, 3460 glyph, 333175 attribute, 344 glue_spec, 17698 attr
+ibute_list, 4 write, 3907 user_defined, 1994 pdf_literal, 2 pdf_start_link, 2 pd
+f_end_link, 2 pdf_action, 986 pdf_colorstack nodes
+   avail lists: 1:14,2:11628,3:4918,4:10103,5:1448,6:293,7:15476,8:2536,9:8466,1
+0:29,11:136
+ 28168 multiletter control sequences out of 65536+600000
+ 168 fonts using 45908295 bytes
  52i,19n,109p,824b,1450s stack positions out of 5000i,500n,10000p,500000b,100000s
 <c:/w32tex/share/texmf-dist/fonts/opentype/public/lm/lmsans17-oblique.otf><c:/w3
-2tex/share/texmf-dist/fonts/opentype/public/lm/lmsans10-bold.otf><c:/w32tex/shar
-e/texmf-dist/fonts/opentype/public/lm/lmmono12-regular.otf><c:/w32tex/share/texm
-f-dist/fonts/truetype/ipa/ipaexm.ttf><c:/w32tex/share/texmf-dist/fonts/opentype/
-public/lm/lmsans17-regular.otf><c:/w32tex/share/texmf-dist/fonts/type1/public/am
-sfonts/cm/cmex10.pfb><c:/w32tex/share/texmf-dist/fonts/type1/public/amsfonts/cm/
-cmmi12.pfb><c:/w32tex/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb>
-<c:/w32tex/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb><c:/w32tex
-/share/texmf-dist/fonts/type1/public/amsfonts/latxfont/lcirclew.pfb><c:/w32tex/s
-hare/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on PPL2023poster.pdf (1 page, 241123 bytes).
+2tex/share/texmf-dist/fonts/opentype/public/lm/lmmono12-regular.otf><c:/w32tex/s
+hare/texmf-dist/fonts/truetype/ipa/ipaexm.ttf><c:/w32tex/share/texmf-dist/fonts/
+opentype/public/lm/lmsans17-regular.otf><c:/w32tex/share/texmf-dist/fonts/type1/
+public/amsfonts/cm/cmex10.pfb><c:/w32tex/share/texmf-dist/fonts/type1/public/ams
+fonts/cm/cmmi12.pfb><c:/w32tex/share/texmf-dist/fonts/type1/public/amsfonts/cm/c
+mr17.pfb><c:/w32tex/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb><
+c:/w32tex/share/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb><c:/w32tex/
+share/texmf-dist/fonts/type1/public/amsfonts/latxfont/lcirclew.pfb><c:/w32tex/sh
+are/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
+Output written on PPL2023poster.pdf (1 page, 250619 bytes).
 
-PDF statistics: 117 PDF objects out of 1000 (max. 8388607)
- 80 compressed objects within 1 object stream
+PDF statistics: 114 PDF objects out of 1000 (max. 8388607)
+ 79 compressed objects within 1 object stream
  3 named destinations out of 1000 (max. 131072)
  66 words of extra memory for PDF output out of 10000 (max. 100000000)
 

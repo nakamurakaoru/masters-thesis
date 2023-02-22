@@ -71,11 +71,11 @@
 		\begin{column}{0.33\columnwidth}
 			\begin{block}{はじめに}
 				\begin{itemize}
-				\item $q$-類似の初等的な結果を Coq で形式化する. 
+				\item $q$-類似の初等的な結果を Coq で形式化する 
 				
 					$\to$具体的にはTaylor展開の$q$-類似の形式化が目標 
-				\item $q$-類似の定義, 定理, 証明は[Kac]による. 
-				\item 形式化には mathcomp を用いている. 
+				\item $q$-類似の定義, 定理, 証明は[Kac]による
+				\item 形式化には mathcomp を用いている 
 				\end{itemize}
 			\end{block}
 			
@@ -150,15 +150,21 @@
 			\end{itembox}
 		\end{block}
 	\end{column}
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	\begin{column}{0.33\columnwidth}
 		\begin{block}{mathcomp の構造}
-			実数として mathcomp の ssrnum で定義されている{\tt rcfType}を用いている. 
+			実数として mathcomp の ssrnum で定義されている{\tt rcfType}を用いている
 			\begin{lstlisting}{Coq}
 Variables (R : rcfType) (q : R). \end{lstlisting}			
-			mathcomp の型には階層構造があり, より一般の型の構造を引き継ぐ. 
-			
-			{\tt rcfType}は特に{\tt ringType}を引き継いでいることが重要. 
+			mathcomp の型には階層構造があり, より一般の型の構造を引き継ぐ
+			\begin{align*}
+  			{\tt eqType} &\to {\tt choiceType} \\
+                   &\to {\tt zmodType} \to {\tt ringType} \to 
+                          {\tt comRingType} \to {\tt comUnitRingType} \\
+						&\to {\tt idomainType} \to {\tt fieldType}\\
+                   &\to {\tt numFieldType} \to {\tt realFieldType} \to {\tt rcfType}
+			\end{align*}
+			{\tt rcfType}は特に{\tt ringType}を引き継いでいることが重要
 			
 			$\to$用いる補題のほとんどが{\tt ringType}に対するもの
 		\end{block}
@@ -208,13 +214,20 @@ Theorem Dq_qbinom_pos a n x : x != 0 ->
 		\end{block}
 		
 		\begin{block}{mathcomp での多項式の構造}
-			一般に環上の多項式全体は環を成し, 加群の構造を持つが, 
-			このことも mathcomp で形式化されている. 
+			環上の多項式全体は環を成し, 加群の構造を持つ.
 			
-			$\to${\tt ringType}の補題がそのまま使え, スカラー倍も定義できる. 
+			このことは mathcomp の poly.v で形式化されている.
+			\begin{lstlisting}{Coq}
+poly : forall R : ringType, nat -> (nat -> R) -> {poly R} \end{lstlisting}			
+			$\to${\tt ringType}の補題がそのまま使え, スカラー倍も扱える. 
+			
+			整域上の多項式では割り算ができる(mathcomp の polydiv.v).
+			\begin{lstlisting}{Coq}
+divp : forall R : idomainType, {poly R} -> {poly R} -> {poly R} \end{lstlisting}
+			$\to${\tt divp}は多項式の割り算なので, 余りが$0$でない可能性がある. 
 		\end{block}
 	\end{column}
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	\begin{column}{0.33\columnwidth}
 		\begin{block}{多項式での再定義}
 			\begin{itemize}
@@ -238,8 +251,8 @@ Fixpoint qbinom_pos_poly a n :=
   end. \end{lstlisting}
   			\end{itemize}
 		\end{block}
-%		
-%		\begin{block}{{\tt Dqp}が正しい割り算である保証}
+		
+		\begin{block}{{\tt Dqp}が正しい割り算である保証}
 %			{\tt Dqp}の定義からは余りが$0$でない可能性がある.
 %			
 %			$\to$実際に計算すると{\tt dqp p}は定数項が打ち消しあい, 
@@ -247,34 +260,32 @@ Fixpoint qbinom_pos_poly a n :=
 %			\begin{lstlisting}{Coq}
 %Lemma Dqp_ok p : dqp 'X %| dqp p.
 %\end{lstlisting}
-%以下, {\tt Dqp}を{\tt 'X}で約分した形
-%			更に, 一般に体上の多項式全体は整域となるため, 商体を構成できる. 
-%			商体は mathcomp の fraction.v で形式化されている. 
-%			\begin{lstlisting}{Coq}
-%Import FracField.
-%
-%Local Notation tofrac := (@tofrac [idomainType of {poly R}]).
-%Local Notation "x %:F" := (tofrac x).
-%
-%Theorem Dqp_ok_frac p : (dqp p)%:F / (dqp 'X)%:F = (Dqp p)%:F.
-%\end{lstlisting}
-%		\end{block}
+			整域上の多項式全体は整域となるため, 商体を構成できる
+			
+			商体は mathcomp の fraction.v で形式化されている. 
+			\begin{lstlisting}{Coq}
+Local Notation tofrac := (@tofrac [idomainType of {poly R}]).
+Local Notation "x %:F" := (tofrac x).
+
+Theorem Dqp_ok_frac p : (dqp p)%:F / (dqp 'X)%:F = (Dqp p)%:F.
+\end{lstlisting}
+		\end{block}
 
 		\begin{block}{各点での定義との関係}
+			多項式として定義し直した{\tt Dqp'}, {\tt qbinom\_pos\_poly}も期待通り振る舞う.
+%				\begin{lstlisting}{Coq}
+%Definition ap_op_poly (D : (R -> R) -> (R -> R)) (p : {poly R}) :=
+%  D (fun (x : R) => p.[x]).
+%Notation "D # p" := (ap_op_poly D p) (at level 49).
+%Lemma dqp_dqE p x : (dqp p).[x] = (dq # p) x. \end{lstlisting}
+%				$\to${\tt p}に{\tt dqp}を適用した多項式の{\tt x}での値と
+%				{\tt p \mapsto p.[x]}という関数に{\tt dq}を適用した関数の{\tt x}での値は等しい
+%				\begin{lstlisting}{Coq}
+%Lemma Dqp_Dqp'E p : Dqp p = Dqp' p.
+%Lemma Dqp'_DqE p x : x != 0 -> (Dqp' p).[x] = (Dq # p) x. 
 				\begin{lstlisting}{Coq}
-Definition ap_op_poly (D : (R -> R) -> (R -> R)) (p : {poly R}) :=
-  D (fun (x : R) => p.[x]).
-Notation "D # p" := (ap_op_poly D p) (at level 49).
-Lemma dqp_dqE p x : (dqp p).[x] = (dq # p) x. \end{lstlisting}
-				$\to${\tt p}に{\tt dqp}を適用した多項式の{\tt x}での値と
-				{\tt p \mapsto p.[x]}という関数に{\tt dq}を適用した関数の{\tt x}での値は等しい
-				\begin{lstlisting}{Coq}
-Lemma Dqp_Dqp'E p : Dqp p = Dqp' p.
-Lemma Dqp'_DqE p x : x != 0 -> (Dqp' p).[x] = (Dq # p) x. 
-
 Lemma qbinom_posE a n x :
   qbinom_pos a n x = (qbinom_pos_poly a n).[x].
-  
 Lemma Dqp'_qbinom_poly a n :
   Dqp' (qbinom_pos_poly a n.+1) = (qnat n.+1) *: (qbinom_pos_poly a n).
 \end{lstlisting}
@@ -296,13 +307,12 @@ Theorem q_Taylorp n (f : {poly R}) c :
 		\end{block}
 		
 		\begin{block}{今後の展望}
-		　現在開発中のライブラリ mathcomp analysis\cite{coq ana} の利用
+			現在開発中のライブラリ mathcomp analysis の利用
 			\begin{itemize}
 				\item $q \to 1$で通常の数学に戻ることの形式化
 				\item 無限和に関する形式化
 				
-				$\to$Gauss's binomial formulaの拡張, 
-				$q$-指数関数, $q$-三角関数
+				$\to$$q$-Taylor展開の無限次への拡張, $q$-指数関数, $q$-三角関数
 			\end{itemize}
 		\end{block}
 		
